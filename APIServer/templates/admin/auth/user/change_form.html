@@ -1,0 +1,83 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block after_field_sets %}
+{{ block.super }}
+{% if api_keys %}
+<fieldset class="module aligned">
+    <h2>API Keys</h2>
+    <div class="form-row">
+        <div>
+            <style>
+    .api-key-grid {
+        display: grid;
+        grid-template-columns: 200px minmax(300px, 1fr) 120px;
+        gap: 16px;
+        width: 100%;
+        border: 1px solid #eee;
+    }
+    .api-key-grid .header {
+        font-weight: bold;
+        background-color: #f8f8f8;
+        padding: 8px;
+        border-bottom: 2px solid #eee;
+    }
+    .api-key-grid .cell {
+        padding: 8px;
+        align-self: center;
+    }
+    .api-key-grid .key-cell {
+        font-family: monospace;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .api-key-button {
+        background: #fff;
+        border: 1px solid #ccc;
+        padding: 4px 8px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .api-key-button:hover {
+        background: #f0f0f0;
+    }
+</style>
+
+<div class="api-key-grid">
+    <div class="header">Name</div>
+    <div class="header">Key</div>
+    <div class="header">Action</div>
+    
+    {% for key in api_keys %}
+    <div class="cell">{{ key.name }}</div>
+    <div class="cell key-cell">
+        <span id="key_{{ forloop.counter }}" style="display: none;">{{ key.key }}</span>
+        <span id="placeholder_{{ forloop.counter }}">*************************************************</span>
+    </div>
+    <div class="cell">
+        <button type="button" onclick="toggleKey({{ forloop.counter }})" class="api-key-button">
+            👁️ Show/Hide
+        </button>
+    </div>
+    {% endfor %}
+</div>
+        </div>
+    </div>
+</fieldset>
+
+<script>
+function toggleKey(index) {
+    var keySpan = document.getElementById('key_' + index);
+    var placeholder = document.getElementById('placeholder_' + index);
+    if (keySpan.style.display === 'none') {
+        keySpan.style.display = 'inline';
+        placeholder.style.display = 'none';
+    } else {
+        keySpan.style.display = 'none';
+        placeholder.style.display = 'inline';
+    }
+}
+</script>
+{% endif %}
+{% endblock %}

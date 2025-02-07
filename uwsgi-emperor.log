@@ -1,0 +1,722 @@
+*** Starting uWSGI 2.0.28 (64bit) on [Mon Feb  3 16:40:29 2025] ***
+compiled with version: 11.4.0 on 03 February 2025 10:30:26
+os: Linux-6.9.3-76060903-generic #202405300957~1736980680~22.04~44ea8a9 SMP PREEMPT_DYNAMIC Thu J
+nodename: pop-os
+machine: x86_64
+clock source: unix
+pcre jit disabled
+detected number of CPU cores: 8
+current working directory: /var/www/html/djangovuer/vassals
+detected binary path: /var/www/html/djangovuer/apienv/bin/uwsgi
+chdir() to /var/www/html/djangovuer
+your processes number limit is 94924
+your memory page size is 4096 bytes
+detected max file descriptor number: 8192
+lock engine: pthread robust mutexes
+thunder lock: disabled (you can enable it with --thunder-lock)
+uWSGI http bound on :8001 fd 3
+uwsgi socket 0 bound to UNIX address /var/www/html/djangovuer/uwsgi.sock fd 7
+Python version: 3.10.12 (main, Jan 17 2025, 14:35:34) [GCC 11.4.0]
+PEP 405 virtualenv detected: /var/www/html/djangovuer/apienv
+Set PythonHome to /var/www/html/djangovuer/apienv
+Python main interpreter initialized at 0x644b535a4e40
+python threads support enabled
+your server socket listen backlog is limited to 100 connections
+your mercy for graceful operations on workers is 60 seconds
+mapped 364600 bytes (356 KB) for 4 cores
+*** Operational MODE: preforking ***
+WSGI app 0 (mountpoint='') ready in 0 seconds on interpreter 0x644b535a4e40 pid: 91343 (default app)
+*** uWSGI is running in multiple interpreter mode ***
+spawned uWSGI master process (pid: 91343)
+spawned uWSGI worker 1 (pid: 91345, cores: 1)
+spawned uWSGI worker 2 (pid: 91346, cores: 1)
+spawned uWSGI worker 3 (pid: 91347, cores: 1)
+spawned uWSGI worker 4 (pid: 91348, cores: 1)
+spawned uWSGI http 1 (pid: 91349)
+Not Found: /
+[pid: 91347|app: 0|req: 1/1] 127.0.0.1 () {60 vars in 1099 bytes} [Mon Feb  3 11:10:36 2025] GET / => generated 2307 bytes in 34 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+announcing my loyalty to the Emperor...
+Not Found: /
+[pid: 91347|app: 0|req: 2/2] 127.0.0.1 () {60 vars in 1099 bytes} [Mon Feb  3 11:10:36 2025] GET / => generated 2307 bytes in 4 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /
+[pid: 91348|app: 0|req: 1/3] 127.0.0.1 () {60 vars in 1099 bytes} [Mon Feb  3 11:10:36 2025] GET / => generated 2307 bytes in 40 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+announcing my loyalty to the Emperor...
+Not Found: /favicon.ico
+[pid: 91347|app: 0|req: 3/4] 127.0.0.1 () {58 vars in 1032 bytes} [Mon Feb  3 11:10:37 2025] GET /favicon.ico => generated 2358 bytes in 6 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /
+[pid: 91348|app: 0|req: 2/5] 127.0.0.1 () {40 vars in 677 bytes} [Mon Feb  3 11:10:42 2025] GET / => generated 2305 bytes in 3 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /favicon.ico
+[pid: 91348|app: 0|req: 3/6] 127.0.0.1 () {40 vars in 629 bytes} [Mon Feb  3 11:10:43 2025] GET /favicon.ico => generated 2356 bytes in 4 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+SIGINT/SIGTERM received...killing workers...
+gateway "uWSGI http 1" has been buried (pid: 91349)
+Mon Feb  3 11:11:26 2025 - received message 0 from emperor
+worker 1 buried after 0 seconds
+worker 2 buried after 0 seconds
+worker 3 buried after 0 seconds
+worker 4 buried after 0 seconds
+goodbye to uWSGI.
+VACUUM: unix socket /var/www/html/djangovuer/uwsgi.sock removed.
+*** Starting uWSGI 2.0.28 (64bit) on [Mon Feb  3 16:42:04 2025] ***
+compiled with version: 11.4.0 on 03 February 2025 10:30:26
+os: Linux-6.9.3-76060903-generic #202405300957~1736980680~22.04~44ea8a9 SMP PREEMPT_DYNAMIC Thu J
+nodename: pop-os
+machine: x86_64
+clock source: unix
+pcre jit disabled
+detected number of CPU cores: 8
+current working directory: /var/www/html/djangovuer/vassals
+detected binary path: /var/www/html/djangovuer/apienv/bin/uwsgi
+chdir() to /var/www/html/djangovuer
+your processes number limit is 94924
+your memory page size is 4096 bytes
+detected max file descriptor number: 8192
+lock engine: pthread robust mutexes
+thunder lock: disabled (you can enable it with --thunder-lock)
+uWSGI http bound on :8001 fd 3
+uwsgi socket 0 bound to UNIX address /var/www/html/djangovuer/uwsgi.sock fd 7
+Python version: 3.10.12 (main, Jan 17 2025, 14:35:34) [GCC 11.4.0]
+PEP 405 virtualenv detected: /var/www/html/djangovuer/apienv
+Set PythonHome to /var/www/html/djangovuer/apienv
+Python main interpreter initialized at 0x62763636ee40
+python threads support enabled
+your server socket listen backlog is limited to 100 connections
+your mercy for graceful operations on workers is 60 seconds
+mapped 364600 bytes (356 KB) for 4 cores
+*** Operational MODE: preforking ***
+WSGI app 0 (mountpoint='') ready in 0 seconds on interpreter 0x62763636ee40 pid: 92464 (default app)
+*** uWSGI is running in multiple interpreter mode ***
+spawned uWSGI master process (pid: 92464)
+spawned uWSGI worker 1 (pid: 92467, cores: 1)
+spawned uWSGI worker 2 (pid: 92468, cores: 1)
+spawned uWSGI worker 3 (pid: 92469, cores: 1)
+spawned uWSGI worker 4 (pid: 92470, cores: 1)
+spawned uWSGI http 1 (pid: 92471)
+SIGINT/SIGTERM received...killing workers...
+gateway "uWSGI http 1" has been buried (pid: 92471)
+Mon Feb  3 11:12:07 2025 - received message 0 from emperor
+worker 1 buried after 1 seconds
+worker 2 buried after 1 seconds
+worker 3 buried after 1 seconds
+worker 4 buried after 1 seconds
+goodbye to uWSGI.
+VACUUM: unix socket /var/www/html/djangovuer/uwsgi.sock removed.
+*** Starting uWSGI 2.0.28 (64bit) on [Mon Feb  3 16:43:09 2025] ***
+compiled with version: 11.4.0 on 03 February 2025 10:30:26
+os: Linux-6.9.3-76060903-generic #202405300957~1736980680~22.04~44ea8a9 SMP PREEMPT_DYNAMIC Thu J
+nodename: pop-os
+machine: x86_64
+clock source: unix
+pcre jit disabled
+detected number of CPU cores: 8
+current working directory: /var/www/html/djangovuer/vassals
+detected binary path: /var/www/html/djangovuer/apienv/bin/uwsgi
+chdir() to /var/www/html/djangovuer
+your processes number limit is 94924
+your memory page size is 4096 bytes
+detected max file descriptor number: 1024
+lock engine: pthread robust mutexes
+thunder lock: disabled (you can enable it with --thunder-lock)
+uWSGI http bound on :8001 fd 3
+uwsgi socket 0 bound to UNIX address /var/www/html/djangovuer/uwsgi.sock fd 7
+Python version: 3.10.12 (main, Jan 17 2025, 14:35:34) [GCC 11.4.0]
+PEP 405 virtualenv detected: /var/www/html/djangovuer/apienv
+Set PythonHome to /var/www/html/djangovuer/apienv
+Python main interpreter initialized at 0x6234e1a17650
+python threads support enabled
+your server socket listen backlog is limited to 100 connections
+your mercy for graceful operations on workers is 60 seconds
+mapped 364600 bytes (356 KB) for 4 cores
+*** Operational MODE: preforking ***
+WSGI app 0 (mountpoint='') ready in 1 seconds on interpreter 0x6234e1a17650 pid: 93017 (default app)
+*** uWSGI is running in multiple interpreter mode ***
+spawned uWSGI master process (pid: 93017)
+spawned uWSGI worker 1 (pid: 93071, cores: 1)
+spawned uWSGI worker 2 (pid: 93072, cores: 1)
+spawned uWSGI worker 3 (pid: 93073, cores: 1)
+spawned uWSGI worker 4 (pid: 93074, cores: 1)
+spawned uWSGI http 1 (pid: 93075)
+Not Found: /
+[pid: 93074|app: 0|req: 1/1] 127.0.0.1 () {44 vars in 730 bytes} [Mon Feb  3 11:13:26 2025] GET / => generated 2305 bytes in 38 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+announcing my loyalty to the Emperor...
+Not Found: /favicon.ico
+[pid: 93072|app: 0|req: 1/2] 127.0.0.1 () {44 vars in 682 bytes} [Mon Feb  3 11:13:26 2025] GET /favicon.ico => generated 2356 bytes in 45 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+announcing my loyalty to the Emperor...
+Not Found: /
+[pid: 93073|app: 0|req: 1/3] 127.0.0.1 () {44 vars in 730 bytes} [Mon Feb  3 11:13:26 2025] GET / => generated 2305 bytes in 45 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+announcing my loyalty to the Emperor...
+Not Found: /favicon.ico
+[pid: 93073|app: 0|req: 2/4] 127.0.0.1 () {44 vars in 682 bytes} [Mon Feb  3 11:13:26 2025] GET /favicon.ico => generated 2356 bytes in 6 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /
+[pid: 93074|app: 0|req: 2/5] 127.0.0.1 () {44 vars in 730 bytes} [Mon Feb  3 11:13:26 2025] GET / => generated 2305 bytes in 5 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /
+[pid: 93074|app: 0|req: 3/6] 127.0.0.1 () {64 vars in 1154 bytes} [Mon Feb  3 11:13:28 2025] GET / => generated 2307 bytes in 3 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /favicon.ico
+[pid: 93073|app: 0|req: 3/7] 127.0.0.1 () {62 vars in 1086 bytes} [Mon Feb  3 11:13:28 2025] GET /favicon.ico => generated 2358 bytes in 4 msecs (HTTP/1.1 404) 6 headers in 215 bytes (2 switches on core 0)
+Not Found: /
+[pid: 93072|app: 0|req: 2/8] 127.0.0.1 () {64 vars in 1154 bytes} [Mon Feb  3 11:13:29 2025] GET / => generated 2307 bytes in 3 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /
+[pid: 93074|app: 0|req: 4/9] 127.0.0.1 () {64 vars in 1154 bytes} [Mon Feb  3 11:13:29 2025] GET / => generated 2307 bytes in 3 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /favicon.ico
+[pid: 93074|app: 0|req: 5/10] 127.0.0.1 () {62 vars in 1086 bytes} [Mon Feb  3 11:13:29 2025] GET /favicon.ico => generated 2358 bytes in 4 msecs (HTTP/1.1 404) 6 headers in 215 bytes (2 switches on core 0)
+Not Found: /
+[pid: 93074|app: 0|req: 6/11] 127.0.0.1 () {64 vars in 1154 bytes} [Mon Feb  3 11:13:29 2025] GET / => generated 2307 bytes in 5 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /
+[pid: 93074|app: 0|req: 7/12] 127.0.0.1 () {64 vars in 1154 bytes} [Mon Feb  3 11:13:30 2025] GET / => generated 2307 bytes in 5 msecs (HTTP/1.1 404) 6 headers in 215 bytes (2 switches on core 0)
+Not Found: /
+[pid: 93073|app: 0|req: 4/13] 127.0.0.1 () {64 vars in 1154 bytes} [Mon Feb  3 11:13:30 2025] GET / => generated 2307 bytes in 3 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /favicon.ico
+[pid: 93074|app: 0|req: 8/14] 127.0.0.1 () {62 vars in 1086 bytes} [Mon Feb  3 11:13:30 2025] GET /favicon.ico => generated 2358 bytes in 4 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+[pid: 93072|app: 0|req: 3/15] 127.0.0.1 () {60 vars in 1107 bytes} [Mon Feb  3 11:13:34 2025] GET /api => generated 0 bytes in 3 msecs (HTTP/1.1 301) 5 headers in 195 bytes (1 switches on core 0)
+[pid: 93073|app: 0|req: 5/16] 127.0.0.1 () {60 vars in 1109 bytes} [Mon Feb  3 11:13:34 2025] GET /api/ => generated 6055 bytes in 24 msecs (HTTP/1.1 200) 9 headers in 387 bytes (1 switches on core 0)
+[pid: 93073|app: 0|req: 6/17] 127.0.0.1 () {70 vars in 1385 bytes} [Mon Feb  3 11:13:37 2025] POST /api/auth/logout/?next=/api/ => generated 0 bytes in 28 msecs (HTTP/1.1 302) 11 headers in 450 bytes (2 switches on core 0)
+Unauthorized: /api/
+[pid: 93072|app: 0|req: 4/18] 127.0.0.1 () {64 vars in 1145 bytes} [Mon Feb  3 11:13:38 2025] GET /api/ => generated 5037 bytes in 34 msecs (HTTP/1.1 401) 10 headers in 422 bytes (1 switches on core 0)
+[pid: 93074|app: 0|req: 9/19] 127.0.0.1 () {62 vars in 1157 bytes} [Mon Feb  3 11:13:39 2025] GET /api/auth/login/?next=/api/ => generated 2705 bytes in 19 msecs (HTTP/1.1 200) 10 headers in 470 bytes (1 switches on core 0)
+[pid: 93074|app: 0|req: 10/20] 127.0.0.1 () {70 vars in 1342 bytes} [Mon Feb  3 11:13:41 2025] POST /api/auth/login/ => generated 2942 bytes in 215 msecs (HTTP/1.1 200) 10 headers in 470 bytes (2 switches on core 0)
+[pid: 93072|app: 0|req: 5/21] 127.0.0.1 () {70 vars in 1331 bytes} [Mon Feb  3 11:13:45 2025] POST /api/auth/login/ => generated 0 bytes in 240 msecs (HTTP/1.1 302) 12 headers in 632 bytes (1 switches on core 0)
+[pid: 93072|app: 0|req: 6/22] 127.0.0.1 () {64 vars in 1200 bytes} [Mon Feb  3 11:13:46 2025] GET /api/ => generated 6053 bytes in 5 msecs (HTTP/1.1 200) 9 headers in 387 bytes (1 switches on core 0)
+[pid: 93074|app: 0|req: 11/23] 127.0.0.1 () {62 vars in 1158 bytes} [Mon Feb  3 11:13:54 2025] GET /api/ => generated 6053 bytes in 10 msecs (HTTP/1.1 200) 9 headers in 387 bytes (1 switches on core 0)
+[pid: 93074|app: 0|req: 12/24] 127.0.0.1 () {60 vars in 1119 bytes} [Mon Feb  3 11:13:59 2025] GET /api/items => generated 0 bytes in 5 msecs (HTTP/1.1 301) 5 headers in 201 bytes (1 switches on core 0)
+[pid: 93072|app: 0|req: 7/25] 127.0.0.1 () {60 vars in 1121 bytes} [Mon Feb  3 11:13:59 2025] GET /api/items/ => generated 10594 bytes in 14 msecs (HTTP/1.1 200) 9 headers in 400 bytes (1 switches on core 0)
+[pid: 93073|app: 0|req: 7/26] 127.0.0.1 () {60 vars in 1121 bytes} [Mon Feb  3 11:14:05 2025] GET /api/nomeco => generated 0 bytes in 9 msecs (HTTP/1.1 301) 5 headers in 202 bytes (1 switches on core 0)
+[pid: 93074|app: 0|req: 13/27] 127.0.0.1 () {60 vars in 1123 bytes} [Mon Feb  3 11:14:05 2025] GET /api/nomeco/ => generated 11119 bytes in 14 msecs (HTTP/1.1 200) 9 headers in 400 bytes (2 switches on core 0)
+Not Found: /
+[pid: 93073|app: 0|req: 8/28] 127.0.0.1 () {44 vars in 730 bytes} [Mon Feb  3 11:14:19 2025] GET / => generated 2305 bytes in 5 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /favicon.ico
+[pid: 93074|app: 0|req: 14/29] 127.0.0.1 () {44 vars in 682 bytes} [Mon Feb  3 11:14:20 2025] GET /favicon.ico => generated 2356 bytes in 7 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /
+[pid: 93074|app: 0|req: 15/30] 127.0.0.1 () {44 vars in 730 bytes} [Mon Feb  3 11:14:20 2025] GET / => generated 2305 bytes in 6 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /favicon.ico
+[pid: 93074|app: 0|req: 16/31] 127.0.0.1 () {44 vars in 682 bytes} [Mon Feb  3 11:14:20 2025] GET /favicon.ico => generated 2356 bytes in 5 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /
+[pid: 93074|app: 0|req: 17/32] 127.0.0.1 () {44 vars in 730 bytes} [Mon Feb  3 11:14:20 2025] GET / => generated 2305 bytes in 5 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /favicon.ico
+[pid: 93074|app: 0|req: 18/33] 127.0.0.1 () {44 vars in 682 bytes} [Mon Feb  3 11:14:20 2025] GET /favicon.ico => generated 2356 bytes in 4 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /
+[pid: 93072|app: 0|req: 8/34] 127.0.0.1 () {44 vars in 730 bytes} [Mon Feb  3 11:18:33 2025] GET / => generated 2305 bytes in 4 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /favicon.ico
+[pid: 93074|app: 0|req: 19/35] 127.0.0.1 () {44 vars in 680 bytes} [Mon Feb  3 11:18:33 2025] GET /favicon.ico => generated 2356 bytes in 5 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /
+[pid: 93074|app: 0|req: 20/36] 127.0.0.1 () {44 vars in 729 bytes} [Mon Feb  3 11:18:33 2025] GET / => generated 2305 bytes in 3 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /
+[pid: 93074|app: 0|req: 21/37] 127.0.0.1 () {44 vars in 729 bytes} [Mon Feb  3 11:18:33 2025] GET / => generated 2305 bytes in 7 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /favicon.ico
+[pid: 93073|app: 0|req: 9/38] 127.0.0.1 () {44 vars in 681 bytes} [Mon Feb  3 11:18:33 2025] GET /favicon.ico => generated 2356 bytes in 7 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Mon Feb  3 11:22:26 2025 - received message 1 from emperor
+gateway "uWSGI http 1" has been buried (pid: 93075)
+...gracefully killing workers...
+Gracefully killing worker 3 (pid: 93073)...
+Gracefully killing worker 4 (pid: 93074)...
+Gracefully killing worker 2 (pid: 93072)...
+Gracefully killing worker 1 (pid: 93071)...
+worker 1 buried after 1 seconds
+worker 2 buried after 1 seconds
+worker 3 buried after 1 seconds
+worker 4 buried after 1 seconds
+binary reloading uWSGI...
+chdir() to /var/www/html/djangovuer/vassals
+closing all non-uwsgi socket fds > 2 (max_fd = 1024)...
+found fd 7 mapped to socket 0 (/var/www/html/djangovuer/uwsgi.sock)
+running /var/www/html/djangovuer/apienv/bin/uwsgi
+*** has_emperor mode detected (fd: 6) ***
+[uWSGI] getting INI configuration from uwsgi.ini
+*** Starting uWSGI 2.0.28 (64bit) on [Mon Feb  3 11:22:27 2025] ***
+compiled with version: 11.4.0 on 03 February 2025 10:30:26
+os: Linux-6.9.3-76060903-generic #202405300957~1736980680~22.04~44ea8a9 SMP PREEMPT_DYNAMIC Thu J
+nodename: pop-os
+machine: x86_64
+clock source: unix
+pcre jit disabled
+detected number of CPU cores: 8
+current working directory: /var/www/html/djangovuer/vassals
+detected binary path: /var/www/html/djangovuer/apienv/bin/uwsgi
+chdir() to /var/www/html/djangovuer
+your processes number limit is 94924
+your memory page size is 4096 bytes
+detected max file descriptor number: 1024
+lock engine: pthread robust mutexes
+thunder lock: disabled (you can enable it with --thunder-lock)
+uWSGI http bound on :8001 fd 3
+uwsgi socket 0 inherited UNIX address /var/www/html/djangovuer/uwsgi.sock fd 7
+Python version: 3.10.12 (main, Jan 17 2025, 14:35:34) [GCC 11.4.0]
+PEP 405 virtualenv detected: /var/www/html/djangovuer/apienv
+Set PythonHome to /var/www/html/djangovuer/apienv
+Python main interpreter initialized at 0x5cab4420e550
+python threads support enabled
+your server socket listen backlog is limited to 100 connections
+your mercy for graceful operations on workers is 60 seconds
+mapped 364600 bytes (356 KB) for 4 cores
+*** Operational MODE: preforking ***
+WSGI app 0 (mountpoint='') ready in 0 seconds on interpreter 0x5cab4420e550 pid: 93017 (default app)
+*** uWSGI is running in multiple interpreter mode ***
+gracefully (RE)spawned uWSGI master process (pid: 93017)
+spawned uWSGI worker 1 (pid: 94468, cores: 1)
+spawned uWSGI worker 2 (pid: 94469, cores: 1)
+spawned uWSGI worker 3 (pid: 94470, cores: 1)
+spawned uWSGI worker 4 (pid: 94471, cores: 1)
+spawned uWSGI http 1 (pid: 94472)
+Not Found: /
+[pid: 94471|app: 0|req: 1/1] 127.0.0.1 () {44 vars in 730 bytes} [Mon Feb  3 12:06:48 2025] GET / => generated 2305 bytes in 50 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+announcing my loyalty to the Emperor...
+Not Found: /favicon.ico
+[pid: 94471|app: 0|req: 2/2] 127.0.0.1 () {44 vars in 682 bytes} [Mon Feb  3 12:06:48 2025] GET /favicon.ico => generated 2356 bytes in 5 msecs (HTTP/1.1 404) 6 headers in 215 bytes (2 switches on core 0)
+Not Found: /
+[pid: 94470|app: 0|req: 1/3] 127.0.0.1 () {44 vars in 730 bytes} [Mon Feb  3 12:06:49 2025] GET / => generated 2305 bytes in 32 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+announcing my loyalty to the Emperor...
+Not Found: /favicon.ico
+[pid: 94471|app: 0|req: 3/4] 127.0.0.1 () {44 vars in 682 bytes} [Mon Feb  3 12:06:49 2025] GET /favicon.ico => generated 2356 bytes in 6 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /
+[pid: 94471|app: 0|req: 4/5] 127.0.0.1 () {44 vars in 730 bytes} [Mon Feb  3 12:06:49 2025] GET / => generated 2305 bytes in 5 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /favicon.ico
+[pid: 94471|app: 0|req: 5/6] 127.0.0.1 () {44 vars in 682 bytes} [Mon Feb  3 12:06:49 2025] GET /favicon.ico => generated 2356 bytes in 4 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /
+[pid: 94470|app: 0|req: 2/7] 127.0.0.1 () {44 vars in 730 bytes} [Mon Feb  3 12:06:49 2025] GET / => generated 2305 bytes in 4 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /
+[pid: 94468|app: 0|req: 1/8] 127.0.0.1 () {44 vars in 730 bytes} [Mon Feb  3 12:06:49 2025] GET / => generated 2305 bytes in 41 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+announcing my loyalty to the Emperor...
+Not Found: /favicon.ico
+[pid: 94471|app: 0|req: 6/9] 127.0.0.1 () {44 vars in 682 bytes} [Mon Feb  3 12:06:50 2025] GET /favicon.ico => generated 2356 bytes in 4 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /
+[pid: 94471|app: 0|req: 7/10] 127.0.0.1 () {60 vars in 1098 bytes} [Mon Feb  3 12:06:51 2025] GET / => generated 2307 bytes in 3 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /
+[pid: 94471|app: 0|req: 8/11] 127.0.0.1 () {60 vars in 1099 bytes} [Mon Feb  3 12:06:51 2025] GET / => generated 2307 bytes in 4 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /favicon.ico
+[pid: 94470|app: 0|req: 3/12] 127.0.0.1 () {58 vars in 1031 bytes} [Mon Feb  3 12:06:51 2025] GET /favicon.ico => generated 2358 bytes in 5 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+[pid: 94470|app: 0|req: 4/13] 127.0.0.1 () {64 vars in 1176 bytes} [Mon Feb  3 12:06:52 2025] GET /api/nomeco/ => generated 11119 bytes in 38 msecs (HTTP/1.1 200) 9 headers in 400 bytes (1 switches on core 0)
+Not Found: /favicon.ico
+[pid: 94471|app: 0|req: 9/14] 127.0.0.1 () {62 vars in 1097 bytes} [Mon Feb  3 12:06:53 2025] GET /favicon.ico => generated 2358 bytes in 6 msecs (HTTP/1.1 404) 6 headers in 215 bytes (2 switches on core 0)
+[pid: 94471|app: 0|req: 10/15] 127.0.0.1 () {64 vars in 1176 bytes} [Mon Feb  3 12:06:53 2025] GET /api/nomeco/ => generated 11119 bytes in 49 msecs (HTTP/1.1 200) 9 headers in 400 bytes (2 switches on core 0)
+[pid: 94470|app: 0|req: 5/16] 127.0.0.1 () {64 vars in 1176 bytes} [Mon Feb  3 12:06:53 2025] GET /api/nomeco/ => generated 11119 bytes in 18 msecs (HTTP/1.1 200) 9 headers in 400 bytes (2 switches on core 0)
+[pid: 94471|app: 0|req: 11/17] 127.0.0.1 () {64 vars in 1176 bytes} [Mon Feb  3 12:06:54 2025] GET /api/nomeco/ => generated 11119 bytes in 20 msecs (HTTP/1.1 200) 9 headers in 400 bytes (1 switches on core 0)
+Not Found: /favicon.ico
+[pid: 94470|app: 0|req: 6/18] 127.0.0.1 () {62 vars in 1097 bytes} [Mon Feb  3 12:06:54 2025] GET /favicon.ico => generated 2358 bytes in 7 msecs (HTTP/1.1 404) 6 headers in 215 bytes (2 switches on core 0)
+Not Found: /
+[pid: 94471|app: 0|req: 12/19] 127.0.0.1 () {54 vars in 946 bytes} [Tue Feb  4 12:47:40 2025] GET / => generated 2307 bytes in 4 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /favicon.ico
+[pid: 94471|app: 0|req: 13/20] 127.0.0.1 () {52 vars in 878 bytes} [Tue Feb  4 12:47:40 2025] GET /favicon.ico => generated 2358 bytes in 6 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Invalid HTTP_HOST header: '192.168.194.78:8001'. You may need to add '192.168.194.78' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/var/www/html/djangovuer/apienv/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/var/www/html/djangovuer/apienv/lib/python3.10/site-packages/django/utils/deprecation.py", line 128, in __call__
+    response = self.process_request(request)
+  File "/var/www/html/djangovuer/apienv/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/var/www/html/djangovuer/apienv/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192.168.194.78:8001'. You may need to add '192.168.194.78' to ALLOWED_HOSTS.
+Bad Request: /
+[pid: 94471|app: 0|req: 14/21] 192.168.194.78 () {40 vars in 689 bytes} [Tue Feb  4 12:48:06 2025] GET / => generated 58494 bytes in 23 msecs (HTTP/1.1 400) 4 headers in 172 bytes (1 switches on core 0)
+Invalid HTTP_HOST header: '192.168.194.78:8001'. You may need to add '192.168.194.78' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/var/www/html/djangovuer/apienv/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/var/www/html/djangovuer/apienv/lib/python3.10/site-packages/django/utils/deprecation.py", line 128, in __call__
+    response = self.process_request(request)
+  File "/var/www/html/djangovuer/apienv/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/var/www/html/djangovuer/apienv/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192.168.194.78:8001'. You may need to add '192.168.194.78' to ALLOWED_HOSTS.
+Bad Request: /favicon.ico
+[pid: 94469|app: 0|req: 1/22] 192.168.194.78 () {38 vars in 631 bytes} [Tue Feb  4 12:48:07 2025] GET /favicon.ico => generated 58440 bytes in 65 msecs (HTTP/1.1 400) 4 headers in 172 bytes (1 switches on core 0)
+announcing my loyalty to the Emperor...
+SIGINT/SIGTERM received...killing workers...
+gateway "uWSGI http 1" has been buried (pid: 94472)
+Tue Feb  4 12:49:26 2025 - received message 0 from emperor
+worker 1 buried after 1 seconds
+worker 2 buried after 1 seconds
+worker 3 buried after 1 seconds
+worker 4 buried after 1 seconds
+goodbye to uWSGI.
+VACUUM WARNING: unix socket /var/www/html/djangovuer/uwsgi.sock changed inode. Skip removal
+*** Starting uWSGI 2.0.28 (64bit) on [Tue Feb  4 18:20:58 2025] ***
+compiled with version: 11.4.0 on 03 February 2025 10:30:26
+os: Linux-6.9.3-76060903-generic #202405300957~1736980680~22.04~44ea8a9 SMP PREEMPT_DYNAMIC Thu J
+nodename: pop-os
+machine: x86_64
+clock source: unix
+pcre jit disabled
+detected number of CPU cores: 8
+current working directory: /var/www/html/djangovuer/vassals
+detected binary path: /var/www/html/djangovuer/apienv/bin/uwsgi
+chdir() to /var/www/html/djangovuer
+your processes number limit is 94924
+your memory page size is 4096 bytes
+detected max file descriptor number: 1048576
+lock engine: pthread robust mutexes
+thunder lock: disabled (you can enable it with --thunder-lock)
+uWSGI http bound on :8001 fd 3
+uwsgi socket 0 bound to UNIX address /var/www/html/djangovuer/uwsgi.sock fd 7
+Python version: 3.10.12 (main, Jan 17 2025, 14:35:34) [GCC 11.4.0]
+PEP 405 virtualenv detected: /var/www/html/djangovuer/apienv
+Set PythonHome to /var/www/html/djangovuer/apienv
+Python main interpreter initialized at 0x5f147fde4ea0
+python threads support enabled
+your server socket listen backlog is limited to 100 connections
+your mercy for graceful operations on workers is 60 seconds
+mapped 364600 bytes (356 KB) for 4 cores
+*** Operational MODE: preforking ***
+WSGI app 0 (mountpoint='') ready in 0 seconds on interpreter 0x5f147fde4ea0 pid: 155052 (default app)
+*** uWSGI is running in multiple interpreter mode ***
+spawned uWSGI master process (pid: 155052)
+spawned uWSGI worker 1 (pid: 155053, cores: 1)
+spawned uWSGI worker 2 (pid: 155054, cores: 1)
+spawned uWSGI worker 3 (pid: 155055, cores: 1)
+spawned uWSGI worker 4 (pid: 155056, cores: 1)
+spawned uWSGI http 1 (pid: 155057)
+Invalid HTTP_HOST header: '192.168.194.78:8001'. You may need to add '192.168.194.78' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/var/www/html/djangovuer/apienv/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/var/www/html/djangovuer/apienv/lib/python3.10/site-packages/django/utils/deprecation.py", line 128, in __call__
+    response = self.process_request(request)
+  File "/var/www/html/djangovuer/apienv/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/var/www/html/djangovuer/apienv/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192.168.194.78:8001'. You may need to add '192.168.194.78' to ALLOWED_HOSTS.
+Bad Request: /
+[pid: 155055|app: 0|req: 1/1] 192.168.194.78 () {44 vars in 742 bytes} [Tue Feb  4 12:51:03 2025] GET / => generated 58759 bytes in 43 msecs (HTTP/1.1 400) 4 headers in 172 bytes (1 switches on core 0)
+announcing my loyalty to the Emperor...
+Invalid HTTP_HOST header: '192.168.194.78:8001'. You may need to add '192.168.194.78' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/var/www/html/djangovuer/apienv/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/var/www/html/djangovuer/apienv/lib/python3.10/site-packages/django/utils/deprecation.py", line 128, in __call__
+    response = self.process_request(request)
+  File "/var/www/html/djangovuer/apienv/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/var/www/html/djangovuer/apienv/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192.168.194.78:8001'. You may need to add '192.168.194.78' to ALLOWED_HOSTS.
+Bad Request: /favicon.ico
+[pid: 155056|app: 0|req: 1/2] 192.168.194.78 () {42 vars in 683 bytes} [Tue Feb  4 12:51:03 2025] GET /favicon.ico => generated 58704 bytes in 57 msecs (HTTP/1.1 400) 4 headers in 172 bytes (1 switches on core 0)
+announcing my loyalty to the Emperor...
+Invalid HTTP_HOST header: '192.168.194.78:8001'. You may need to add '192.168.194.78' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/var/www/html/djangovuer/apienv/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/var/www/html/djangovuer/apienv/lib/python3.10/site-packages/django/utils/deprecation.py", line 128, in __call__
+    response = self.process_request(request)
+  File "/var/www/html/djangovuer/apienv/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/var/www/html/djangovuer/apienv/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192.168.194.78:8001'. You may need to add '192.168.194.78' to ALLOWED_HOSTS.
+Bad Request: /
+[pid: 155056|app: 0|req: 2/3] 192.168.194.78 () {44 vars in 741 bytes} [Tue Feb  4 12:51:04 2025] GET / => generated 58758 bytes in 16 msecs (HTTP/1.1 400) 4 headers in 172 bytes (1 switches on core 0)
+Invalid HTTP_HOST header: '192.168.194.78:8001'. You may need to add '192.168.194.78' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/var/www/html/djangovuer/apienv/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/var/www/html/djangovuer/apienv/lib/python3.10/site-packages/django/utils/deprecation.py", line 128, in __call__
+    response = self.process_request(request)
+  File "/var/www/html/djangovuer/apienv/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/var/www/html/djangovuer/apienv/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192.168.194.78:8001'. You may need to add '192.168.194.78' to ALLOWED_HOSTS.
+Bad Request: /favicon.ico
+[pid: 155056|app: 0|req: 3/4] 192.168.194.78 () {42 vars in 683 bytes} [Tue Feb  4 12:51:04 2025] GET /favicon.ico => generated 58704 bytes in 24 msecs (HTTP/1.1 400) 4 headers in 172 bytes (1 switches on core 0)
+Invalid HTTP_HOST header: '192.168.194.78:8001'. You may need to add '192.168.194.78' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/var/www/html/djangovuer/apienv/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/var/www/html/djangovuer/apienv/lib/python3.10/site-packages/django/utils/deprecation.py", line 128, in __call__
+    response = self.process_request(request)
+  File "/var/www/html/djangovuer/apienv/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/var/www/html/djangovuer/apienv/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192.168.194.78:8001'. You may need to add '192.168.194.78' to ALLOWED_HOSTS.
+Bad Request: /
+[pid: 155055|app: 0|req: 2/5] 192.168.194.78 () {44 vars in 742 bytes} [Tue Feb  4 12:51:04 2025] GET / => generated 58759 bytes in 28 msecs (HTTP/1.1 400) 4 headers in 172 bytes (1 switches on core 0)
+Invalid HTTP_HOST header: '192.168.194.78:8001'. You may need to add '192.168.194.78' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/var/www/html/djangovuer/apienv/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/var/www/html/djangovuer/apienv/lib/python3.10/site-packages/django/utils/deprecation.py", line 128, in __call__
+    response = self.process_request(request)
+  File "/var/www/html/djangovuer/apienv/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/var/www/html/djangovuer/apienv/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192.168.194.78:8001'. You may need to add '192.168.194.78' to ALLOWED_HOSTS.
+Bad Request: /favicon.ico
+[pid: 155056|app: 0|req: 4/6] 192.168.194.78 () {42 vars in 684 bytes} [Tue Feb  4 12:51:04 2025] GET /favicon.ico => generated 58705 bytes in 19 msecs (HTTP/1.1 400) 4 headers in 172 bytes (2 switches on core 0)
+SIGINT/SIGTERM received...killing workers...
+gateway "uWSGI http 1" has been buried (pid: 155057)
+Tue Feb  4 12:51:18 2025 - received message 0 from emperor
+worker 1 buried after 1 seconds
+worker 2 buried after 1 seconds
+worker 3 buried after 1 seconds
+worker 4 buried after 1 seconds
+goodbye to uWSGI.
+VACUUM: unix socket /var/www/html/djangovuer/uwsgi.sock removed.
+*** Starting uWSGI 2.0.28 (64bit) on [Tue Feb  4 18:21:30 2025] ***
+compiled with version: 11.4.0 on 03 February 2025 10:30:26
+os: Linux-6.9.3-76060903-generic #202405300957~1736980680~22.04~44ea8a9 SMP PREEMPT_DYNAMIC Thu J
+nodename: pop-os
+machine: x86_64
+clock source: unix
+pcre jit disabled
+detected number of CPU cores: 8
+current working directory: /var/www/html/djangovuer/vassals
+detected binary path: /var/www/html/djangovuer/apienv/bin/uwsgi
+chdir() to /var/www/html/djangovuer
+your processes number limit is 94924
+your memory page size is 4096 bytes
+detected max file descriptor number: 1048576
+lock engine: pthread robust mutexes
+thunder lock: disabled (you can enable it with --thunder-lock)
+uWSGI http bound on :8001 fd 3
+uwsgi socket 0 bound to UNIX address /var/www/html/djangovuer/uwsgi.sock fd 7
+Python version: 3.10.12 (main, Jan 17 2025, 14:35:34) [GCC 11.4.0]
+PEP 405 virtualenv detected: /var/www/html/djangovuer/apienv
+Set PythonHome to /var/www/html/djangovuer/apienv
+Python main interpreter initialized at 0x55bdc852eea0
+python threads support enabled
+your server socket listen backlog is limited to 100 connections
+your mercy for graceful operations on workers is 60 seconds
+mapped 364600 bytes (356 KB) for 4 cores
+*** Operational MODE: preforking ***
+WSGI app 0 (mountpoint='') ready in 0 seconds on interpreter 0x55bdc852eea0 pid: 155357 (default app)
+*** uWSGI is running in multiple interpreter mode ***
+spawned uWSGI master process (pid: 155357)
+spawned uWSGI worker 1 (pid: 155358, cores: 1)
+spawned uWSGI worker 2 (pid: 155359, cores: 1)
+spawned uWSGI worker 3 (pid: 155360, cores: 1)
+spawned uWSGI worker 4 (pid: 155361, cores: 1)
+spawned uWSGI http 1 (pid: 155362)
+Not Found: /
+[pid: 155361|app: 0|req: 1/1] 192.168.194.78 () {44 vars in 742 bytes} [Tue Feb  4 12:51:32 2025] GET / => generated 2312 bytes in 33 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+announcing my loyalty to the Emperor...
+Not Found: /favicon.ico
+[pid: 155361|app: 0|req: 2/2] 192.168.194.78 () {42 vars in 683 bytes} [Tue Feb  4 12:51:32 2025] GET /favicon.ico => generated 2363 bytes in 6 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /
+[pid: 155361|app: 0|req: 3/3] 192.168.194.78 () {44 vars in 741 bytes} [Tue Feb  4 12:51:32 2025] GET / => generated 2312 bytes in 5 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /favicon.ico
+[pid: 155359|app: 0|req: 1/4] 192.168.194.78 () {42 vars in 683 bytes} [Tue Feb  4 12:51:33 2025] GET /favicon.ico => generated 2363 bytes in 46 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+announcing my loyalty to the Emperor...
+Not Found: /
+[pid: 155360|app: 0|req: 1/5] 192.168.194.78 () {44 vars in 741 bytes} [Tue Feb  4 12:51:33 2025] GET / => generated 2312 bytes in 35 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+announcing my loyalty to the Emperor...
+Not Found: /favicon.ico
+[pid: 155360|app: 0|req: 2/6] 192.168.194.78 () {42 vars in 683 bytes} [Tue Feb  4 12:51:33 2025] GET /favicon.ico => generated 2363 bytes in 6 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /
+[pid: 155360|app: 0|req: 3/7] 192.168.194.78 () {44 vars in 742 bytes} [Tue Feb  4 12:51:33 2025] GET / => generated 2312 bytes in 3 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /favicon.ico
+[pid: 155361|app: 0|req: 4/8] 192.168.194.78 () {42 vars in 684 bytes} [Tue Feb  4 12:51:33 2025] GET /favicon.ico => generated 2363 bytes in 5 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /api/api-keys/generate/
+[pid: 155361|app: 0|req: 5/9] 192.168.194.78 () {40 vars in 733 bytes} [Tue Feb  4 13:06:09 2025] GET /api/api-keys/generate/ => generated 8942 bytes in 6 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /api/api-keys/generate/
+[pid: 155361|app: 0|req: 6/10] 192.168.194.78 () {44 vars in 785 bytes} [Tue Feb  4 13:06:41 2025] GET /api/api-keys/generate/ => generated 8942 bytes in 6 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /favicon.ico
+[pid: 155361|app: 0|req: 7/11] 192.168.194.78 () {42 vars in 705 bytes} [Tue Feb  4 13:06:41 2025] GET /favicon.ico => generated 2363 bytes in 6 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /api/api-keys/generate/
+[pid: 155360|app: 0|req: 4/12] 192.168.194.78 () {44 vars in 785 bytes} [Tue Feb  4 13:06:41 2025] GET /api/api-keys/generate/ => generated 8942 bytes in 9 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /favicon.ico
+[pid: 155360|app: 0|req: 5/13] 192.168.194.78 () {42 vars in 705 bytes} [Tue Feb  4 13:06:41 2025] GET /favicon.ico => generated 2363 bytes in 4 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /api/api-keys/generate/
+[pid: 155361|app: 0|req: 8/14] 192.168.194.78 () {44 vars in 786 bytes} [Tue Feb  4 13:06:41 2025] GET /api/api-keys/generate/ => generated 8942 bytes in 6 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /favicon.ico
+[pid: 155360|app: 0|req: 6/15] 192.168.194.78 () {42 vars in 706 bytes} [Tue Feb  4 13:06:42 2025] GET /favicon.ico => generated 2363 bytes in 6 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /api/api-keys/generate/
+[pid: 155361|app: 0|req: 9/16] 192.168.194.78 () {44 vars in 786 bytes} [Tue Feb  4 13:06:42 2025] GET /api/api-keys/generate/ => generated 8942 bytes in 4 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /api/api-keys/generate/
+[pid: 155361|app: 0|req: 10/17] 192.168.194.78 () {36 vars in 564 bytes} [Tue Feb  4 13:07:26 2025] GET /api/api-keys/generate/ => generated 8942 bytes in 3 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /api/api-keys/generate/
+[pid: 155359|app: 0|req: 2/18] 192.168.194.78 () {38 vars in 584 bytes} [Tue Feb  4 13:07:32 2025] POST /api/api-keys/generate/ => generated 8943 bytes in 4 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /api/api-keys/generate/
+[pid: 155360|app: 0|req: 7/19] 192.168.194.78 () {38 vars in 533 bytes} [Tue Feb  4 13:08:10 2025] POST /api/api-keys/generate/ => generated 8943 bytes in 6 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /api/api-keys/generate/
+[pid: 155360|app: 0|req: 8/20] 192.168.194.78 () {38 vars in 533 bytes} [Tue Feb  4 13:08:12 2025] POST /api/api-keys/generate/ => generated 8943 bytes in 7 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+SIGINT/SIGTERM received...killing workers...
+gateway "uWSGI http 1" has been buried (pid: 155362)
+Tue Feb  4 13:08:26 2025 - received message 0 from emperor
+worker 1 buried after 0 seconds
+worker 2 buried after 0 seconds
+worker 3 buried after 0 seconds
+worker 4 buried after 0 seconds
+goodbye to uWSGI.
+VACUUM: unix socket /var/www/html/djangovuer/uwsgi.sock removed.
+*** Starting uWSGI 2.0.28 (64bit) on [Tue Feb  4 18:38:27 2025] ***
+compiled with version: 11.4.0 on 03 February 2025 10:30:26
+os: Linux-6.9.3-76060903-generic #202405300957~1736980680~22.04~44ea8a9 SMP PREEMPT_DYNAMIC Thu J
+nodename: pop-os
+machine: x86_64
+clock source: unix
+pcre jit disabled
+detected number of CPU cores: 8
+current working directory: /var/www/html/djangovuer/vassals
+detected binary path: /var/www/html/djangovuer/apienv/bin/uwsgi
+chdir() to /var/www/html/djangovuer
+your processes number limit is 94924
+your memory page size is 4096 bytes
+detected max file descriptor number: 1048576
+lock engine: pthread robust mutexes
+thunder lock: disabled (you can enable it with --thunder-lock)
+uWSGI http bound on :8001 fd 3
+uwsgi socket 0 bound to UNIX address /var/www/html/djangovuer/uwsgi.sock fd 7
+Python version: 3.10.12 (main, Jan 17 2025, 14:35:34) [GCC 11.4.0]
+PEP 405 virtualenv detected: /var/www/html/djangovuer/apienv
+Set PythonHome to /var/www/html/djangovuer/apienv
+Python main interpreter initialized at 0x599481e63ea0
+python threads support enabled
+your server socket listen backlog is limited to 100 connections
+your mercy for graceful operations on workers is 60 seconds
+mapped 364600 bytes (356 KB) for 4 cores
+*** Operational MODE: preforking ***
+WSGI app 0 (mountpoint='') ready in 0 seconds on interpreter 0x599481e63ea0 pid: 157725 (default app)
+*** uWSGI is running in multiple interpreter mode ***
+spawned uWSGI master process (pid: 157725)
+spawned uWSGI worker 1 (pid: 157726, cores: 1)
+spawned uWSGI worker 2 (pid: 157727, cores: 1)
+spawned uWSGI worker 3 (pid: 157728, cores: 1)
+spawned uWSGI worker 4 (pid: 157729, cores: 1)
+spawned uWSGI http 1 (pid: 157730)
+Unauthorized: /api/api-keys/generate/
+[pid: 157729|app: 0|req: 1/1] 192.168.194.78 () {44 vars in 786 bytes} [Tue Feb  4 13:08:30 2025] GET /api/api-keys/generate/ => generated 4029 bytes in 57 msecs (HTTP/1.1 401) 10 headers in 423 bytes (1 switches on core 0)
+announcing my loyalty to the Emperor...
+Not Found: /static/rest_framework/css/bootstrap.min.css
+[pid: 157729|app: 0|req: 2/2] 192.168.194.78 () {44 vars in 781 bytes} [Tue Feb  4 13:08:30 2025] GET /static/rest_framework/css/bootstrap.min.css => generated 2459 bytes in 6 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /static/rest_framework/css/bootstrap-tweaks.css
+[pid: 157729|app: 0|req: 3/3] 192.168.194.78 () {44 vars in 787 bytes} [Tue Feb  4 13:08:30 2025] GET /static/rest_framework/css/bootstrap-tweaks.css => generated 2468 bytes in 8 msecs (HTTP/1.1 404) 6 headers in 215 bytes (2 switches on core 0)
+Not Found: /static/rest_framework/js/ajax-form.js
+[pid: 157729|app: 0|req: 4/4] 192.168.194.78 () {44 vars in 754 bytes} [Tue Feb  4 13:08:30 2025] GET /static/rest_framework/js/ajax-form.js => generated 2441 bytes in 11 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /static/rest_framework/js/csrf.js
+[pid: 157729|app: 0|req: 5/5] 192.168.194.78 () {44 vars in 744 bytes} [Tue Feb  4 13:08:30 2025] GET /static/rest_framework/js/csrf.js => generated 2426 bytes in 6 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /static/rest_framework/css/prettify.css
+[pid: 157728|app: 0|req: 1/6] 192.168.194.78 () {44 vars in 771 bytes} [Tue Feb  4 13:08:30 2025] GET /static/rest_framework/css/prettify.css => generated 2444 bytes in 56 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+announcing my loyalty to the Emperor...
+Not Found: /static/rest_framework/css/default.css
+[pid: 157727|app: 0|req: 1/7] 192.168.194.78 () {44 vars in 769 bytes} [Tue Feb  4 13:08:30 2025] GET /static/rest_framework/css/default.css => generated 2441 bytes in 60 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+announcing my loyalty to the Emperor...
+Not Found: /static/rest_framework/js/bootstrap.min.js
+[pid: 157728|app: 0|req: 2/8] 192.168.194.78 () {44 vars in 762 bytes} [Tue Feb  4 13:08:31 2025] GET /static/rest_framework/js/bootstrap.min.js => generated 2453 bytes in 6 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /static/rest_framework/js/jquery-3.7.1.min.js
+Not Found: /static/rest_framework/js/prettify-min.js
+[pid: 157729|app: 0|req: 6/9] 192.168.194.78 () {44 vars in 760 bytes} [Tue Feb  4 13:08:31 2025] GET /static/rest_framework/js/prettify-min.js => generated 2450 bytes in 10 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+[pid: 157726|app: 0|req: 1/10] 192.168.194.78 () {44 vars in 768 bytes} [Tue Feb  4 13:08:30 2025] GET /static/rest_framework/js/jquery-3.7.1.min.js => generated 2462 bytes in 80 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+announcing my loyalty to the Emperor...
+Not Found: /static/rest_framework/js/default.js
+[pid: 157729|app: 0|req: 7/11] 192.168.194.78 () {44 vars in 750 bytes} [Tue Feb  4 13:08:31 2025] GET /static/rest_framework/js/default.js => generated 2435 bytes in 3 msecs (HTTP/1.1 404) 6 headers in 215 bytes (2 switches on core 0)
+Not Found: /static/rest_framework/js/load-ajax-form.js
+[pid: 157729|app: 0|req: 8/12] 192.168.194.78 () {44 vars in 764 bytes} [Tue Feb  4 13:08:31 2025] GET /static/rest_framework/js/load-ajax-form.js => generated 2456 bytes in 3 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /favicon.ico
+[pid: 157727|app: 0|req: 2/13] 192.168.194.78 () {44 vars in 763 bytes} [Tue Feb  4 13:08:31 2025] GET /favicon.ico => generated 2363 bytes in 5 msecs (HTTP/1.1 404) 6 headers in 215 bytes (2 switches on core 0)
+Not Found: /static/rest_framework/css/bootstrap-tweaks.css
+[pid: 157727|app: 0|req: 3/14] 192.168.194.78 () {40 vars in 733 bytes} [Tue Feb  4 13:08:37 2025] GET /static/rest_framework/css/bootstrap-tweaks.css => generated 2468 bytes in 5 msecs (HTTP/1.1 404) 6 headers in 215 bytes (2 switches on core 0)
+Not Found: /static/rest_framework/css/prettify.css
+Not Found: /static/rest_framework/css/bootstrap.min.css
+[pid: 157728|app: 0|req: 3/15] 192.168.194.78 () {40 vars in 727 bytes} [Tue Feb  4 13:08:37 2025] GET /static/rest_framework/css/bootstrap.min.css => generated 2459 bytes in 6 msecs (HTTP/1.1 404) 6 headers in 215 bytes (2 switches on core 0)
+Not Found: /static/rest_framework/css/default.css
+[pid: 157729|app: 0|req: 9/16] 192.168.194.78 () {40 vars in 718 bytes} [Tue Feb  4 13:08:37 2025] GET /static/rest_framework/css/prettify.css => generated 2444 bytes in 6 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+[pid: 157726|app: 0|req: 2/17] 192.168.194.78 () {40 vars in 716 bytes} [Tue Feb  4 13:08:37 2025] GET /static/rest_framework/css/default.css => generated 2441 bytes in 6 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Unauthorized: /api/api-keys/generate/
+[pid: 157728|app: 0|req: 4/18] 192.168.194.78 () {46 vars in 843 bytes} [Tue Feb  4 13:08:40 2025] GET /api/api-keys/generate/ => generated 4029 bytes in 24 msecs (HTTP/1.1 401) 10 headers in 423 bytes (1 switches on core 0)
+Not Found: /static/rest_framework/css/bootstrap.min.css
+[pid: 157728|app: 0|req: 5/19] 192.168.194.78 () {44 vars in 781 bytes} [Tue Feb  4 13:08:40 2025] GET /static/rest_framework/css/bootstrap.min.css => generated 2459 bytes in 6 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /static/rest_framework/css/bootstrap-tweaks.css
+[pid: 157729|app: 0|req: 10/20] 192.168.194.78 () {44 vars in 787 bytes} [Tue Feb  4 13:08:40 2025] GET /static/rest_framework/css/bootstrap-tweaks.css => generated 2468 bytes in 3 msecs (HTTP/1.1 404) 6 headers in 215 bytes (2 switches on core 0)
+Not Found: /static/rest_framework/css/default.css
+[pid: 157728|app: 0|req: 6/21] 192.168.194.78 () {44 vars in 769 bytes} [Tue Feb  4 13:08:40 2025] GET /static/rest_framework/css/default.css => generated 2441 bytes in 5 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /static/rest_framework/css/prettify.css
+[pid: 157727|app: 0|req: 4/22] 192.168.194.78 () {44 vars in 771 bytes} [Tue Feb  4 13:08:40 2025] GET /static/rest_framework/css/prettify.css => generated 2444 bytes in 7 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /static/rest_framework/js/ajax-form.js
+[pid: 157729|app: 0|req: 11/23] 192.168.194.78 () {44 vars in 754 bytes} [Tue Feb  4 13:08:40 2025] GET /static/rest_framework/js/ajax-form.js => generated 2441 bytes in 5 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /static/rest_framework/js/jquery-3.7.1.min.js
+[pid: 157726|app: 0|req: 3/24] 192.168.194.78 () {44 vars in 768 bytes} [Tue Feb  4 13:08:40 2025] GET /static/rest_framework/js/jquery-3.7.1.min.js => generated 2462 bytes in 9 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /static/rest_framework/js/bootstrap.min.js
+[pid: 157726|app: 0|req: 4/25] 192.168.194.78 () {44 vars in 762 bytes} [Tue Feb  4 13:08:40 2025] GET /static/rest_framework/js/bootstrap.min.js => generated 2453 bytes in 6 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /static/rest_framework/js/prettify-min.js
+[pid: 157728|app: 0|req: 7/26] 192.168.194.78 () {44 vars in 760 bytes} [Tue Feb  4 13:08:40 2025] GET /static/rest_framework/js/prettify-min.js => generated 2450 bytes in 8 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /static/rest_framework/js/csrf.js
+[pid: 157729|app: 0|req: 12/27] 192.168.194.78 () {44 vars in 744 bytes} [Tue Feb  4 13:08:40 2025] GET /static/rest_framework/js/csrf.js => generated 2426 bytes in 9 msecs (HTTP/1.1 404) 6 headers in 215 bytes (2 switches on core 0)
+Not Found: /static/rest_framework/js/default.js
+[pid: 157728|app: 0|req: 8/28] 192.168.194.78 () {44 vars in 750 bytes} [Tue Feb  4 13:08:40 2025] GET /static/rest_framework/js/default.js => generated 2435 bytes in 9 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /static/rest_framework/js/load-ajax-form.js
+[pid: 157726|app: 0|req: 5/29] 192.168.194.78 () {44 vars in 764 bytes} [Tue Feb  4 13:08:40 2025] GET /static/rest_framework/js/load-ajax-form.js => generated 2456 bytes in 10 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /static/rest_framework/js/ajax-form.js
+[pid: 157727|app: 0|req: 5/30] 192.168.194.78 () {38 vars in 636 bytes} [Tue Feb  4 13:08:40 2025] GET /static/rest_framework/js/ajax-form.js => generated 2441 bytes in 6 msecs (HTTP/1.1 404) 6 headers in 215 bytes (2 switches on core 0)
+Not Found: /static/rest_framework/js/bootstrap.min.js
+[pid: 157728|app: 0|req: 9/31] 192.168.194.78 () {38 vars in 644 bytes} [Tue Feb  4 13:08:40 2025] GET /static/rest_framework/js/bootstrap.min.js => generated 2453 bytes in 7 msecs (HTTP/1.1 404) 6 headers in 215 bytes (2 switches on core 0)
+Not Found: /static/rest_framework/js/prettify-min.js
+[pid: 157726|app: 0|req: 6/32] 192.168.194.78 () {38 vars in 642 bytes} [Tue Feb  4 13:08:40 2025] GET /static/rest_framework/js/prettify-min.js => generated 2450 bytes in 8 msecs (HTTP/1.1 404) 6 headers in 215 bytes (2 switches on core 0)
+Not Found: /static/rest_framework/js/jquery-3.7.1.min.js
+[pid: 157729|app: 0|req: 13/33] 192.168.194.78 () {38 vars in 650 bytes} [Tue Feb  4 13:08:40 2025] GET /static/rest_framework/js/jquery-3.7.1.min.js => generated 2462 bytes in 10 msecs (HTTP/1.1 404) 6 headers in 215 bytes (2 switches on core 0)
+Not Found: /static/rest_framework/js/default.js
+Not Found: /static/rest_framework/js/csrf.js
+[pid: 157727|app: 0|req: 6/34] 192.168.194.78 () {38 vars in 626 bytes} [Tue Feb  4 13:08:40 2025] GET /static/rest_framework/js/csrf.js => generated 2426 bytes in 8 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+[pid: 157728|app: 0|req: 10/35] 192.168.194.78 () {38 vars in 632 bytes} [Tue Feb  4 13:08:40 2025] GET /static/rest_framework/js/default.js => generated 2435 bytes in 6 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /static/rest_framework/js/load-ajax-form.js
+[pid: 157727|app: 0|req: 7/36] 192.168.194.78 () {38 vars in 646 bytes} [Tue Feb  4 13:08:40 2025] GET /static/rest_framework/js/load-ajax-form.js => generated 2456 bytes in 7 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /favicon.ico
+[pid: 157728|app: 0|req: 11/37] 192.168.194.78 () {44 vars in 763 bytes} [Tue Feb  4 13:08:40 2025] GET /favicon.ico => generated 2363 bytes in 6 msecs (HTTP/1.1 404) 6 headers in 215 bytes (2 switches on core 0)
+Not Found: /
+[pid: 157729|app: 0|req: 14/38] 192.168.194.78 () {46 vars in 797 bytes} [Tue Feb  4 13:08:43 2025] GET / => generated 2312 bytes in 3 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /favicon.ico
+[pid: 157726|app: 0|req: 7/39] 192.168.194.78 () {44 vars in 740 bytes} [Tue Feb  4 13:08:43 2025] GET /favicon.ico => generated 2363 bytes in 4 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /
+[pid: 157729|app: 0|req: 15/40] 192.168.194.78 () {46 vars in 798 bytes} [Tue Feb  4 13:08:43 2025] GET / => generated 2312 bytes in 4 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /
+[pid: 157729|app: 0|req: 16/41] 192.168.194.78 () {46 vars in 799 bytes} [Tue Feb  4 13:08:43 2025] GET / => generated 2312 bytes in 6 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /favicon.ico
+[pid: 157729|app: 0|req: 17/42] 192.168.194.78 () {44 vars in 741 bytes} [Tue Feb  4 13:08:44 2025] GET /favicon.ico => generated 2363 bytes in 3 msecs (HTTP/1.1 404) 6 headers in 215 bytes (2 switches on core 0)
+[pid: 157728|app: 0|req: 12/43] 192.168.194.78 () {42 vars in 752 bytes} [Tue Feb  4 13:08:46 2025] GET /api => generated 0 bytes in 3 msecs (HTTP/1.1 301) 5 headers in 195 bytes (1 switches on core 0)
+Unauthorized: /api/
+[pid: 157729|app: 0|req: 18/44] 192.168.194.78 () {42 vars in 754 bytes} [Tue Feb  4 13:08:47 2025] GET /api/ => generated 5037 bytes in 5 msecs (HTTP/1.1 401) 10 headers in 422 bytes (1 switches on core 0)
+Not Found: /static/rest_framework/css/bootstrap.min.css
+[pid: 157728|app: 0|req: 13/45] 192.168.194.78 () {40 vars in 710 bytes} [Tue Feb  4 13:08:47 2025] GET /static/rest_framework/css/bootstrap.min.css => generated 2459 bytes in 7 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /static/rest_framework/css/bootstrap-tweaks.css
+[pid: 157729|app: 0|req: 19/46] 192.168.194.78 () {40 vars in 716 bytes} [Tue Feb  4 13:08:47 2025] GET /static/rest_framework/css/bootstrap-tweaks.css => generated 2468 bytes in 5 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /static/rest_framework/js/jquery-3.7.1.min.js
+[pid: 157729|app: 0|req: 20/47] 192.168.194.78 () {40 vars in 697 bytes} [Tue Feb  4 13:08:47 2025] GET /static/rest_framework/js/jquery-3.7.1.min.js => generated 2462 bytes in 5 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /static/rest_framework/css/default.css
+[pid: 157728|app: 0|req: 14/48] 192.168.194.78 () {40 vars in 698 bytes} [Tue Feb  4 13:08:47 2025] GET /static/rest_framework/css/default.css => generated 2441 bytes in 7 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /static/rest_framework/css/prettify.css
+[pid: 157727|app: 0|req: 8/49] 192.168.194.78 () {40 vars in 700 bytes} [Tue Feb  4 13:08:47 2025] GET /static/rest_framework/css/prettify.css => generated 2444 bytes in 9 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /static/rest_framework/js/ajax-form.js
+[pid: 157726|app: 0|req: 8/50] 192.168.194.78 () {40 vars in 683 bytes} [Tue Feb  4 13:08:47 2025] GET /static/rest_framework/js/ajax-form.js => generated 2441 bytes in 7 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /static/rest_framework/js/csrf.js
+[pid: 157729|app: 0|req: 21/51] 192.168.194.78 () {40 vars in 673 bytes} [Tue Feb  4 13:08:47 2025] GET /static/rest_framework/js/csrf.js => generated 2426 bytes in 5 msecs (HTTP/1.1 404) 6 headers in 215 bytes (2 switches on core 0)
+Not Found: /static/rest_framework/js/prettify-min.js
+[pid: 157727|app: 0|req: 9/52] 192.168.194.78 () {40 vars in 689 bytes} [Tue Feb  4 13:08:47 2025] GET /static/rest_framework/js/prettify-min.js => generated 2450 bytes in 3 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /static/rest_framework/js/bootstrap.min.js
+[pid: 157728|app: 0|req: 15/53] 192.168.194.78 () {40 vars in 691 bytes} [Tue Feb  4 13:08:47 2025] GET /static/rest_framework/js/bootstrap.min.js => generated 2453 bytes in 5 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /static/rest_framework/js/load-ajax-form.js
+Not Found: /static/rest_framework/js/default.js
+[pid: 157729|app: 0|req: 22/55] 192.168.194.78 () {40 vars in 693 bytes} [Tue Feb  4 13:08:47 2025] GET /static/rest_framework/js/load-ajax-form.js => generated 2456 bytes in 5 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+[pid: 157727|app: 0|req: 10/55] 192.168.194.78 () {40 vars in 679 bytes} [Tue Feb  4 13:08:47 2025] GET /static/rest_framework/js/default.js => generated 2435 bytes in 5 msecs (HTTP/1.1 404) 6 headers in 215 bytes (2 switches on core 0)
+Not Found: /static/rest_framework/js/jquery-3.7.1.min.js
+[pid: 157729|app: 0|req: 23/56] 192.168.194.78 () {38 vars in 648 bytes} [Tue Feb  4 13:08:47 2025] GET /static/rest_framework/js/jquery-3.7.1.min.js => generated 2462 bytes in 8 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /static/rest_framework/js/ajax-form.js
+Not Found: /static/rest_framework/js/bootstrap.min.js
+[pid: 157726|app: 0|req: 9/57] 192.168.194.78 () {38 vars in 635 bytes} [Tue Feb  4 13:08:47 2025] GET /static/rest_framework/js/ajax-form.js => generated 2441 bytes in 13 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+[pid: 157729|app: 0|req: 24/58] 192.168.194.78 () {38 vars in 643 bytes} [Tue Feb  4 13:08:47 2025] GET /static/rest_framework/js/bootstrap.min.js => generated 2453 bytes in 5 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /static/rest_framework/js/csrf.js
+Not Found: /static/rest_framework/js/prettify-min.js
+[pid: 157727|app: 0|req: 11/59] 192.168.194.78 () {38 vars in 641 bytes} [Tue Feb  4 13:08:47 2025] GET /static/rest_framework/js/prettify-min.js => generated 2450 bytes in 15 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+[pid: 157728|app: 0|req: 16/60] 192.168.194.78 () {38 vars in 625 bytes} [Tue Feb  4 13:08:47 2025] GET /static/rest_framework/js/csrf.js => generated 2426 bytes in 16 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /static/rest_framework/js/load-ajax-form.js
+Not Found: /static/rest_framework/js/default.js
+[pid: 157726|app: 0|req: 10/61] 192.168.194.78 () {38 vars in 646 bytes} [Tue Feb  4 13:08:47 2025] GET /static/rest_framework/js/load-ajax-form.js => generated 2456 bytes in 8 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+[pid: 157729|app: 0|req: 25/62] 192.168.194.78 () {38 vars in 632 bytes} [Tue Feb  4 13:08:47 2025] GET /static/rest_framework/js/default.js => generated 2435 bytes in 8 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /static/rest_framework/css/bootstrap.min.css
+[pid: 157729|app: 0|req: 26/63] 192.168.194.78 () {40 vars in 710 bytes} [Tue Feb  4 13:08:49 2025] GET /static/rest_framework/css/bootstrap.min.css => generated 2459 bytes in 5 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /static/rest_framework/css/bootstrap-tweaks.css
+[pid: 157728|app: 0|req: 17/64] 192.168.194.78 () {40 vars in 716 bytes} [Tue Feb  4 13:08:49 2025] GET /static/rest_framework/css/bootstrap-tweaks.css => generated 2468 bytes in 5 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /static/rest_framework/css/prettify.css
+[pid: 157727|app: 0|req: 12/65] 192.168.194.78 () {40 vars in 700 bytes} [Tue Feb  4 13:08:49 2025] GET /static/rest_framework/css/prettify.css => generated 2444 bytes in 6 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+Not Found: /static/rest_framework/css/default.css
+[pid: 157726|app: 0|req: 11/66] 192.168.194.78 () {40 vars in 698 bytes} [Tue Feb  4 13:08:49 2025] GET /static/rest_framework/css/default.css => generated 2441 bytes in 4 msecs (HTTP/1.1 404) 6 headers in 215 bytes (1 switches on core 0)
+SIGINT/SIGTERM received...killing workers...
+gateway "uWSGI http 1" has been buried (pid: 157730)
+Tue Feb  4 13:26:15 2025 - received message 0 from emperor
+worker 1 buried after 1 seconds
+worker 2 buried after 1 seconds
+worker 3 buried after 1 seconds
+worker 4 buried after 1 seconds
+goodbye to uWSGI.
+VACUUM: unix socket /var/www/html/djangovuer/uwsgi.sock removed.
