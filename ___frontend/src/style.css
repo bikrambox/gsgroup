@@ -1,8 +1,8 @@
 @import "tailwindcss";
+
 @tailwind base;
 @tailwind components;
-@tailwind utilities; 
-@import "flowbite/src/themes/default";
+@tailwind utilities;
 /* 
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;

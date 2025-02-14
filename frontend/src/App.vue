@@ -1,32 +1,39 @@
-<template>
+<!-- <template>
   <router-view></router-view>
+</template> -->
+
+
+
+<template>
+  <div>
+    <router-view></router-view>
+  </div>
 </template>
 
+<script>
+export default {
+  mounted() {
+    // Optional: Add a method to detect and respond to system theme changes
+    const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    // Initial check
+    this.handleDarkMode(darkModeMediaQuery);
+    
+    // Listen for changes
+    darkModeMediaQuery.addListener(this.handleDarkMode);
+  },
+  methods: {
+    handleDarkMode(e) {
+      // You can add custom logic here if needed
+      console.log('System dark mode is:', e.matches ? 'on' : 'off')
+    }
+  }
+}
+</script>
+
 <style>
-:root {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui;
-  line-height: 1.5;
-  font-weight: 400;
-}
-
-body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  font-weight: normal;
-}
-
-a {
-  color: #42b983;
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
+/* Optional: Smooth transition for dark mode */
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 </style>

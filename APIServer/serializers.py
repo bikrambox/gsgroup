@@ -6,18 +6,42 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.utils import timezone
 from .models import APIKey, NomecoDelivery, NovonordisDelivery
+from .utils.crypto import CryptoUtils
+
+class EncryptedCharField(serializers.CharField):
+    """Custom field that encrypts data before saving and decrypts when reading"""
+    
+    def to_internal_value(self, data):
+        # Encrypt data before saving
+        return CryptoUtils.encrypt_data(data)
+
+    def to_representation(self, value):
+        # Decrypt data when reading
+        try:
+            return CryptoUtils.decrypt_data(value)
+        except ValueError:
+            return value  # Return as is if decryption fails
 
 class UserSerializer(serializers.ModelSerializer):
+    password = EncryptedCharField(write_only=True)
+    email = EncryptedCharField(required=False)
+    
     class Meta:
         model = User
         fields = ('id', 'username', 'email', 'password')
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
+        # Decrypt password before creating user
+        password = CryptoUtils.decrypt_data(validated_data.pop('password'))
+        email = validated_data.get('email', '')
+        if email:
+            email = CryptoUtils.decrypt_data(email)
+            
         user = User.objects.create_user(
             username=validated_data['username'],
-            email=validated_data.get('email', ''),
-            password=validated_data['password']
+            email=email,
+            password=password
         )
         return user
 
@@ -78,13 +102,18 @@ class APIKeyProfileSerializer(serializers.ModelSerializer):
         return 'active'
 
 class ChangePasswordSerializer(serializers.Serializer):
-    current_password = serializers.CharField(required=True)
-    new_password = serializers.CharField(required=True, min_length=8)
-    confirm_password = serializers.CharField(required=True)
+    current_password = EncryptedCharField(required=True)
+    new_password = EncryptedCharField(required=True)
+    confirm_password = EncryptedCharField(required=True)
 
     def validate(self, data):
-        if data['new_password'] != data['confirm_password']:
+        # Decrypt passwords for comparison
+        new_pass = CryptoUtils.decrypt_data(data['new_password'])
+        confirm_pass = CryptoUtils.decrypt_data(data['confirm_password'])
+        
+        if new_pass != confirm_pass:
             raise serializers.ValidationError({'confirm_password': 'Passwords do not match'})
+            
         return data
 
     def validate_new_password(self, value):

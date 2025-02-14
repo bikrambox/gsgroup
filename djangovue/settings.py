@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
+    'corsheaders',  # Add CORS headers
     'APIServer'
 ]
 
@@ -111,12 +112,34 @@ SIMPLE_JWT = {
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # Add CORS middleware before CommonMiddleware
     'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'APIServer.middleware.encryption.EncryptionMiddleware',  # Add encryption middleware
 ]
+
+# CORS settings
+CORS_ALLOW_ALL_ORIGINS = False  # More secure than allowing all origins
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',
+    'http://0.0.0.0:5173',
+    'http://127.0.0.1:5173',
+]
+CORS_ALLOW_CREDENTIALS = True  # Allow credentials (cookies, authorization headers)
+
+# CSRF settings for cross-origin requests
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:5173',
+    'http://0.0.0.0:5173',
+    'http://127.0.0.1:5173',
+]
+
+# Session settings
+SESSION_COOKIE_SAMESITE = 'Lax'  # or 'None' if using HTTPS
+SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
 
 ROOT_URLCONF = 'djangovue.urls'
 
