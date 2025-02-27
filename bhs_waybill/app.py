@@ -6,11 +6,9 @@ app = Flask(__name__,
            static_folder='static',
            template_folder='templates')
 
-# Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Initialize FTP connection
 ftp = FTPConnection()
 
 @app.route('/')
@@ -29,7 +27,7 @@ def ftp_list():
     logger.info("API request to list FTP directory")
     result = ftp.list_dir()
     return jsonify(result)
-    
+
 if __name__ == '__main__':
     # This will only be used in development
     host = os.getenv('HOST', '0.0.0.0')

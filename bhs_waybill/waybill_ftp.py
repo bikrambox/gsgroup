@@ -3,7 +3,6 @@ import os
 from dotenv import load_dotenv
 import logging
 
-# Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -12,20 +11,30 @@ class FTPConnection:
         load_dotenv()
         self.ftp = None
         self.host = os.getenv('FTP_HOST')
+        self.port = int(os.getenv('FTP_PORT', 21))
         self.username = os.getenv('FTP_USERNAME')
         self.password = os.getenv('FTP_PASSWORD')
         self.connected = False
-        logger.info(f"Initializing FTP connection from bastion host to {self.host}")
+        logger.info(f"Initializing FTP connection from bastion host to {self.host}:{self.port}")
 
     def connect(self):
         try:
-            self.ftp = ftplib.FTP(self.host)
+            self.ftp = ftplib.FTP()
+            logger.info(f"Attempting connection to {self.host}:{self.port}")
+            self.ftp.connect(self.host, self.port)
             self.ftp.login(self.username, self.password)
             self.connected = True
-            logger.info(f"Successfully connected to FTP server at {self.host}")
+            logger.info(f"Successfully connected to FTP server at {self.host}:{self.port}")
             return {
                 "status": "success",
-                "message": f"Connected to FTP server at {self.host}"
+                "message": f"Connected to FTP server at {self.host}:{self.port}"
+            }
+        except ConnectionRefusedError as e:
+            self.connected = False
+            logger.error(f"Connection refused to {self.host}:{self.port} - {str(e)}")
+            return {
+                "status": "error",
+                "message": f"FTP connection refused: {str(e)}"
             }
         except Exception as e:
             self.connected = False
