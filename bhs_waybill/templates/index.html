@@ -10,7 +10,7 @@
     </style>
 </head>
 <body>
-    <h1>BHS Waybill FTP</h1>
+    <h1>BHS Waybill FTPS</h1>
     <div id="status"></div>
     <button onclick="listFiles()">List Files</button>
     <div id="file-list"></div>
@@ -20,10 +20,10 @@
             try {
                 const response = await fetch('/api/ftp/status');
                 const result = await response.json();
-                console.log(`[Bastion FTP] ${result.message}`);
+                console.log(`[Bastion FTPS] ${result.message}`);
                 document.getElementById('status').innerHTML = `Status: ${result.message}`;
             } catch (error) {
-                console.error('[Bastion FTP] Status error:', error);
+                console.error('[Bastion FTPS] Status error:', error);
             }
         }
 
@@ -31,11 +31,11 @@
             try {
                 const response = await fetch('/api/ftp/list');
                 const result = await response.json();
-                console.log(`[Bastion FTP] ${result.message}`);
+                console.log(`[Bastion FTPS] ${result.message}`);
                 
                 if (result.status === 'success') {
                     const fileList = document.getElementById('file-list');
-                    fileList.innerHTML = '<h2>FTP Files:</h2>' + 
+                    fileList.innerHTML = '<h2>FTPS Files:</h2>' + 
                         '<ul>' + 
                         result.data.map(file => `<li>${file}</li>`).join('') + 
                         '</ul>';
@@ -43,11 +43,11 @@
                     document.getElementById('file-list').innerHTML = `Error: ${result.message}`;
                 }
             } catch (error) {
-                console.error('[Bastion FTP] List error:', error);
+                console.error('[Bastion FTPS] List error:', error);
             }
         }
 
-        checkStatus(); // Check status on load
+        checkStatus();
     </script>
 </body>
 </html>
