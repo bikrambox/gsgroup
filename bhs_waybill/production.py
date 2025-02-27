@@ -25,12 +25,9 @@ logger = logging.getLogger(__name__)
 
 load_dotenv()
 
-
-
 if __name__ == '__main__':
     host = os.getenv('HOST', '0.0.0.0')
     port = int(os.getenv('PORT', 5500))
     
     logger.info(f"Starting BHS Waybill in production mode on {host}:{port}...")
-    initialize_ftp()  # Connect to FTP once at startup
     serve(app, host=host, port=port)
