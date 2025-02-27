@@ -76,7 +76,7 @@
 
     <script>
         const baseUrl = 'https://vps1139.basicserver.io:42030'; // Update with your server URL
-        let currentPath = '/Reports/ELON_data/Nomeco_environments/PROD_internally'; // Changed from const to let
+        let currentPath = '/Reports/ELON_data/Nomeco_environments/PROD_internally'; // Ensure this is 'let'
 
         async function loadDirectory(path = currentPath) {
             console.log("Loading directory for path - Input:", path, "Global currentPath:", currentPath);
@@ -127,7 +127,7 @@
             let cumulativePath = '/';
             parts.forEach((part, index) => {
                 // Build the cumulative path up to this part
-                const currentPath = cumulativePath + part;
+                const currentPath = cumulativePath + part; // Local const, doesn’t affect global currentPath
                 if (index < parts.length - 1) {
                     cumulativePath = currentPath + '/';
                 } else {
@@ -145,10 +145,10 @@
                     breadcrumb.href = '#';
                     breadcrumb.onclick = (e) => {
                         e.preventDefault();
-                        console.log("Clicked breadcrumb - Before update:", currentPath, "Global currentPath:", currentPath);
-                        currentPath = currentPath; // Ensure we’re navigating to the correct parent
-                        console.log("Clicked breadcrumb - After update:", currentPath);
-                        loadDirectory(currentPath);
+                        console.log("Clicked breadcrumb - Before update:", currentPath, "Global currentPath:", window.currentPath);
+                        window.currentPath = currentPath; // Use window.currentPath to ensure global scope
+                        console.log("Clicked breadcrumb - After update:", window.currentPath);
+                        loadDirectory(window.currentPath);
                     };
                 }
 
@@ -163,10 +163,10 @@
                 homeBreadcrumb.href = '#';
                 homeBreadcrumb.onclick = (e) => {
                     e.preventDefault();
-                    console.log("Clicked Home breadcrumb, navigating to root. Current global currentPath:", currentPath);
-                    currentPath = '/'; // Adjust this to the root FTP directory if different
-                    console.log("Clicked Home breadcrumb, new currentPath:", currentPath);
-                    loadDirectory(currentPath);
+                    console.log("Clicked Home breadcrumb, navigating to root. Current global currentPath:", window.currentPath);
+                    window.currentPath = '/'; // Adjust this to the root FTP directory if different
+                    console.log("Clicked Home breadcrumb, new currentPath:", window.currentPath);
+                    loadDirectory(window.currentPath);
                 };
                 breadcrumbs.insertBefore(homeBreadcrumb, breadcrumbs.firstChild);
 
