@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request
 from waybill_ftp import FTPConnection  # Updated import
 import logging
 import os
@@ -40,7 +40,15 @@ def ftp_status():
 @app.route('/api/ftp/list', methods=['GET'])
 def ftp_list():
     logger.info("API request to list FTPS directory")
-    result = ftp_connection.list_dir()
+    path = request.args.get('path', '/Reports/ELON_data/Nomeco_environments/PROD_internally')
+    result = ftp_connection.list_dir(path)
+    return jsonify(result)
+
+@app.route('/api/ftp/navigate', methods=['GET'])
+def ftp_navigate():
+    logger.info("API request to navigate FTPS directory")
+    path = request.args.get('path', '')
+    result = ftp_connection.list_dir(path)
     return jsonify(result)
 
 if __name__ == '__main__':

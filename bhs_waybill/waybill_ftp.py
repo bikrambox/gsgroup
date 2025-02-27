@@ -49,7 +49,7 @@ class FTPConnection:
                 "message": f"FTPS connection failed: {e}"
             }
 
-    def list_dir(self):
+    def list_dir(self, path='/Reports/ELON_data/Nomeco_environments/PROD_internally'):
         if not self.connected or not self.ftp:
             logger.warning("Attempted to list directory without active connection")
             return {
@@ -61,24 +61,34 @@ class FTPConnection:
             current_dir = self.ftp.pwd()
             logger.info(f"Current FTP working directory: {current_dir}")
             
-            # Define the target directory with forward slashes (FTP standard)
-            target_dir = "/Reports/ELON_data/Nomeco_environments/PROD_internally"
-            logger.info(f"Navigating to directory: {target_dir}")
-            
             # Change to the specified directory
-            self.ftp.cwd(target_dir)
+            if path:
+                logger.info(f"Navigating to directory: {path}")
+                self.ftp.cwd(path)
             
-            # Log the new working directory to confirm
-            new_dir = self.ftp.pwd()
-            logger.info(f"Successfully changed to directory: {new_dir}")
+            # Get directory listing with details to distinguish folders/files
+            files = []
+            self.ftp.retrlines('LIST', files.append)
             
-            # List the contents of the directory
-            files = self.ftp.nlst()
-            logger.info(f"Successfully retrieved directory listing from {target_dir}")
+            # Parse the listing to identify directories and files
+            items = []
+            for line in files:
+                # Example parsing (format depends on FTP server, e.g., "drwxr-xr-x   2 user group 4096 Oct 10 2024 Nomeco_2024-10-10")
+                parts = line.split()
+                if len(parts) >= 9:
+                    name = parts[-1]  # Last part is the name
+                    is_dir = parts[0].startswith('d')  # 'd' indicates directory
+                    items.append({
+                        "name": name,
+                        "is_dir": is_dir,
+                        "path": f"{path}/{name}" if path.endswith('/') else f"{path}/{name}"
+                    })
+            
+            logger.info(f"Successfully retrieved directory listing from {path}")
             return {
                 "status": "success",
-                "data": files,
-                "message": f"Directory listing retrieved successfully from {target_dir}"
+                "data": items,
+                "message": f"Directory listing retrieved successfully from {path}"
             }
         except ftplib.error_perm as e:
             logger.error(f"Permission error accessing directory: {e}")

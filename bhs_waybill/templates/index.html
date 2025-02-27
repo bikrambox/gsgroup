@@ -3,51 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BHS Waybill</title>
+    <title>BHS Waybill FTPS File Manager</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
-        #file-list { margin-top: 20px; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .file-manager {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .directory-path {
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .item-list {
+            list-style: none;
+            padding: 0;
+        }
+        .item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+        .item.dir {
+            color: blue;
+        }
+        .item.file {
+            color: black;
+        }
+        .item:hover {
+            background-color: #f5f5f5;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
-    <h1>BHS Waybill FTPS</h1>
-    <div id="status"></div>
-    <button onclick="listFiles()">List Files</button>
-    <div id="file-list"></div>
+    <div class="file-manager">
+        <h1>BHS Waybill FTPS File Manager</h1>
+        <div class="directory-path" id="currentPath">/Reports/ELON_data/Nomeco_environments/PROD_internally</div>
+        <ul class="item-list" id="fileList"></ul>
+        <div class="error" id="errorMessage"></div>
+    </div>
 
     <script>
-        async function checkStatus() {
-            try {
-                const response = await fetch('/api/ftp/status');
-                const result = await response.json();
-                console.log(`[Bastion FTPS] ${result.message}`);
-                document.getElementById('status').innerHTML = `Status: ${result.message}`;
-            } catch (error) {
-                console.error('[Bastion FTPS] Status error:', error);
-            }
-        }
+        const baseUrl = 'http://localhost:8000'; // Update with your server URL
+        let currentPath = '/Reports/ELON_data/Nomeco_environments/PROD_internally';
 
-        async function listFiles() {
+        async function loadDirectory(path = currentPath) {
             try {
-                const response = await fetch('/api/ftp/list');
-                const result = await response.json();
-                console.log(`[Bastion FTPS] ${result.message}`);
-                
-                if (result.status === 'success') {
-                    const fileList = document.getElementById('file-list');
-                    fileList.innerHTML = '<h2>FTPS Files:</h2>' + 
-                        '<ul>' + 
-                        result.data.map(file => `<li>${file}</li>`).join('') + 
-                        '</ul>';
-                } else {
-                    document.getElementById('file-list').innerHTML = `Error: ${result.message}`;
+                const response = await fetch(`${baseUrl}/api/ftp/list?path=${encodeURIComponent(path)}`);
+                const data = await response.json();
+
+                if (data.status === 'error') {
+                    document.getElementById('errorMessage').textContent = data.message;
+                    document.getElementById('fileList').innerHTML = '';
+                    return;
                 }
+
+                document.getElementById('errorMessage').textContent = '';
+                document.getElementById('currentPath').textContent = path;
+                const fileList = document.getElementById('fileList');
+                fileList.innerHTML = '';
+
+                data.data.forEach(item => {
+                    const li = document.createElement('li');
+                    li.className = `item ${item.is_dir ? 'dir' : 'file'}`;
+                    li.textContent = item.name;
+                    li.onclick = () => {
+                        if (item.is_dir) {
+                            currentPath = item.path;
+                            loadDirectory(currentPath);
+                        } else {
+                            alert(`File selected: ${item.name}`);
+                            // Add file handling logic here (e.g., download)
+                        }
+                    };
+                    fileList.appendChild(li);
+                });
             } catch (error) {
-                console.error('[Bastion FTPS] List error:', error);
+                document.getElementById('errorMessage').textContent = 'Failed to load directory: ' + error.message;
             }
         }
 
-        checkStatus();
+        // Load initial directory
+        window.onload = () => loadDirectory();
     </script>
 </body>
 </html>
