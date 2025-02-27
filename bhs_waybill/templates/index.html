@@ -76,10 +76,10 @@
 
     <script>
         const baseUrl = 'https://vps1139.basicserver.io:42030'; // Update with your server URL
-        let currentPath = '/Reports/ELON_data/Nomeco_environments/PROD_internally';
+        let currentPath = '/Reports/ELON_data/Nomeco_environments/PROD_internally'; // Changed from const to let
 
         async function loadDirectory(path = currentPath) {
-            console.log("Loading directory for path:", path);
+            console.log("Loading directory for path - Input:", path, "Global currentPath:", currentPath);
             try {
                 const response = await fetch(`${baseUrl}/api/ftp/list?path=${encodeURIComponent(path)}`);
                 const data = await response.json();
@@ -87,7 +87,7 @@
                 if (data.status === 'error') {
                     document.getElementById('errorMessage').textContent = data.message;
                     document.getElementById('fileList').innerHTML = '';
-                    console.error("Failed to load directory:", data.message);
+                    console.error("Failed to load directory:", data.message, "Requested path:", path);
                     return;
                 }
 
@@ -103,7 +103,7 @@
                     li.onclick = () => {
                         if (item.is_dir) {
                             currentPath = item.path;
-                            console.log("Navigating to directory:", currentPath);
+                            console.log("Navigating to directory - New currentPath:", currentPath, "Item path:", item.path);
                             loadDirectory(currentPath);
                         } else {
                             alert(`File selected: ${item.name}`);
@@ -114,7 +114,7 @@
                 });
             } catch (error) {
                 document.getElementById('errorMessage').textContent = 'Failed to load directory: ' + error.message;
-                console.error("Fetch error:", error);
+                console.error("Fetch error:", error, "Requested path:", path);
             }
         }
 
@@ -140,12 +140,14 @@
 
                 if (index === parts.length - 1) {
                     breadcrumb.classList.add('active');
+                    console.log("Active breadcrumb (current directory):", currentPath);
                 } else {
                     breadcrumb.href = '#';
                     breadcrumb.onclick = (e) => {
                         e.preventDefault();
-                        console.log("Clicked breadcrumb:", currentPath); // Use currentPath here, not cumulativePath
-                        currentPath = currentPath; // Set the path to navigate to the parent
+                        console.log("Clicked breadcrumb - Before update:", currentPath, "Global currentPath:", currentPath);
+                        currentPath = currentPath; // Ensure we’re navigating to the correct parent
+                        console.log("Clicked breadcrumb - After update:", currentPath);
                         loadDirectory(currentPath);
                     };
                 }
@@ -161,8 +163,9 @@
                 homeBreadcrumb.href = '#';
                 homeBreadcrumb.onclick = (e) => {
                     e.preventDefault();
-                    console.log("Clicked Home breadcrumb, navigating to root");
+                    console.log("Clicked Home breadcrumb, navigating to root. Current global currentPath:", currentPath);
                     currentPath = '/'; // Adjust this to the root FTP directory if different
+                    console.log("Clicked Home breadcrumb, new currentPath:", currentPath);
                     loadDirectory(currentPath);
                 };
                 breadcrumbs.insertBefore(homeBreadcrumb, breadcrumbs.firstChild);
