@@ -49,49 +49,50 @@ class FTPConnection:
                 "message": f"FTPS connection failed: {e}"
             }
 
-def list_dir(self):
-    if not self.connected or not self.ftp:
-        logger.warning("Attempted to list directory without active connection")
-        return {
-            "status": "error",
-            "message": "Not connected to FTPS server"
-        }
-    try:
-        # Log the current working directory before attempting to change
-        current_dir = self.ftp.pwd()
-        logger.info(f"Current FTP working directory: {current_dir}")
-        
-        # Define the target directory with forward slashes (FTP standard)
-        target_dir = "/Reports/ELON_data/Nomeco_environments/PROD_internally"
-        logger.info(f"Navigating to directory: {target_dir}")
-        
-        # Change to the specified directory
-        self.ftp.cwd(target_dir)
-        
-        # Log the new working directory to confirm
-        new_dir = self.ftp.pwd()
-        logger.info(f"Successfully changed to directory: {new_dir}")
-        
-        # List the contents of the directory
-        files = self.ftp.nlst()
-        logger.info(f"Successfully retrieved directory listing from {target_dir}")
-        return {
-            "status": "success",
-            "data": files,
-            "message": f"Directory listing retrieved successfully from {target_dir}"
-        }
-    except ftplib.error_perm as e:
-        logger.error(f"Permission error accessing directory: {e}")
-        return {
-            "status": "error",
-            "message": f"Permission error accessing directory: {e}"
-        }
-    except Exception as e:
-        logger.error(f"Error listing directory: {e}")
-        return {
-            "status": "error",
-            "message": f"Error listing directory: {e}"
-        }
+    def list_dir(self):
+        if not self.connected or not self.ftp:
+            logger.warning("Attempted to list directory without active connection")
+            return {
+                "status": "error",
+                "message": "Not connected to FTPS server"
+            }
+        try:
+            # Log the current working directory before attempting to change
+            current_dir = self.ftp.pwd()
+            logger.info(f"Current FTP working directory: {current_dir}")
+            
+            # Define the target directory with forward slashes (FTP standard)
+            target_dir = "/Reports/ELON_data/Nomeco_environments/PROD_internally"
+            logger.info(f"Navigating to directory: {target_dir}")
+            
+            # Change to the specified directory
+            self.ftp.cwd(target_dir)
+            
+            # Log the new working directory to confirm
+            new_dir = self.ftp.pwd()
+            logger.info(f"Successfully changed to directory: {new_dir}")
+            
+            # List the contents of the directory
+            files = self.ftp.nlst()
+            logger.info(f"Successfully retrieved directory listing from {target_dir}")
+            return {
+                "status": "success",
+                "data": files,
+                "message": f"Directory listing retrieved successfully from {target_dir}"
+            }
+        except ftplib.error_perm as e:
+            logger.error(f"Permission error accessing directory: {e}")
+            return {
+                "status": "error",
+                "message": f"Permission error accessing directory: {e}"
+            }
+        except Exception as e:
+            logger.error(f"Error listing directory: {e}")
+            return {
+                "status": "error",
+                "message": f"Error listing directory: {e}"
+            }
+
     def get_status(self):
         if self.connected:
             return {"status": "success", "message": f"Connected to {self.host}:{self.port}"}
