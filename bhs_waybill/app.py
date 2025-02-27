@@ -1,4 +1,5 @@
 from flask import Flask, render_template, jsonify, request
+from flask_cors import CORS
 from waybill_ftp import FTPConnection  # Updated import
 import logging
 import os
@@ -10,6 +11,9 @@ load_dotenv()
 app = Flask(__name__, 
             static_folder='static',
             template_folder='templates')
+
+# Enable CORS for all routes (or specify origins if needed)
+CORS(app, resources={r"/api/*": {"origins": "*"}})  # Allows all origins; restrict if needed
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
