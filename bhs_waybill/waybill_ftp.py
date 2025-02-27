@@ -18,6 +18,8 @@ class FTPConnection:
         logger.info(f"Initializing FTP connection from bastion host to {self.host}:{self.port}")
 
     def connect(self):
+        if self.connected:
+            return {"status": "success", "message": "Already connected"}
         try:
             self.ftp = ftplib.FTP()
             logger.info(f"Attempting connection to {self.host}:{self.port}")
@@ -66,8 +68,14 @@ class FTPConnection:
                 "message": f"Error listing directory: {str(e)}"
             }
 
+    def get_status(self):
+        """Return current connection status"""
+        if self.connected:
+            return {"status": "success", "message": f"Connected to {self.host}:{self.port}"}
+        return {"status": "error", "message": "Not connected to FTP server"}
+
     def disconnect(self):
-        if self.ftp:
+        if self.connected and self.ftp:
             try:
                 self.ftp.quit()
                 self.connected = False

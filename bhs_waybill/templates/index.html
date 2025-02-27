@@ -11,22 +11,19 @@
 </head>
 <body>
     <h1>BHS Waybill FTP</h1>
-    <button onclick="connectFTP()">Connect to FTP</button>
-    <button onclick="listFiles()" disabled id="list-btn">List Files</button>
+    <div id="status"></div>
+    <button onclick="listFiles()">List Files</button>
     <div id="file-list"></div>
 
     <script>
-        async function connectFTP() {
+        async function checkStatus() {
             try {
-                const response = await fetch('/api/ftp/connect');
+                const response = await fetch('/api/ftp/status');
                 const result = await response.json();
                 console.log(`[Bastion FTP] ${result.message}`);
-                
-                if (result.status === 'success') {
-                    document.getElementById('list-btn').disabled = false;
-                }
+                document.getElementById('status').innerHTML = `Status: ${result.message}`;
             } catch (error) {
-                console.error('[Bastion FTP] Connection error:', error);
+                console.error('[Bastion FTP] Status error:', error);
             }
         }
 
@@ -42,13 +39,15 @@
                         '<ul>' + 
                         result.data.map(file => `<li>${file}</li>`).join('') + 
                         '</ul>';
+                } else {
+                    document.getElementById('file-list').innerHTML = `Error: ${result.message}`;
                 }
             } catch (error) {
                 console.error('[Bastion FTP] List error:', error);
             }
         }
 
-        connectFTP();
+        checkStatus(); // Check status on load
     </script>
 </body>
 </html>
