@@ -19,9 +19,28 @@
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
-        .directory-path {
+        .breadcrumbs {
             margin-bottom: 10px;
             font-weight: bold;
+        }
+        .breadcrumb {
+            display: inline-block;
+            color: #333;
+            text-decoration: none;
+            padding: 2px 5px;
+        }
+        .breadcrumb:not(:last-child):after {
+            content: " / ";
+            color: #666;
+            margin: 0 5px;
+        }
+        .breadcrumb:hover {
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        .breadcrumb.active {
+            color: #666;
+            pointer-events: none;
         }
         .item-list {
             list-style: none;
@@ -50,14 +69,13 @@
 <body>
     <div class="file-manager">
         <h1>BHS Waybill FTPS File Manager</h1>
-        <div class="directory-path" id="currentPath">/Reports/ELON_data/Nomeco_environments/PROD_internally</div>
+        <div class="breadcrumbs" id="breadcrumbs"></div>
         <ul class="item-list" id="fileList"></ul>
         <div class="error" id="errorMessage"></div>
     </div>
 
     <script>
-        // const baseUrl = 'http://localhost:8000'; // Update with your server URL
-        const baseUrl = 'https://vps1139.basicserver.io:42030';
+        const baseUrl = 'https://vps1139.basicserver.io:42030'; // Update with your server URL
         let currentPath = '/Reports/ELON_data/Nomeco_environments/PROD_internally';
 
         async function loadDirectory(path = currentPath) {
@@ -72,7 +90,7 @@
                 }
 
                 document.getElementById('errorMessage').textContent = '';
-                document.getElementById('currentPath').textContent = path;
+                updateBreadcrumbs(path);
                 const fileList = document.getElementById('fileList');
                 fileList.innerHTML = '';
 
@@ -93,6 +111,51 @@
                 });
             } catch (error) {
                 document.getElementById('errorMessage').textContent = 'Failed to load directory: ' + error.message;
+            }
+        }
+
+        function updateBreadcrumbs(path) {
+            const parts = path.split('/').filter(part => part.length > 0);
+            const breadcrumbs = document.getElementById('breadcrumbs');
+            breadcrumbs.innerHTML = '';
+
+            let cumulativePath = '';
+            parts.forEach((part, index) => {
+                cumulativePath += '/' + part;
+                const breadcrumb = document.createElement('a');
+                breadcrumb.className = 'breadcrumb';
+                breadcrumb.textContent = part;
+
+                if (index === parts.length - 1) {
+                    breadcrumb.classList.add('active');
+                } else {
+                    breadcrumb.href = '#';
+                    breadcrumb.onclick = (e) => {
+                        e.preventDefault();
+                        currentPath = cumulativePath;
+                        loadDirectory(currentPath);
+                    };
+                }
+
+                breadcrumbs.appendChild(breadcrumb);
+            });
+
+            // Add "Home" breadcrumb as the first item
+            if (parts.length > 0) {
+                const homeBreadcrumb = document.createElement('a');
+                homeBreadcrumb.className = 'breadcrumb';
+                homeBreadcrumb.textContent = 'Home';
+                homeBreadcrumb.href = '#';
+                homeBreadcrumb.onclick = (e) => {
+                    e.preventDefault();
+                    currentPath = '/'; // Adjust this to the root FTP directory if different
+                    loadDirectory(currentPath);
+                };
+                breadcrumbs.insertBefore(homeBreadcrumb, breadcrumbs.firstChild);
+
+                // Add separators after "Home"
+                const separator = document.createTextNode(' / ');
+                breadcrumbs.insertBefore(separator, breadcrumbs.childNodes[1]);
             }
         }
 
