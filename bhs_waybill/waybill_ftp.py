@@ -8,14 +8,16 @@ logger = logging.getLogger(__name__)
 
 class FTPConnection:
     def __init__(self):
+        # Load env variables in the class
         load_dotenv()
         self.ftp = None
-        self.host = os.getenv('FTP_HOST', '10.6.8.43')  # Default to your host
-        self.port = int(os.getenv('FTP_PORT', 21))      # Default FTPS port
-        self.username = os.getenv('FTP_USERNAME', 'BHSR\\jeba')  # Default to your username (note escaped backslash)
-        self.password = os.getenv('FTP_PASSWORD', 'Hundekoldt2006!')  # Default to your password
+        self.host = os.getenv('FTP_HOST')
+        self.port = int(os.getenv('FTP_PORT'))
+        self.username = os.getenv('FTP_USERNAME')  # Single backslash in .env
+        self.password = os.getenv('FTP_PASSWORD')
         self.connected = False
         logger.info(f"Initializing FTPS connection from bastion host to {self.host}:{self.port}")
+        logger.info(f"Using credentials - Username: '{self.username}', Password: '{self.password}'")
 
     def connect(self):
         if self.connected:
@@ -25,7 +27,7 @@ class FTPConnection:
             logger.info(f"Attempting FTPS connection to {self.host}:{self.port}")
             self.ftp.connect(self.host, self.port)
             self.ftp.login(self.username, self.password)
-            self.ftp.prot_p()  # Switch to protected data connection
+            self.ftp.prot_p()  # Enable protected data connection
             self.connected = True
             logger.info(f"Successfully connected to FTPS server at {self.host}:{self.port}")
             return {
@@ -34,17 +36,17 @@ class FTPConnection:
             }
         except ftplib.error_perm as e:
             self.connected = False
-            logger.error(f"FTPS authentication or permission failed: {str(e)}")
+            logger.error(f"FTPS authentication or permission failed: {e}")
             return {
                 "status": "error",
-                "message": f"FTPS authentication or permission failed: {str(e)}"
+                "message": f"FTPS authentication or permission failed: {e}"
             }
         except Exception as e:
             self.connected = False
-            logger.error(f"FTPS connection failed: {str(e)}")
+            logger.error(f"FTPS connection failed: {e}")
             return {
                 "status": "error",
-                "message": f"FTPS connection failed: {str(e)}"
+                "message": f"FTPS connection failed: {e}"
             }
 
     def list_dir(self):
@@ -63,10 +65,10 @@ class FTPConnection:
                 "message": "Directory listing retrieved successfully"
             }
         except Exception as e:
-            logger.error(f"Error listing directory: {str(e)}")
+            logger.error(f"Error listing directory: {e}")
             return {
                 "status": "error",
-                "message": f"Error listing directory: {str(e)}"
+                "message": f"Error listing directory: {e}"
             }
 
     def get_status(self):
@@ -82,6 +84,6 @@ class FTPConnection:
                 logger.info("FTPS connection closed")
                 return True
             except Exception as e:
-                logger.error(f"Error closing FTPS connection: {str(e)}")
+                logger.error(f"Error closing FTPS connection: {e}")
                 return False
         return True

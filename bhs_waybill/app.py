@@ -1,10 +1,15 @@
 from flask import Flask, render_template, jsonify
 from waybill_ftp import FTPConnection  # Updated import
 import logging
+import os
+from dotenv import load_dotenv
+
+# Load environment variables before anything else
+load_dotenv()
 
 app = Flask(__name__, 
-           static_folder='static',
-           template_folder='templates')
+            static_folder='static',
+            template_folder='templates')
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
