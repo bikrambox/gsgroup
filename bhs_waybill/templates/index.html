@@ -5,14 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BHS Waybill</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-        }
-        #file-list {
-            margin-top: 20px;
-        }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        #file-list { margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -26,13 +20,13 @@
             try {
                 const response = await fetch('/api/ftp/connect');
                 const result = await response.json();
-                console.log(`FTP Connection: ${result.message}`);
+                console.log(`[Bastion FTP] ${result.message}`);
                 
                 if (result.status === 'success') {
                     document.getElementById('list-btn').disabled = false;
                 }
             } catch (error) {
-                console.error('FTP Connection error:', error);
+                console.error('[Bastion FTP] Connection error:', error);
             }
         }
 
@@ -40,7 +34,7 @@
             try {
                 const response = await fetch('/api/ftp/list');
                 const result = await response.json();
-                console.log(`FTP List: ${result.message}`);
+                console.log(`[Bastion FTP] ${result.message}`);
                 
                 if (result.status === 'success') {
                     const fileList = document.getElementById('file-list');
@@ -50,12 +44,11 @@
                         '</ul>';
                 }
             } catch (error) {
-                console.error('FTP List error:', error);
+                console.error('[Bastion FTP] List error:', error);
             }
         }
 
-        // Initial connection attempt
-        connectFTP();
+        connectFTP(); // Initial connection attempt
     </script>
 </body>
 </html>
