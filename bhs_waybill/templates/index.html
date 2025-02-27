@@ -126,8 +126,13 @@
 
             let cumulativePath = '/';
             parts.forEach((part, index) => {
-                cumulativePath += part;
-                if (index < parts.length - 1) cumulativePath += '/';
+                // Build the cumulative path up to this part
+                const currentPath = cumulativePath + part;
+                if (index < parts.length - 1) {
+                    cumulativePath = currentPath + '/';
+                } else {
+                    cumulativePath = currentPath;
+                }
 
                 const breadcrumb = document.createElement('a');
                 breadcrumb.className = 'breadcrumb';
@@ -139,8 +144,8 @@
                     breadcrumb.href = '#';
                     breadcrumb.onclick = (e) => {
                         e.preventDefault();
-                        console.log("Clicked breadcrumb:", cumulativePath);
-                        currentPath = cumulativePath;
+                        console.log("Clicked breadcrumb:", currentPath); // Use currentPath here, not cumulativePath
+                        currentPath = currentPath; // Set the path to navigate to the parent
                         loadDirectory(currentPath);
                     };
                 }
