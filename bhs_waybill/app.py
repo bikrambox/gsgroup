@@ -1,9 +1,10 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, Response
 from flask_cors import CORS
 from waybill_ftp import FTPConnection  # Updated import
 import logging
 import os
 from dotenv import load_dotenv
+import io
 
 # Load environment variables before anything else
 load_dotenv()
@@ -22,10 +23,17 @@ logger = logging.getLogger(__name__)
 ftp_connection = FTPConnection()
 
 def initialize_ftp():
-    """Initialize FTPS connection at startup"""
-    result = ftp_connection.connect()
-    logger.info(f"FTPS Status at startup: {result['message']}")
-    return result
+    """Initialize FTPS connection at startup and retry on failure"""
+    max_retries = 3
+    for attempt in range(max_retries):
+        result = ftp_connection.connect()
+        if result["status"] == "success":
+            logger.info(f"FTPS Status at startup: {result['message']}")
+            return result
+        logger.error(f"Attempt {attempt + 1}/{max_retries} failed: {result['message']}")
+        time.sleep(5)  # Wait before retrying
+    logger.error("Failed to initialize FTPS connection after all retries")
+    return {"status": "error", "message": "Failed to connect to FTPS server"}
 
 # Initialize FTPS when the app starts
 initialize_ftp()
@@ -39,6 +47,8 @@ def index():
 def ftp_status():
     logger.info("API request for FTPS status")
     result = ftp_connection.get_status()
+    if result["status"] == "error":
+        ftp_connection.connect()  # Attempt to reconnect
     return jsonify(result)
 
 @app.route('/api/ftp/list', methods=['GET'])
@@ -46,6 +56,9 @@ def ftp_list():
     logger.info("API request to list FTPS directory")
     path = request.args.get('path', '/Reports/ELON_data/Nomeco_environments/PROD_internally')
     result = ftp_connection.list_dir(path)
+    if result["status"] == "error" and "Not connected" in result["message"]:
+        ftp_connection.connect()  # Attempt to reconnect
+        result = ftp_connection.list_dir(path)
     return jsonify(result)
 
 @app.route('/api/ftp/navigate', methods=['GET'])
@@ -53,7 +66,41 @@ def ftp_navigate():
     logger.info("API request to navigate FTPS directory")
     path = request.args.get('path', '')
     result = ftp_connection.list_dir(path)
+    if result["status"] == "error" and "Not connected" in result["message"]:
+        ftp_connection.connect()  # Attempt to reconnect
+        result = ftp_connection.list_dir(path)
     return jsonify(result)
+
+@app.route('/api/ftp/download/<path:file_path>', methods=['GET'])
+def ftp_download(file_path):
+    logger.info(f"API request to download file: {file_path}")
+    try:
+        # Decode the URL-encoded path
+        decoded_path = file_path.replace('%2F', '/')
+        result = ftp_connection.get_file(decoded_path)
+        if result["status"] == "error":
+            if "Not connected" in result["message"]:
+                ftp_connection.connect()  # Attempt to reconnect
+                result = ftp_connection.get_file(decoded_path)
+            if result["status"] == "error":
+                return jsonify(result), 404
+        
+        # Determine file type and return appropriate response
+        if file_path.endswith('.pdf'):
+            return Response(result["data"], mimetype='application/pdf')
+        elif file_path.endswith('.csv'):
+            return Response(result["data"], mimetype='text/csv')
+        elif file_path.endswith('.txt'):
+            return Response(result["data"], mimetype='text/plain')
+        else:
+            return jsonify({"status": "error", "message": "Unsupported file type"}), 400
+    except Exception as e:
+        logger.error(f"Error downloading file: {e}")
+        return jsonify({"status": "error", "message": f"Failed to download file: {e}"}), 500
+
+@app.route('/favicon.ico')
+def favicon():
+    return app.send_static_file('favicon.ico')
 
 if __name__ == '__main__':
     # This will only be used in development
