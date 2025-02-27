@@ -1,5 +1,5 @@
 from flask import Flask, render_template, jsonify
-from production import ftp_connection  # Import the global instance
+from waybill_ftp import FTPConnection
 import logging
 
 app = Flask(__name__, 
@@ -8,6 +8,18 @@ app = Flask(__name__,
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Global FTP connection instance
+ftp_connection = FTPConnection()
+
+def initialize_ftp():
+    """Initialize FTP connection at startup"""
+    result = ftp_connection.connect()
+    logger.info(f"FTP Status at startup: {result['message']}")
+    return result
+
+# Initialize FTP when the app starts
+initialize_ftp()
 
 @app.route('/')
 def index():

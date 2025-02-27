@@ -69,7 +69,6 @@ class FTPConnection:
             }
 
     def get_status(self):
-        """Return current connection status"""
         if self.connected:
             return {"status": "success", "message": f"Connected to {self.host}:{self.port}"}
         return {"status": "error", "message": "Not connected to FTP server"}

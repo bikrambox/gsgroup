@@ -15,24 +15,17 @@
 
 
 from waitress import serve
-from app import app
-from waybill_ftp import FTPConnection  # Import FTPConnection
+from app import app  # Import the Flask app
 import os
 from dotenv import load_dotenv
 import logging
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 load_dotenv()
 
-# Global FTP connection instance
-ftp_connection = FTPConnection()
 
-def initialize_ftp():
-    """Initialize FTP connection at startup"""
-    result = ftp_connection.connect()
-    logger.info(f"FTP Status at startup: {result['message']}")
-    return result
 
 if __name__ == '__main__':
     host = os.getenv('HOST', '0.0.0.0')
