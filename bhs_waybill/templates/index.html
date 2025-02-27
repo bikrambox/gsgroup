@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BHS Waybill</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        #file-list {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>BHS Waybill FTP</h1>
+    <button onclick="connectFTP()">Connect to FTP</button>
+    <button onclick="listFiles()" disabled id="list-btn">List Files</button>
+    <div id="file-list"></div>
+
+    <script>
+        async function connectFTP() {
+            try {
+                const response = await fetch('/api/ftp/connect');
+                const result = await response.json();
+                console.log(`FTP Connection: ${result.message}`);
+                
+                if (result.status === 'success') {
+                    document.getElementById('list-btn').disabled = false;
+                }
+            } catch (error) {
+                console.error('FTP Connection error:', error);
+            }
+        }
+
+        async function listFiles() {
+            try {
+                const response = await fetch('/api/ftp/list');
+                const result = await response.json();
+                console.log(`FTP List: ${result.message}`);
+                
+                if (result.status === 'success') {
+                    const fileList = document.getElementById('file-list');
+                    fileList.innerHTML = '<h2>FTP Files:</h2>' + 
+                        '<ul>' + 
+                        result.data.map(file => `<li>${file}</li>`).join('') + 
+                        '</ul>';
+                }
+            } catch (error) {
+                console.error('FTP List error:', error);
+            }
+        }
+
+        // Initial connection attempt
+        connectFTP();
+    </script>
+</body>
+</html>

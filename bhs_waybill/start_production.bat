@@ -1,0 +1,3 @@
+@echo off
+echo Starting BHS Waybill in production mode on port 5500...
+python production.py

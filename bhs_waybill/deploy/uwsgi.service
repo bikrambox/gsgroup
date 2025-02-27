@@ -1,0 +1,15 @@
+[Unit]
+Description=BHS Waybill uWSGI Service
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=${APP_PATH}
+ExecStart=${VENV_PATH}/bin/uwsgi --ini ${APP_PATH}/deploy/uwsgi.ini
+Restart=always
+StandardOutput=append:${LOG_DIR}/uwsgi.log
+StandardError=append:${LOG_DIR}/uwsgi_error.log
+
+[Install]
+WantedBy=multi-user.target
