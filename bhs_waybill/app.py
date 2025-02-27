@@ -1,5 +1,5 @@
 from flask import Flask, render_template, jsonify
-from waybill_ftp import FTPConnection
+from waybill_sftp import SFTPConnection  # Updated import
 import logging
 
 app = Flask(__name__, 
@@ -9,16 +9,16 @@ app = Flask(__name__,
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Global FTP connection instance
-ftp_connection = FTPConnection()
+# Global SFTP connection instance
+ftp_connection = SFTPConnection()
 
 def initialize_ftp():
-    """Initialize FTP connection at startup"""
+    """Initialize SFTP connection at startup"""
     result = ftp_connection.connect()
-    logger.info(f"FTP Status at startup: {result['message']}")
+    logger.info(f"SFTP Status at startup: {result['message']}")
     return result
 
-# Initialize FTP when the app starts
+# Initialize SFTP when the app starts
 initialize_ftp()
 
 @app.route('/')
@@ -28,13 +28,13 @@ def index():
 
 @app.route('/api/ftp/status', methods=['GET'])
 def ftp_status():
-    logger.info("API request for FTP status")
+    logger.info("API request for SFTP status")
     result = ftp_connection.get_status()
     return jsonify(result)
 
 @app.route('/api/ftp/list', methods=['GET'])
 def ftp_list():
-    logger.info("API request to list FTP directory")
+    logger.info("API request to list SFTP directory")
     result = ftp_connection.list_dir()
     return jsonify(result)
 

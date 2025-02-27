@@ -10,9 +10,10 @@ PORT=5500
 
 #FTP Credentials
 
-FTP_HOST=your_ftp_host
-FTP_USERNAME=your_ftp_username
-FTP_PASSWORD=your_ftp_password
+SFTP_HOST=HOST
+SFTP_PORT=22
+SFTP_USERNAME=user
+SFTP_PASSWORD=pass
 
 # Path Configuration
 STATIC_FOLDER=static
