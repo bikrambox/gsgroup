@@ -12,13 +12,11 @@ class FTPConnection:
         self.ftp = None
         self.host = os.getenv('FTP_HOST', '10.6.8.43')
         self.port = int(os.getenv('FTP_PORT', 21))
-        # Force single backslash, strip any extra escaping
         self.username = os.getenv('FTP_USERNAME', 'BHSR\jeba').replace('\\\\', '\\')
         self.password = os.getenv('FTP_PASSWORD', 'Hundekoldt2006!')
         self.connected = False
         logger.info(f"Initializing FTPS connection from bastion host to {self.host}:{self.port}")
         logger.info(f"Using credentials - Username: '{self.username}', Password: '{self.password}'")
-        # Debug raw value
         logger.info(f"Raw username (repr): {repr(self.username)}")
 
     def connect(self):
@@ -59,12 +57,26 @@ class FTPConnection:
                 "message": "Not connected to FTPS server"
             }
         try:
+            # Define the target directory (Windows path with backslashes)
+            target_dir = r"\Reports\ELON_data\Nomeco_environments\PROD_internally"
+            logger.info(f"Navigating to directory: {target_dir}")
+            
+            # Change to the specified directory
+            self.ftp.cwd(target_dir)
+            
+            # List the contents of the directory
             files = self.ftp.nlst()
-            logger.info("Successfully retrieved directory listing")
+            logger.info(f"Successfully retrieved directory listing from {target_dir}")
             return {
                 "status": "success",
                 "data": files,
-                "message": "Directory listing retrieved successfully"
+                "message": f"Directory listing retrieved successfully from {target_dir}"
+            }
+        except ftplib.error_perm as e:
+            logger.error(f"Permission error accessing directory: {e}")
+            return {
+                "status": "error",
+                "message": f"Permission error accessing directory: {e}"
             }
         except Exception as e:
             logger.error(f"Error listing directory: {e}")
