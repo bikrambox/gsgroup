@@ -8,16 +8,18 @@ logger = logging.getLogger(__name__)
 
 class FTPConnection:
     def __init__(self):
-        # Load env variables in the class
         load_dotenv()
         self.ftp = None
-        self.host = os.getenv('FTP_HOST')
-        self.port = int(os.getenv('FTP_PORT'))
-        self.username = os.getenv('FTP_USERNAME')  # Single backslash in .env
-        self.password = os.getenv('FTP_PASSWORD')
+        self.host = os.getenv('FTP_HOST', '10.6.8.43')
+        self.port = int(os.getenv('FTP_PORT', 21))
+        # Force single backslash, strip any extra escaping
+        self.username = os.getenv('FTP_USERNAME', 'BHSR\jeba').replace('\\\\', '\\')
+        self.password = os.getenv('FTP_PASSWORD', 'Hundekoldt2006!')
         self.connected = False
         logger.info(f"Initializing FTPS connection from bastion host to {self.host}:{self.port}")
         logger.info(f"Using credentials - Username: '{self.username}', Password: '{self.password}'")
+        # Debug raw value
+        logger.info(f"Raw username (repr): {repr(self.username)}")
 
     def connect(self):
         if self.connected:
