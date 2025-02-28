@@ -342,12 +342,13 @@
                     const downloadLink = document.createElement('a');
                     downloadLink.textContent = 'Download PDF';
                     downloadLink.className = 'download-link';
-                    // Create a blob URL for direct download instead of using the API URL
-                    downloadLink.href = URL.createObjectURL(data);
-                    downloadLink.download = filePath.split('/').pop();
-                    // Add click handler to handle download manually if needed
-                    downloadLink.onclick = (e) => {
-                        console.log("Download clicked with URL:", downloadLink.href);
+                    downloadLink.href = "javascript:void(0)";
+                    downloadLink.setAttribute('data-filepath', filePath);
+                    downloadLink.onclick = function(e) {
+                        e.preventDefault();
+                        console.log("Download clicked for:", this.getAttribute('data-filepath'));
+                        // Open in new window/tab with the correct port
+                        window.open(`${downloadBaseUrl}/${encodeURIComponent(this.getAttribute('data-filepath'))}`, '_blank');
                     };
                     fileViewer.appendChild(downloadLink);
                 } else if (contentType === 'text/csv') {
@@ -369,9 +370,14 @@
                     const downloadLink = document.createElement('a');
                     downloadLink.textContent = 'Download CSV';
                     downloadLink.className = 'download-link';
-                    // Create a blob URL for direct download instead of using the API URL
-                    downloadLink.href = URL.createObjectURL(new Blob([text], {type: 'text/csv'}));
-                    downloadLink.download = filePath.split('/').pop();
+                    downloadLink.href = "javascript:void(0)";
+                    downloadLink.setAttribute('data-filepath', filePath);
+                    downloadLink.onclick = function(e) {
+                        e.preventDefault();
+                        console.log("Download clicked for:", this.getAttribute('data-filepath'));
+                        // Open in new window/tab with the correct port
+                        window.open(`${downloadBaseUrl}/${encodeURIComponent(this.getAttribute('data-filepath'))}`, '_blank');
+                    };
                     fileViewer.appendChild(downloadLink);
                 } else if (contentType === 'text/plain') {
                     // Display plain text, with download link
@@ -383,9 +389,14 @@
                     const downloadLink = document.createElement('a');
                     downloadLink.textContent = 'Download TXT';
                     downloadLink.className = 'download-link';
-                    // Create a blob URL for direct download instead of using the API URL
-                    downloadLink.href = URL.createObjectURL(new Blob([text], {type: 'text/plain'}));
-                    downloadLink.download = filePath.split('/').pop();
+                    downloadLink.href = "javascript:void(0)";
+                    downloadLink.setAttribute('data-filepath', filePath);
+                    downloadLink.onclick = function(e) {
+                        e.preventDefault();
+                        console.log("Download clicked for:", this.getAttribute('data-filepath'));
+                        // Open in new window/tab with the correct port
+                        window.open(`${downloadBaseUrl}/${encodeURIComponent(this.getAttribute('data-filepath'))}`, '_blank');
+                    };
                     fileViewer.appendChild(downloadLink);
                 } else {
                     fileViewer.textContent = 'Unsupported file type';
@@ -510,20 +521,38 @@
                     fileItem.className = 'file-item';
                     fileItem.textContent = file;
 
-                    // Add download link next to file name, hardcoded to HTTPS
+                    // Add download link next to file name
                     const downloadLink = document.createElement('a');
                     downloadLink.textContent = ' (Download)';
                     downloadLink.className = 'download-link';
-                    downloadLink.href = `https://vps1139.basicserver.io:42030/api/ftp/download/${encodeURIComponent(`/Reports/ELON_data/Nomeco_environments/PROD_internally/${folderName}/${file}`)}`;
-                    downloadLink.download = file;
+                    
+                    // Use a data attribute to store the file path
+                    const filePath = `/Reports/ELON_data/Nomeco_environments/PROD_internally/${folderName}/${file}`;
+                    downloadLink.setAttribute('data-filepath', filePath);
+                    
+                    // Set href to javascript:void(0) and handle with click event
+                    downloadLink.href = "javascript:void(0)";
+                    downloadLink.onclick = function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        // Get the file path from data attribute
+                        const filePath = this.getAttribute('data-filepath');
+                        console.log("Downloading file:", filePath);
+                        
+                        // Open in new window/tab with the correct port
+                        window.open(`https://vps1139.basicserver.io:42030/api/ftp/download/${encodeURIComponent(filePath)}`, '_blank');
+                    };
 
                     fileItem.appendChild(document.createTextNode(' '));
                     fileItem.appendChild(downloadLink);
 
                     fileItem.onclick = (e) => {
-                        e.preventDefault(); // Prevent default link behavior if needed
-                        console.log("Clicked to view file:", `/Reports/ELON_data/Nomeco_environments/PROD_internally/${folderName}/${file}`);
-                        viewFile(`/Reports/ELON_data/Nomeco_environments/PROD_internally/${folderName}/${file}`);
+                        if (e.target !== downloadLink) { // Only view if not clicking the download link
+                            e.preventDefault();
+                            console.log("Clicked to view file:", `/Reports/ELON_data/Nomeco_environments/PROD_internally/${folderName}/${file}`);
+                            viewFile(`/Reports/ELON_data/Nomeco_environments/PROD_internally/${folderName}/${file}`);
+                        }
                     };
                     filesContainer.appendChild(fileItem);
                 });

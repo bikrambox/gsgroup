@@ -18,9 +18,9 @@ app = Flask(__name__,
 
 # Enable CORS for all routes, ensuring HTTPS and cross-browser compatibility
 CORS(app, resources={r"/api/*": {
-    "origins": ["https://vps1139.basicserver.io:42030", "https://vps1139.basicserver.io"],
+    "origins": ["https://vps1139.basicserver.io:42030", "https://vps1139.basicserver.io", "http://localhost:8000", "*"],
     "allow_headers": ["Content-Type", "Authorization"],
-    "methods": ["GET", "POST", "OPTIONS"],
+    "methods": ["GET", "POST", "OPTIONS", "HEAD"],
     "supports_credentials": True
 }})
 
