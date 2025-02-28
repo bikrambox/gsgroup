@@ -166,7 +166,7 @@ class FTPConnection:
             }
 
     def direct_ftp_download(self, file_path):
-        """Directly download a file from the FTP server and return its contents, optimized for Windows FTP."""
+        """Directly download a file from the FTP server and return its contents, optimized for Windows FTP, without verification."""
         if not self.ensure_connected():
             logger.warning("Attempted to download file without active connection")
             return {

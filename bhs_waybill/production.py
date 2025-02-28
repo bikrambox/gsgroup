@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 
 def index_ftp_files(ftp_connection, base_path='/Reports/ELON_data/Nomeco_environments/PROD_internally'):
-    """Index all files in the FTP server and store in SQLite database, with path validation for Windows FTP."""
+    """Index all files in the FTP server and store in SQLite database, minimizing verification for speed."""
     logger.info("Starting FTP file indexing process for base path: %s", base_path)
     
     # Create or update database indexing status file
@@ -54,13 +54,7 @@ def index_ftp_files(ftp_connection, base_path='/Reports/ELON_data/Nomeco_environ
                     index_recursive(full_path)
                 else:
                     file_name = item["name"]
-                    logger.info(f"Found file: {file_name} at {full_path} (checking FTP access)")
-                    # Try to verify FTP access, but proceed even if verification fails
-                    test_result = ftp_connection.direct_ftp_download(full_path)
-                    if test_result["status"] == "error":
-                        logger.warning(f"Cannot verify file via FTP: {full_path} - {test_result['message']}, indexing anyway")
-                    else:
-                        logger.info(f"Verified FTP access for: {full_path}")
+                    logger.info(f"Found file: {file_name} at {full_path} (skipping FTP verification for speed)")
                     c.execute("INSERT OR REPLACE INTO files (file_name, file_path) VALUES (?, ?)", 
                               (file_name, full_path))
                     logger.info("Indexed: %s at %s", file_name, full_path)
