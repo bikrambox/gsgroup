@@ -183,7 +183,7 @@
     </div>
 
     <script>
-        const baseUrl = 'https://vps1139.basicserver.io:42030'; // Ensure HTTPS
+        const BASEuri = 'https://vps1139.basicserver.io:42030'; // Ensure HTTPS
         let currentPath = '/Reports/ELON_data/Nomeco_environments/PROD_internally';
 
         // Initialize IndexedDB for storing file index
@@ -210,7 +210,7 @@
         async function loadIndexFromServer() {
             console.log("Starting to load index from server");
             try {
-                const response = await fetch(`${baseUrl}/api/ftp/index`);
+                const response = await fetch(`${BASEuri}/api/ftp/index`);
                 if (!response.ok) throw new Error('Failed to fetch index');
                 console.log("Fetched index database successfully");
                 const blob = await response.blob();
@@ -251,7 +251,7 @@
         async function loadDirectory(path = currentPath) {
             console.log("Loading directory for path - Input:", path, "Global currentPath:", currentPath);
             try {
-                const response = await fetch(`${baseUrl}/api/ftp/list?path=${encodeURIComponent(path)}`);
+                const response = await fetch(`${BASEuri}/api/ftp/list?path=${encodeURIComponent(path)}`);
                 const data = await response.json();
 
                 if (data.status === 'error') {
@@ -291,7 +291,7 @@
         async function viewFile(filePath) {
             console.log("Viewing file:", filePath);
             try {
-                const response = await fetch(`${baseUrl}/api/ftp/download/${encodeURIComponent(filePath)}`, { mode: 'cors' });
+                const response = await fetch(`${BASEuri}/api/ftp/download/${encodeURIComponent(filePath)}`, { mode: 'cors' });
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -314,7 +314,7 @@
                     const downloadLink = document.createElement('a');
                     downloadLink.textContent = 'Download PDF';
                     downloadLink.className = 'download-link';
-                    downloadLink.href = `${baseUrl}/api/ftp/download/${encodeURIComponent(filePath)}`;
+                    downloadLink.href = `${BASEuri}/api/ftp/download/${encodeURIComponent(filePath)}`;
                     downloadLink.download = filePath.split('/').pop();
                     fileViewer.appendChild(downloadLink);
                 } else if (contentType === 'text/csv') {
@@ -336,7 +336,7 @@
                     const downloadLink = document.createElement('a');
                     downloadLink.textContent = 'Download CSV';
                     downloadLink.className = 'download-link';
-                    downloadLink.href = `${baseUrl}/api/ftp/download/${encodeURIComponent(filePath)}`;
+                    downloadLink.href = `${BASEuri}/api/ftp/download/${encodeURIComponent(filePath)}`;
                     downloadLink.download = filePath.split('/').pop();
                     fileViewer.appendChild(downloadLink);
                 } else if (contentType === 'text/plain') {
@@ -348,7 +348,7 @@
                     const downloadLink = document.createElement('a');
                     downloadLink.textContent = 'Download TXT';
                     downloadLink.className = 'download-link';
-                    downloadLink.href = `${baseUrl}/api/ftp/download/${encodeURIComponent(filePath)}`;
+                    downloadLink.href = `${BASEuri}/api/ftp/download/${encodeURIComponent(filePath)}`;
                     downloadLink.download = filePath.split('/').pop();
                     fileViewer.appendChild(downloadLink);
                 } else {
@@ -478,7 +478,7 @@
                     const downloadLink = document.createElement('a');
                     downloadLink.textContent = ' (Download)';
                     downloadLink.className = 'download-link';
-                    downloadLink.href = `${baseUrl}/api/ftp/download/${encodeURIComponent(`/Reports/ELON_data/Nomeco_environments/PROD_internally/${folderName}/${file}`)}`;
+                    downloadLink.href = `${BASEuri}/api/ftp/download/${encodeURIComponent(`/Reports/ELON_data/Nomeco_environments/PROD_internally/${folderName}/${file}`)}`;
                     downloadLink.download = file;
 
                     fileItem.appendChild(document.createTextNode(' '));
@@ -515,7 +515,7 @@
         async function updateIndexingStatus() {
             console.log("Checking indexing status");
             try {
-                const response = await fetch(`${baseUrl}/api/indexing_status`);
+                const response = await fetch(`${BASEuri}/api/indexing_status`);
                 if (!response.ok) throw new Error('Failed to fetch indexing status');
                 const data = await response.json();
                 console.log("Indexing status received:", data.status);
