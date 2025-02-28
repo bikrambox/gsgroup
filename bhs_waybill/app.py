@@ -44,10 +44,21 @@ initialize_ftp()
 @app.before_request
 def before_request():
     """Detect if the request is coming through a proxy (e.g., Nginx) and set the URL scheme to HTTPS if X-Forwarded-Proto is 'https'."""
-    if request.headers.get('X-Forwarded-Proto') == 'https':
+    forwarded_proto = request.headers.get('X-Forwarded-Proto')
+    current_scheme = request.environ.get('wsgi.url_scheme', 'http')
+    logger.info(f"Before request - X-Forwarded-Proto: {forwarded_proto}, Current Scheme: {current_scheme}")
+    
+    if forwarded_proto == 'https':
         request.environ['wsgi.url_scheme'] = 'https'
+        logger.info("Forcing HTTPS scheme due to X-Forwarded-Proto: https")
     else:
         request.environ['wsgi.url_scheme'] = 'http'
+        logger.info("Keeping HTTP scheme (no HTTPS proxy detected)")
+
+    # Force HTTPS for all URLs, even if X-Forwarded-Proto is missing or incorrect
+    if app.config.get('PREFER_HTTPS', True):
+        request.environ['wsgi.url_scheme'] = 'https'
+        logger.info("Forcing HTTPS scheme globally (PREFER_HTTPS config)")
 
 @app.route('/')
 def index():
@@ -101,6 +112,10 @@ def ftp_download(file_path):
         filename = decoded_path.split('/')[-1]
         if file_path.endswith(('.pdf', '.csv', '.txt')):
             logger.info(f"Successfully downloaded file: {filename}")
+            # Use request.url_root to ensure HTTPS in the response URL
+            base_url = request.url_root
+            if not base_url.startswith('https://'):
+                base_url = 'https://' + base_url.split('://')[1]  # Force HTTPS
             return Response(
                 result["data"],
                 mimetype={
