@@ -18,16 +18,11 @@ app = Flask(__name__,
 
 # Enable CORS for all routes, ensuring HTTPS and cross-browser compatibility
 CORS(app, resources={r"/api/*": {
-    "origins": ["https://vps1139.basicserver.io:42030", "https://vps1139.basicserver.io", "http://localhost:8000", "*"],
+    "origins": ["https://vps1139.basicserver.io:42030", "https://vps1139.basicserver.io", "http://localhost:8000"],
     "allow_headers": ["Content-Type", "Authorization"],
     "methods": ["GET", "POST", "OPTIONS", "HEAD"],
     "supports_credentials": True
 }})
-
-# logging.basicConfig(level=logging.INFO)
-# logger = logging.getLogger(__name__)
-
-
 
 # Configure logging to output to terminal
 logging.basicConfig(
@@ -35,12 +30,10 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
         logging.StreamHandler(),  # Output to terminal
-        logging.FileHandler('app.log')  # Optional: Output to file
+        logging.FileHandler('app.log')  # Optional: Output to file for debugging
     ]
 )
 logger = logging.getLogger(__name__)
-
-
 
 # Force HTTPS globally
 app.config['PREFER_HTTPS'] = True
@@ -68,11 +61,13 @@ initialize_ftp()
 def before_request():
     """Detect if the request is coming through a proxy (e.g., Nginx) and force HTTPS unconditionally."""
     forwarded_proto = request.headers.get('X-Forwarded-Proto')
+    forwarded_port = request.headers.get('X-Forwarded-Port', '443')
     current_scheme = request.environ.get('wsgi.url_scheme', 'http')
-    logger.info(f"Before request - X-Forwarded-Proto: {forwarded_proto}, Current Scheme: {current_scheme}")
+    logger.info(f"Before request - X-Forwarded-Proto: {forwarded_proto}, X-Forwarded-Port: {forwarded_port}, Current Scheme: {current_scheme}")
     
     # Force HTTPS unconditionally, ignoring X-Forwarded-Proto if it’s None or missing
     request.environ['wsgi.url_scheme'] = 'https'
+    request.environ['SERVER_PORT'] = forwarded_port
     logger.info("Forcing HTTPS scheme unconditionally for all requests (Windows FTP)")
 
 @app.route('/')
@@ -108,7 +103,7 @@ def ftp_navigate():
         result = ftp_connection.list_dir(path)
     return jsonify(result)
 
-@app.route('/api/ftp/download/<path:file_path>', methods=['GET'])
+@app.route('/api/ftp/download/<path:file_path>', methods=['GET', 'OPTIONS'])
 def ftp_download(file_path):
     logger.info(f"API request to download file: {file_path} over HTTPS (Windows FTP)")
     logger.info("HELLO FROM DOWNLOAD#####################################")
@@ -129,7 +124,8 @@ def ftp_download(file_path):
         if file_path.endswith(('.pdf', '.csv', '.txt')):
             logger.info(f"Successfully downloaded file: {filename} over HTTPS (Windows FTP)")
             # Hardcode the HTTPS URL in the response, ensuring all headers use HTTPS with port
-            hardcoded_url = f"https://vps1139.basicserver.io:42030/api/ftp/download/{file_path}"
+            port = request.environ.get('SERVER_PORT', '42030')
+            hardcoded_url = f"https://vps1139.basicserver.io:{port}/api/ftp/download/{file_path}"
             
             # Set the Content-Type based on file extension
             content_type = {
@@ -144,16 +140,17 @@ def ftp_download(file_path):
                 mimetype=content_type,
                 headers={
                     'Content-Disposition': f'attachment; filename="{filename}"',
-                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Origin': 'https://vps1139.basicserver.io:42030',
                     'Access-Control-Allow-Methods': 'GET, OPTIONS',
-                    'Access-Control-Allow-Headers': 'Content-Type',
+                    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+                    'Access-Control-Max-Age': '86400'
                 }
             )
             
             # Explicitly set the Location header to include the port
             response.headers['Location'] = hardcoded_url
             response.headers['Content-Location'] = hardcoded_url
-            logger.info("Testing logger II output in app.py")
+            logger.info(f"Successfully downloaded file: Status={response.status}, Headers={response.headers}, Data length={len(response.data) if response.data else 0}")
             
             return response
         else:
@@ -220,5 +217,4 @@ if __name__ == '__main__':
     # This will only be used in development
     host = os.getenv('HOST', '0.0.0.0')
     port = int(os.getenv('PORT', 8000))
-    logger.info(f"Starting BHS Waybill in production mode on {os.getenv('HOST')}:{os.getenv('PORT')}")
     app.run(debug=True, host=host, port=port, ssl_context=None)  # Remove SSL context for local testing

@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <base href="https://vps1139.basicserver.io:42030/">
     <title>BHS Waybill FTPS File Manager</title>
     <style>
         body {
@@ -43,7 +42,7 @@
             background-color: green;
         }
         .left-panel, .right-panel {
-            width: 48%; /* Adjust to match screenshot layout */
+            width: 48%;
             box-sizing: border-box;
         }
         .left-panel {
@@ -127,8 +126,8 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
-            max-height: 400px; /* Fixed height for the table */
-            overflow-y: auto; /* Enable vertical scrolling */
+            max-height: 400px;
+            overflow-y: auto;
         }
         th, td {
             border: 1px solid #ddd;
@@ -140,8 +139,8 @@
         }
         .files-column {
             display: flex;
-            flex-direction: column; /* Stack files vertically */
-            gap: 5px; /* Spacing between files */
+            flex-direction: column;
+            gap: 5px;
         }
         .file-item {
             color: black;
@@ -162,11 +161,10 @@
     </style>
 </head>
 <body>
-    <!-- <div class="file-manager"> -->
     <div class="">
         <h1>BHS Waybill FTPS File Manager</h1>
         <div class="indexing-status">
-            <div class="status-indicator" id="databaseStatus">FTP: Indexing [Ongoing]</div>
+            <div class="status-indicator" id="databaseStatus">Database: Indexing [Ongoing]</div>
             <div class="status-indicator" id="jsonStatus">JSON: Indexing [Ongoing]</div>
         </div>
         <div class="search-container">
@@ -174,10 +172,10 @@
             <button id="searchButton">Search</button>
         </div>
         <div class="left-panel">
-            <div class="breadcrumbs" id="breadcrumbs"></div>
-            <!-- <ul class="item-list" id="fileL ist"></ul> -->
-            <!-- <div class="error" id="errorMessage"></div> -->
-            <!-- <div id="fileViewer"></div> -->
+            <!-- <div class="breadcrumbs" id="breadcrumbs"></div> -->
+            <!-- <ul class="item-list" id="fileList"></ul>
+            <div class="error" id="errorMessage"></div>
+            <div id="fileViewer"></div> -->
         </div>
         <div class="right-panel">
             <table id="searchResultsTable">
@@ -193,7 +191,7 @@
     </div>
 
     <script>
-        const baseUrl = 'https://vps1139.basicserver.io:42030'; // Ensure HTTPS for all requests
+        const baseUrl = 'https://vps1139.basicserver.io:42030';
         let currentPath = '/Reports/ELON_data/Nomeco_environments/PROD_internally';
 
         // Hardcode the download base URL
@@ -289,12 +287,13 @@
                     li.className = `item ${item.is_dir ? 'dir' : 'file'}`;
                     li.textContent = item.name;
                     li.onclick = () => {
+                        console.log("Clicked item:", item.name, "Is directory?", item.is_dir, "Path:", item.path);
                         if (item.is_dir) {
                             currentPath = item.path;
                             console.log("Navigating to directory - New currentPath:", currentPath, "Item path:", item.path);
                             loadDirectory(currentPath);
                         } else {
-                            viewFile(item.path);
+                            downloadFile(item.path); // Changed to downloadFile for direct download
                         }
                     };
                     fileList.appendChild(li);
@@ -305,8 +304,8 @@
             }
         }
 
-        async function viewFile(filePath) {
-            console.log("Viewing file:", filePath);
+        async function downloadFile(filePath) {
+            console.log("Starting to download file:", filePath);
             const requestedUrl = `${downloadBaseUrl}/${encodeURIComponent(filePath)}`;
             console.log("Requested URL for download:", requestedUrl);
 
@@ -319,81 +318,26 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
-                console.log("Response URL for download:", response.url, "Headers:", Object.fromEntries(response.headers.entries()));
+                console.log("Response received for download:", response.url, "Headers:", Object.fromEntries(response.headers.entries()));
 
                 const contentType = response.headers.get('content-type');
                 const data = await response.blob(); // Use blob for downloading files
 
-                const fileViewer = document.getElementById('fileViewer');
-                if (!fileViewer) {
-                    console.error("File viewer element not found");
-                    document.getElementById('errorMessage').textContent = 'File viewer not available';
-                    return;
-                }
-                fileViewer.innerHTML = '';
+                // Directly trigger download for all supported file types
+                const blob = new Blob([data]);
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filePath.split('/').pop();
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
 
-                // Display file in viewer or offer download
-                if (contentType === 'application/pdf') {
-                    // Use an iframe for PDF viewing and add download link
-                    const iframe = document.createElement('iframe');
-                    iframe.src = URL.createObjectURL(data);
-                    iframe.width = '100%';
-                    iframe.height = '500px';
-                    fileViewer.appendChild(iframe);
-
-                    const downloadLink = document.createElement('a');
-                    downloadLink.textContent = 'Download PDF';
-                    downloadLink.className = 'download-link';
-                    const hardcodedUrl = `https://vps1139.basicserver.io:42030/api/ftp/download/${encodeURIComponent(filePath)}`;
-                    console.log("Setting download URL to:", hardcodedUrl);
-                    downloadLink.href = hardcodedUrl;
-                    downloadLink.target = "_blank";
-                    fileViewer.appendChild(downloadLink);
-                } else if (contentType === 'text/csv') {
-                    // Parse CSV and display as table, with download link
-                    const text = await response.text();
-                    const rows = text.trim().split('\n').map(row => row.split(','));
-                    const table = document.createElement('table');
-                    rows.forEach((row, index) => {
-                        const tr = document.createElement('tr');
-                        row.forEach(cell => {
-                            const td = document.createElement(index === 0 ? 'th' : 'td');
-                            td.textContent = cell.trim();
-                            tr.appendChild(td);
-                        });
-                        table.appendChild(tr);
-                    });
-                    fileViewer.appendChild(table);
-
-                    const downloadLink = document.createElement('a');
-                    downloadLink.textContent = 'Download CSV';
-                    downloadLink.className = 'download-link';
-                    const hardcodedUrl = `https://vps1139.basicserver.io:42030/api/ftp/download/${encodeURIComponent(filePath)}`;
-                    console.log("Setting download URL to:", hardcodedUrl);
-                    downloadLink.href = hardcodedUrl;
-                    downloadLink.target = "_blank";
-                    fileViewer.appendChild(downloadLink);
-                } else if (contentType === 'text/plain') {
-                    // Display plain text, with download link
-                    const pre = document.createElement('pre');
-                    const text = await response.text();
-                    pre.textContent = text;
-                    fileViewer.appendChild(pre);
-
-                    const downloadLink = document.createElement('a');
-                    downloadLink.textContent = 'Download TXT';
-                    downloadLink.className = 'download-link';
-                    const hardcodedUrl = `https://vps1139.basicserver.io:42030/api/ftp/download/${encodeURIComponent(filePath)}`;
-                    console.log("Setting download URL to:", hardcodedUrl);
-                    downloadLink.href = hardcodedUrl;
-                    downloadLink.target = "_blank";
-                    fileViewer.appendChild(downloadLink);
-                } else {
-                    fileViewer.textContent = 'Unsupported file type';
-                }
+                document.getElementById('fileViewer').innerHTML = 'File download initiated.';
             } catch (error) {
-                document.getElementById('errorMessage').textContent = 'Failed to load file: ' + error.message;
-                console.error("File viewing error:", error);
+                document.getElementById('errorMessage').textContent = 'Failed to download file: ' + error.message;
+                console.error("Download error:", error);
             }
         }
 
@@ -405,7 +349,6 @@
 
             let cumulativePath = '/';
             parts.forEach((part, index) => {
-                // Build the cumulative path up to this part
                 const currentPath = cumulativePath + part;
                 if (index < parts.length - 1) {
                     cumulativePath = currentPath + '/';
@@ -425,7 +368,7 @@
                     breadcrumb.onclick = (e) => {
                         e.preventDefault();
                         console.log("Clicked breadcrumb - Before update:", currentPath, "Global currentPath:", window.currentPath);
-                        window.currentPath = currentPath; // Use window.currentPath to ensure global scope
+                        window.currentPath = currentPath;
                         console.log("Clicked breadcrumb - After update:", window.currentPath);
                         loadDirectory(window.currentPath);
                     };
@@ -434,7 +377,6 @@
                 breadcrumbs.appendChild(breadcrumb);
             });
 
-            // Add "Home" breadcrumb as the first item
             if (parts.length > 0) {
                 const homeBreadcrumb = document.createElement('a');
                 homeBreadcrumb.className = 'breadcrumb';
@@ -443,13 +385,12 @@
                 homeBreadcrumb.onclick = (e) => {
                     e.preventDefault();
                     console.log("Clicked Home breadcrumb, navigating to root. Current global currentPath:", window.currentPath);
-                    window.currentPath = '/'; // Adjust this to the root FTP directory if different
+                    window.currentPath = '/';
                     console.log("Clicked Home breadcrumb, new currentPath:", window.currentPath);
                     loadDirectory(window.currentPath);
                 };
                 breadcrumbs.insertBefore(homeBreadcrumb, breadcrumbs.firstChild);
 
-                // Add separators after "Home"
                 const separator = document.createTextNode(' / ');
                 breadcrumbs.insertBefore(separator, breadcrumbs.childNodes[1]);
             }
@@ -471,7 +412,7 @@
                 if (cursor) {
                     const file = cursor.value;
                     console.log("Processing file:", file.file_name, file.file_path);
-                    const folderName = file.file_path.split('/').slice(-2, -1)[0] || 'Root'; // Get Daily_data folder name
+                    const folderName = file.file_path.split('/').slice(-2, -1)[0] || 'Root';
                     if (file.file_name.toLowerCase().includes(searchTerm)) {
                         console.log("Match found:", file.file_name);
                         if (!results[folderName]) {
@@ -511,32 +452,12 @@
                     fileItem.className = 'file-item';
                     fileItem.textContent = file;
 
-                    // Add download link next to file name
-                    const downloadLink = document.createElement('a');
-                    downloadLink.textContent = ' (Download)';
-                    downloadLink.className = 'download-link';
-                    
-                    // Use a data attribute to store the file path
-                    const filePath = `/Reports/ELON_data/Nomeco_environments/PROD_internally/${folderName}/${file}`;
-                    
-                    // Hardcode the full URL with port number
-                    const hardcodedUrl = `https://vps1139.basicserver.io:42030/api/ftp/download/${encodeURIComponent(filePath)}`;
-                    console.log("Setting search result download URL to:", hardcodedUrl);
-                    
-                    // Set target to _blank to open in new tab
-                    downloadLink.href = hardcodedUrl;
-                    downloadLink.target = "_blank";
-
-                    fileItem.appendChild(document.createTextNode(' '));
-                    fileItem.appendChild(downloadLink);
-
                     fileItem.onclick = (e) => {
-                        if (e.target !== downloadLink) { // Only view if not clicking the download link
-                            e.preventDefault();
-                            console.log("Clicked to view file:", `/Reports/ELON_data/Nomeco_environments/PROD_internally/${folderName}/${file}`);
-                            viewFile(`/Reports/ELON_data/Nomeco_environments/PROD_internally/${folderName}/${file}`);
-                        }
+                        console.log("Clicked file item:", file, "Folder:", folderName);
+                        e.preventDefault(); // Prevent default link behavior if needed
+                        downloadFile(`/Reports/ELON_data/Nomeco_environments/PROD_internally/${folderName}/${file}`);
                     };
+
                     filesContainer.appendChild(fileItem);
                 });
                 filesCell.appendChild(filesContainer);
@@ -579,7 +500,7 @@
             const jsonStatusElement = document.getElementById('jsonStatus');
 
             if (dbStatusElement) {
-                dbStatusElement.textContent = `FTP: Indexing [${databaseStatus === 'done' ? 'Done' : 'Ongoing'}]`;
+                dbStatusElement.textContent = `Database: Indexing [${databaseStatus === 'done' ? 'Done' : 'Ongoing'}]`;
                 dbStatusElement.className = `status-indicator ${databaseStatus === 'done' ? 'indexing-done' : 'indexing-ongoing'}`;
                 console.log("Database indexing status updated to:", databaseStatus);
             } else {
