@@ -106,7 +106,7 @@ def ftp_download(file_path):
         filename = decoded_path.split('/')[-1]
         if file_path.endswith(('.pdf', '.csv', '.txt')):
             logger.info(f"Successfully downloaded file: {filename} over HTTPS (Windows FTP)")
-            # Hardcode the HTTPS URL in the response
+            # Hardcode the HTTPS URL in the response, ensuring all headers use HTTPS
             hardcoded_url = f"https://vps1139.basicserver.io:42030/api/ftp/download/{file_path}"
             return Response(
                 result["data"],
@@ -117,7 +117,8 @@ def ftp_download(file_path):
                 }[file_path[-4:]],
                 headers={
                     'Content-Disposition': f'attachment; filename="{filename}"',
-                    'Location': hardcoded_url  # Ensure redirects use HTTPS
+                    'Location': hardcoded_url,  # Ensure redirects use HTTPS
+                    'Content-Location': hardcoded_url  # Additional header to enforce HTTPS in responses
                 }
             )
         else:

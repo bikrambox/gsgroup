@@ -317,7 +317,7 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
-                console.log("Response URL for download:", response.url);
+                console.log("Response URL for download:", response.url, "Headers:", Object.fromEntries(response.headers.entries()));
 
                 const contentType = response.headers.get('content-type');
                 const data = await response.blob(); // Use blob for downloading files
