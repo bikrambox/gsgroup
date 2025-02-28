@@ -305,14 +305,19 @@
 
         async function viewFile(filePath) {
             console.log("Viewing file:", filePath);
+            const requestedUrl = `${downloadBaseUrl}/${encodeURIComponent(filePath)}`;
+            console.log("Requested URL for download:", requestedUrl);
+
             try {
-                const response = await fetch(`${downloadBaseUrl}/${encodeURIComponent(filePath)}`, { 
+                const response = await fetch(requestedUrl, { 
                     mode: 'cors', 
                     credentials: 'include' 
                 });
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
+
+                console.log("Response URL for download:", response.url);
 
                 const contentType = response.headers.get('content-type');
                 const data = await response.blob(); // Use blob for downloading files
@@ -337,7 +342,7 @@
                     const downloadLink = document.createElement('a');
                     downloadLink.textContent = 'Download PDF';
                     downloadLink.className = 'download-link';
-                    downloadLink.href = `${downloadBaseUrl}/${encodeURIComponent(filePath)}`;
+                    downloadLink.href = requestedUrl;
                     downloadLink.download = filePath.split('/').pop();
                     fileViewer.appendChild(downloadLink);
                 } else if (contentType === 'text/csv') {
@@ -359,7 +364,7 @@
                     const downloadLink = document.createElement('a');
                     downloadLink.textContent = 'Download CSV';
                     downloadLink.className = 'download-link';
-                    downloadLink.href = `${downloadBaseUrl}/${encodeURIComponent(filePath)}`;
+                    downloadLink.href = requestedUrl;
                     downloadLink.download = filePath.split('/').pop();
                     fileViewer.appendChild(downloadLink);
                 } else if (contentType === 'text/plain') {
@@ -371,7 +376,7 @@
                     const downloadLink = document.createElement('a');
                     downloadLink.textContent = 'Download TXT';
                     downloadLink.className = 'download-link';
-                    downloadLink.href = `${downloadBaseUrl}/${encodeURIComponent(filePath)}`;
+                    downloadLink.href = requestedUrl;
                     downloadLink.download = filePath.split('/').pop();
                     fileViewer.appendChild(downloadLink);
                 } else {
