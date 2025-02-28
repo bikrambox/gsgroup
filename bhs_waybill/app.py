@@ -15,8 +15,8 @@ app = Flask(__name__,
             static_folder='static',
             template_folder='templates')
 
-# Enable CORS for all routes, ensuring HTTPS only
-CORS(app, resources={r"/api/*": {"origins": "https://vps1139.basicserver.io:42030"}})  # Restrict to HTTPS origin
+# Enable CORS for all routes, ensuring HTTPS and cross-browser compatibility
+CORS(app, resources={r"/api/*": {"origins": ["https://vps1139.basicserver.io:42030"], "allow_headers": ["Content-Type"]}})
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -110,11 +110,18 @@ def ftp_download(file_path):
 
 @app.route('/api/ftp/index', methods=['GET'])
 def get_ftp_index():
-    logger.info("Serving FTP index database")
+    logger.info("Serving FTP index database as JSON")
     try:
-        return send_file('ftp_index.db', as_attachment=True, download_name='ftp_index.db', mimetype='application/x-sqlite3')
+        conn = sqlite3.connect('ftp_index.db')
+        c = conn.cursor()
+        c.execute("SELECT file_name, file_path FROM files")
+        rows = c.fetchall()
+        data = [{"file_name": row[0], "file_path": row[1]} for row in rows]
+        conn.close()
+        logger.info("Successfully served FTP index as JSON with %d records", len(data))
+        return jsonify(data)
     except Exception as e:
-        logger.error(f"Error serving FTP index database: {e}")
+        logger.error(f"Error serving FTP index database as JSON: {e}")
         return jsonify({"status": "error", "message": f"Failed to serve FTP index: {e}"}), 500
 
 @app.route('/api/indexing_status', methods=['GET'])

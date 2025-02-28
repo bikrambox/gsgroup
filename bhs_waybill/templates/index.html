@@ -167,7 +167,7 @@
         <div class="left-panel">
             <div class="breadcrumbs" id="breadcrumbs"></div>
             <ul class="item-list" id="fileList"></ul>
-            <div class="error" id="errorMessage"></div>
+            <div class="error" id="<|control704|>Message"></div>
             <div id="fileViewer"></div>
         </div>
         <div class="right-panel">
@@ -193,8 +193,8 @@
 
         request.onupgradeneeded = function(event) {
             db = event.target.result;
-            db.createObjectStore('files', { keyPath: 'file_name' });
-            console.log("IndexedDB upgraded: Created 'files' object store");
+            const store = db.createObjectStore('files', { keyPath: 'file_name' });
+            console.log("IndexedDB upgraded: Created 'files' object store with keyPath 'file_name'");
         };
 
         request.onsuccess = function(event) {
@@ -211,50 +211,38 @@
         async function loadIndexFromServer() {
             console.log("Starting to load index from server");
             try {
-                const response = await fetch(`${baseUrl}/api/ftp/index`);
-                if (!response.ok) throw new Error('Failed to fetch index');
+                const response = await fetch(`${baseUrl}/api/ftp/index`, { mode: 'cors' });
+                if (!response.ok) throw new Error('Failed to fetch index: ' + response.status);
                 console.log("Fetched index database successfully");
-                const blob = await response.blob();
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    console.log("Reading index database blob");
-                    const arrayBuffer = e.target.result;
-                    // Here, we need to parse the SQLite blob or assume server-side JSON conversion
-                    parseSQLiteData(arrayBuffer); // Pass the arrayBuffer for parsing
-                };
-                reader.readAsArrayBuffer(blob);
+                const jsonData = await response.json();
+                console.log("Received JSON data:", jsonData);
+                parseSQLiteData(jsonData);
             } catch (error) {
                 console.error("Error loading index from server:", error);
             }
         }
 
-        function parseSQLiteData(sqliteData) {
-            console.log("Parsing SQLite data into IndexedDB");
-            // This is a placeholder; you need a library like sql.js to parse SQLite data or ensure app.py converts it to JSON
-            // For now, simulate parsing or rely on server-side JSON conversion
-            fetch(`${baseUrl}/api/ftp/index`)
-                .then(response => response.json())
-                .then(jsonData => {
-                    console.log("Received JSON data from server:", jsonData);
-                    const transaction = db.transaction(['files'], 'readwrite');
-                    const store = transaction.objectStore('files');
-                    
-                    jsonData.forEach(item => {
-                        store.put(item);
-                        console.log("Stored in IndexedDB:", item.file_name, item.file_path);
-                    });
+        function parseSQLiteData(jsonData) {
+            console.log("Parsing JSON data into IndexedDB");
+            const transaction = db.transaction(['files'], 'readwrite');
+            const store = transaction.objectStore('files');
+            
+            jsonData.forEach(item => {
+                if (!item.file_name || !item.file_path) {
+                    console.warn("Invalid data in JSON:", item);
+                    return;
+                }
+                store.put(item);
+                console.log("Stored in IndexedDB:", item.file_name, item.file_path);
+            });
 
-                    console.log("IndexedDB populated with FTP index");
-                })
-                .catch(error => {
-                    console.error("Error fetching JSON data:", error);
-                });
+            console.log("IndexedDB populated with FTP index");
         }
 
         async function loadDirectory(path = currentPath) {
             console.log("Loading directory for path - Input:", path, "Global currentPath:", currentPath);
             try {
-                const response = await fetch(`${baseUrl}/api/ftp/list?path=${encodeURIComponent(path)}`);
+                const response = await fetch(`${baseUrl}/api/ftp/list?path=${encodeURIComponent(path)}`, { mode: 'cors' });
                 const data = await response.json();
 
                 if (data.status === 'error') {
@@ -294,7 +282,10 @@
         async function viewFile(filePath) {
             console.log("Viewing file:", filePath);
             try {
-                const response = await fetch(`${baseUrl}/api/ftp/download/${encodeURIComponent(filePath)}`, { mode: 'cors' });
+                const response = await fetch(`${baseUrl}/api/ftp/download/${encodeURIComponent(filePath)}`, { 
+                    mode: 'cors', 
+                    credentials: 'include' // Ensure cookies/credentials are included if needed
+                });
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -518,7 +509,7 @@
         async function updateIndexingStatus() {
             console.log("Checking indexing status");
             try {
-                const response = await fetch(`${baseUrl}/api/indexing_status`);
+                const response = await fetch(`${baseUrl}/api/indexing_status`, { mode: 'cors' });
                 if (!response.ok) throw new Error('Failed to fetch indexing status');
                 const data = await response.json();
                 console.log("Indexing status received:", data.status);
