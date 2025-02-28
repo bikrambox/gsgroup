@@ -98,4 +98,4 @@ if __name__ == '__main__':
     # ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
     # ssl_context.load_cert_chain(certfile='/path/to/your/certificate.pem', keyfile='/path/to/your/key.pem')
     
-    serve(app, host=host, port=port, ssl_context=ssl_context)
+    serve(app, host=host, port=port)
