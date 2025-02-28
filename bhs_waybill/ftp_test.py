@@ -23,11 +23,11 @@ def connect_to_ftp():
     
     try:
         # Use a modern, non-deprecated TLS protocol
-        context = ssl.SSLContext(ssl.PROTOCOL_TLS)  # Use the default TLS protocol (TLS 1.2+)
+        context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)  # Use TLSv1.2 for compatibility (non-deprecated in Python 3.12+)
         context.load_default_certs()  # Load default certificates
         ftp = ftplib.FTP_TLS(context=context, timeout=600)  # Set timeout to 10 minutes
         
-        logger.info(f"Attempting FTPS connection to {ftp_host}:{ftp_port} with default TLS and timeout 600s")
+        logger.info(f"Attempting FTPS connection to {ftp_host}:{ftp_port} with TLSv1.2 and timeout 600s")
         ftp.connect(ftp_host, ftp_port)
         ftp.login(ftp_username, ftp_password)
         ftp.prot_p()  # Enable protected data connection
@@ -44,6 +44,32 @@ def connect_to_ftp():
         logger.error(f"FTPS connection failed: {e}")
         raise Exception(f"FTPS connection failed: {e}")
 
+def list_ftp_directory(ftp, path='.'):
+    """List the contents of an FTP directory, handling Windows FTP paths."""
+    try:
+        # Use forward slashes for FTP commands, as many servers (including Windows) accept them
+        normalized_path = path.replace('\\', '/')
+        logger.info(f"Listing directory contents at: {normalized_path}")
+        
+        # Change to the specified directory
+        ftp.cwd(normalized_path)
+        
+        # Get directory listing
+        files = []
+        ftp.retrlines('LIST', files.append)
+        
+        logger.info(f"Directory listing for {normalized_path}:")
+        for line in files:
+            logger.info(line)
+        
+        return True
+    except ftplib.error_perm as e:
+        logger.error(f"Permission error listing directory {path}: {e}")
+        return False
+    except Exception as e:
+        logger.error(f"Error listing directory {path}: {e}")
+        return False
+
 def download_file(ftp, file_path, local_path):
     """Download a specific file from FTP and save it locally, handling Windows FTP paths."""
     try:
@@ -58,19 +84,19 @@ def download_file(ftp, file_path, local_path):
         while normalized_path.count(base_path) > 1:
             normalized_path = normalized_path.replace(base_path + base_path, base_path)
         
-        # Convert forward slashes to backslashes for Windows FTP, if needed (test and adjust based on server)
-        normalized_path = normalized_path.replace('/', '\\')
+        # Use forward slashes for FTP commands, as Windows FTP servers often accept them
+        normalized_path = normalized_path.replace('\\', '/')
         logger.info(f"Normalized FTP path for download (Windows): {normalized_path}")
 
         # Navigate to the directory containing the file (remove filename from path)
-        directory = os.path.dirname(normalized_path) or '\\'
-        filename = os.path.basename(normalized_path)
+        directory = '/'.join(normalized_path.split('/')[:-1]) or '/'
+        filename = normalized_path.split('/')[-1]
         
         logger.info(f"Attempting to retrieve file: {filename} from {directory} via FTP (Windows)")
         
-        # Verify the directory exists before attempting to download (use backslashes for Windows)
+        # Verify the directory exists before attempting to download
         try:
-            ftp.cwd(directory.replace('\\', '/'))  # Use forward slashes for FTP commands, as most FTP servers prefer them
+            ftp.cwd(directory)
             logger.info(f"Verified directory exists: {directory}")
         except ftplib.error_perm as e:
             logger.error(f"Directory verification failed for {directory}: {e}")
@@ -102,13 +128,37 @@ def download_file(ftp, file_path, local_path):
             logger.error(f"Error closing local file: {e}")
 
 def main():
-    """Main function to test FTP connection and download a file."""
+    """Main function to test FTP connection, list directories, and download a file."""
     file_path = 'Reports/ELON_data/Nomeco_environments/PROD_internally/Nomeco_2024-10-01/20241001000000_BZ760818_Investigate.txt'
     local_filename = os.path.basename(file_path)  # Get the filename from the path
     local_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), local_filename)  # Save in the same directory as this script
     
     try:
+        # Connect to FTP
         ftp = connect_to_ftp()
+        
+        # Print the current working directory
+        current_dir = ftp.pwd()
+        logger.info(f"Current working directory on FTP server: {current_dir}")
+        
+        # List directory contents at the root and relevant subdirectories to find the file
+        root_paths = ['/', '\\']  # Test both forward and backslashes for Windows FTP
+        for root_path in root_paths:
+            if list_ftp_directory(ftp, root_path):
+                # Try to navigate and list subdirectories to find the file
+                potential_dirs = [
+                    'Reports',
+                    'Reports/ELON_data',
+                    'Reports/ELON_data/Nomeco_environments',
+                    'Reports/ELON_data/Nomeco_environments/PROD_internally',
+                    'Reports/ELON_data/Nomeco_environments/PROD_internally/Nomeco_2024-10-01'
+                ]
+                for dir_path in potential_dirs:
+                    full_dir = f"{root_path}{dir_path}".replace('//', '/').replace('\\\\', '\\')
+                    if list_ftp_directory(ftp, full_dir):
+                        logger.info(f"Found directory: {full_dir}")
+        
+        # Attempt to download the file from the normalized path
         download_file(ftp, file_path, local_path)
         ftp.quit()
         logger.info(f"FTPS connection closed after download")
