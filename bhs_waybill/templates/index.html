@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BHS Waybill FTPS File Manager</title>
     <style>
+        /* Keep your existing CSS styles here (unchanged) */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -149,20 +150,11 @@
         .file-item:hover {
             text-decoration: underline;
         }
-        .download-link {
-            color: #007BFF;
-            text-decoration: underline;
-            cursor: pointer;
-            margin-left: 5px;
-        }
-        .download-link:hover {
-            color: #0056b3;
-        }
     </style>
 </head>
 <body>
-    <!-- <div class="file-manager"> -->
     <div class="">
+    <!-- <div class="file-manager"> -->
         <h1>BHS Waybill FTPS File Manager</h1>
         <div class="indexing-status">
             <div class="status-indicator" id="databaseStatus">Database: Indexing [Ongoing]</div>
@@ -294,7 +286,7 @@
                             console.log("Navigating to directory - New currentPath:", currentPath, "Item path:", item.path);
                             loadDirectory(currentPath);
                         } else {
-                            downloadFile(item.path); // Trigger direct download
+                            downloadFile(item.path); // Trigger direct download via URL
                         }
                     };
                     fileList.appendChild(li);
@@ -305,70 +297,24 @@
             }
         }
 
-        // async function downloadFile(filePath) {
-        //     console.log("Starting to download file:", filePath);
-        //     const requestedUrl = `${downloadBaseUrl}/${encodeURIComponent(filePath)}`;
-        //     console.log("Requested URL for download:", requestedUrl);
-
-        //     // try {
-        //     //     const response = await fetch(requestedUrl, { 
-        //     //         mode: 'cors', 
-        //     //         credentials: 'include' 
-        //     //     });
-        //     //     if (!response.ok) {
-        //     //         throw new Error(`HTTP error! status: ${response.status}`);
-        //     //     }
-
-        //     //     console.log("Response received for download:", response.url, "Headers:", Object.fromEntries(response.headers.entries()));
-
-        //     //     const contentType = response.headers.get('content-type');
-        //     //     const data = await response.blob(); // Use blob for downloading files
-
-        //     //     // Directly trigger download for all supported file types
-        //     //     const blob = new Blob([data]);
-        //     //     const url = window.URL.createObjectURL(blob);
-        //     //     const a = document.createElement('a');
-        //     //     a.href = url;
-        //     //     a.download = filePath.split('/').pop();
-        //     //     document.body.appendChild(a);
-        //     //     a.click();
-        //     //     window.URL.revokeObjectURL(url);
-        //     //     document.body.removeChild(a);
-
-        //     //     document.getElementById('fileViewer').innerHTML = 'File download initiated.';
-        //     // } catch (error) {
-        //     //     document.getElementById('errorMessage').textContent = 'Failed to download file: ' + error.message;
-        //     //     console.error("Download error:", error);
-        //     // }
-        // }
-
-        async function downloadFile(filePath) {
+        function downloadFile(filePath) {
             console.log("Starting to download file:", filePath);
             const requestedUrl = `${downloadBaseUrl}/${encodeURIComponent(filePath)}`;
             console.log("Requested URL for download:", requestedUrl);
-            URL.revokeObjectURL(requestedUrl);
-            // try {
-            //     // Create a temporary <a> element to trigger the download
-            //     const a = document.createElement('a');
-            //     a.href = requestedUrl;
-            //     a.download = filePath.split('/').pop(); // Set the filename for the download
-            //     a.target = '_blank'; // Open in a new tab/window to avoid navigating away from the current page
 
-            //     // Append to the document, click programmatically, and remove
-            //     document.body.appendChild(a);
-            //     a.click();
-            //     document.body.removeChild(a);
+            // Create a temporary <a> element to trigger the download
+            const a = document.createElement('a');
+            a.href = requestedUrl;
+            a.download = filePath.split('/').pop(); // Set the filename for the download
+            a.target = '_blank'; // Open in a new tab/window to avoid navigating away
 
-            //     console.log("Download initiated for:", requestedUrl);
-            // } catch (error) {
-            //     document.getElementById('errorMessage').textContent = 'Failed to initiate download: ' + error.message;
-            //     console.error("Download initiation error:", error);
-            // }
+            // Append to the document, click programmatically, and remove
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            console.log("Download initiated for:", requestedUrl);
         }
-
-
-
-
 
         function updateBreadcrumbs(path) {
             console.log("Updating breadcrumbs for path:", path);
