@@ -8,6 +8,7 @@ import io
 import sqlite3
 import time
 import threading
+from urllib.parse import urlparse
 
 # Load environment variables before anything else
 load_dotenv()
@@ -21,6 +22,9 @@ CORS(app, resources={r"/api/*": {"origins": ["https://vps1139.basicserver.io:420
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Force HTTPS globally
+app.config['PREFER_HTTPS'] = True
 
 # Global FTPS connection instance
 ftp_connection = FTPConnection()
@@ -43,31 +47,23 @@ initialize_ftp()
 
 @app.before_request
 def before_request():
-    """Detect if the request is coming through a proxy (e.g., Nginx) and set the URL scheme to HTTPS if X-Forwarded-Proto is 'https'."""
+    """Detect if the request is coming through a proxy (e.g., Nginx) and force HTTPS unconditionally."""
     forwarded_proto = request.headers.get('X-Forwarded-Proto')
     current_scheme = request.environ.get('wsgi.url_scheme', 'http')
     logger.info(f"Before request - X-Forwarded-Proto: {forwarded_proto}, Current Scheme: {current_scheme}")
     
-    if forwarded_proto == 'https':
-        request.environ['wsgi.url_scheme'] = 'https'
-        logger.info("Forcing HTTPS scheme due to X-Forwarded-Proto: https")
-    else:
-        request.environ['wsgi.url_scheme'] = 'http'
-        logger.info("Keeping HTTP scheme (no HTTPS proxy detected)")
-
-    # Force HTTPS for all URLs, even if X-Forwarded-Proto is missing or incorrect
-    if app.config.get('PREFER_HTTPS', True):
-        request.environ['wsgi.url_scheme'] = 'https'
-        logger.info("Forcing HTTPS scheme globally (PREFER_HTTPS config)")
+    # Force HTTPS unconditionally, ignoring X-Forwarded-Proto if it’s None or missing
+    request.environ['wsgi.url_scheme'] = 'https'
+    logger.info("Forcing HTTPS scheme unconditionally for all requests")
 
 @app.route('/')
 def index():
-    logger.info("Serving SPA index page")
+    logger.info("Serving SPA index page over HTTPS")
     return render_template('index.html')
 
 @app.route('/api/ftp/status', methods=['GET'])
 def ftp_status():
-    logger.info("API request for FTPS status")
+    logger.info("API request for FTPS status over HTTPS")
     result = ftp_connection.get_status()
     if result["status"] == "error":
         ftp_connection.connect()  # Attempt to reconnect
@@ -75,7 +71,7 @@ def ftp_status():
 
 @app.route('/api/ftp/list', methods=['GET'])
 def ftp_list():
-    logger.info("API request to list FTPS directory with path: %s", request.args.get('path', '/Reports/ELON_data/Nomeco_environments/PROD_internally'))
+    logger.info("API request to list FTPS directory with path: %s over HTTPS", request.args.get('path', '/Reports/ELON_data/Nomeco_environments/PROD_internally'))
     path = request.args.get('path', '/Reports/ELON_data/Nomeco_environments/PROD_internally')
     result = ftp_connection.list_dir(path)
     if result["status"] == "error" and "Not connected" in result["message"]:
@@ -85,7 +81,7 @@ def ftp_list():
 
 @app.route('/api/ftp/navigate', methods=['GET'])
 def ftp_navigate():
-    logger.info("API request to navigate FTPS directory with path: %s", request.args.get('path', ''))
+    logger.info("API request to navigate FTPS directory with path: %s over HTTPS", request.args.get('path', ''))
     path = request.args.get('path', '')
     result = ftp_connection.list_dir(path)
     if result["status"] == "error" and "Not connected" in result["message"]:
@@ -95,7 +91,7 @@ def ftp_navigate():
 
 @app.route('/api/ftp/download/<path:file_path>', methods=['GET'])
 def ftp_download(file_path):
-    logger.info(f"API request to download file: {file_path}")
+    logger.info(f"API request to download file: {file_path} over HTTPS")
     try:
         # Decode the URL-encoded path
         decoded_path = file_path.replace('%2F', '/')
@@ -105,17 +101,15 @@ def ftp_download(file_path):
                 ftp_connection.connect()  # Attempt to reconnect
                 result = ftp_connection.get_file(decoded_path)
             if result["status"] == "error":
-                logger.error(f"Failed to download file {file_path}: {result['message']}")
+                logger.error(f"Failed to download file {file_path} over HTTPS: {result['message']}")
                 return jsonify(result), 404
         
         # Determine file type and return as downloadable file over HTTPS
         filename = decoded_path.split('/')[-1]
         if file_path.endswith(('.pdf', '.csv', '.txt')):
-            logger.info(f"Successfully downloaded file: {filename}")
-            # Use request.url_root to ensure HTTPS in the response URL
-            base_url = request.url_root
-            if not base_url.startswith('https://'):
-                base_url = 'https://' + base_url.split('://')[1]  # Force HTTPS
+            logger.info(f"Successfully downloaded file: {filename} over HTTPS")
+            # Use a hardcoded HTTPS base URL to ensure HTTPS in responses
+            base_url = 'https://vps1139.basicserver.io:42030/'
             return Response(
                 result["data"],
                 mimetype={
@@ -126,27 +120,27 @@ def ftp_download(file_path):
                 headers={'Content-Disposition': f'attachment; filename="{filename}"'}
             )
         else:
-            logger.error(f"Unsupported file type for {filename}")
+            logger.error(f"Unsupported file type for {filename} over HTTPS")
             return jsonify({"status": "error", "message": "Unsupported file type"}), 400
     except Exception as e:
-        logger.error(f"Error downloading file {file_path}: {e}")
-        return jsonify({"status": "error", "message": f"Failed to download file: {e}"}), 500
+        logger.error(f"Error downloading file {file_path} over HTTPS: {e}")
+        return jsonify({"status": "error", "message": f"Failed to download file over HTTPS: {e}"}), 500
 
 @app.route('/api/ftp/index', methods=['GET'])
 def get_ftp_index():
-    logger.info("Serving FTP index database as JSON")
+    logger.info("Serving FTP index database as JSON over HTTPS")
     try:
         # Check if database indexing is done
         with open('database_indexing_status.txt', 'r') as f:
             db_status = f.read().strip()
         if db_status != 'done':
-            logger.info("Database indexing not complete, returning ongoing status for JSON")
-            return jsonify({"status": "ongoing", "message": "Database indexing in progress"})
+            logger.info("Database indexing not complete, returning ongoing status for JSON over HTTPS")
+            return jsonify({"status": "ongoing", "message": "Database indexing in progress over HTTPS"})
 
         # Simulate JSON indexing (assuming it happens after database indexing)
         with open('json_indexing_status.txt', 'w') as f:
             f.write('ongoing')
-        logger.info("JSON indexing status set to 'ongoing' in json_indexing_status.txt")
+        logger.info("JSON indexing status set to 'ongoing' over HTTPS in json_indexing_status.txt")
 
         conn = sqlite3.connect('ftp_index.db')
         c = conn.cursor()
@@ -158,30 +152,31 @@ def get_ftp_index():
         # Update JSON indexing status to done after processing
         with open('json_indexing_status.txt', 'w') as f:
             f.write('done')
-        logger.info("JSON indexing status set to 'done' in json_indexing_status.txt")
-        logger.info("Successfully served FTP index as JSON with %d records", len(data))
+        logger.info("JSON indexing status set to 'done' over HTTPS in json_indexing_status.txt")
+        logger.info("Successfully served FTP index as JSON over HTTPS with %d records", len(data))
         return jsonify(data)
     except Exception as e:
-        logger.error(f"Error serving FTP index database as JSON: {e}")
-        return jsonify({"status": "error", "message": f"Failed to serve FTP index: {e}"}), 500
+        logger.error(f"Error serving FTP index database as JSON over HTTPS: {e}")
+        return jsonify({"status": "error", "message": f"Failed to serve FTP index over HTTPS: {e}"}), 500
 
 @app.route('/api/indexing_status', methods=['GET'])
 def get_indexing_status():
-    """Return the current indexing statuses for database and JSON."""
-    logger.info("API request for indexing status")
+    """Return the current indexing statuses for database and JSON over HTTPS."""
+    logger.info("API request for indexing status over HTTPS")
     try:
         with open('database_indexing_status.txt', 'r') as f:
             db_status = f.read().strip()
         with open('json_indexing_status.txt', 'r') as f:
             json_status = f.read().strip()
-        logger.info(f"Indexing statuses returned: Database: {db_status}, JSON: {json_status}")
+        logger.info(f"Indexing statuses returned over HTTPS: Database: {db_status}, JSON: {json_status}")
         return jsonify({"database_status": db_status, "json_status": json_status})
     except Exception as e:
-        logger.error(f"Error reading indexing status: {e}")
+        logger.error(f"Error reading indexing status over HTTPS: {e}")
         return jsonify({"database_status": "ongoing", "json_status": "ongoing"}), 500
 
 @app.route('/favicon.ico')
 def favicon():
+    logger.info("Serving favicon over HTTPS")
     return app.send_static_file('favicon.ico')
 
 if __name__ == '__main__':
