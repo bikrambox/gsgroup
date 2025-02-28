@@ -164,7 +164,7 @@
     <div class="">
         <h1>BHS Waybill FTPS File Manager</h1>
         <div class="indexing-status">
-            <div class="status-indicator" id="databaseStatus">Database: Indexing [Ongoing]</div>
+            <div class="status-indicator" id="databaseStatus">FTP: Indexing [Ongoing]</div>
             <div class="status-indicator" id="jsonStatus">JSON: Indexing [Ongoing]</div>
         </div>
         <div class="search-container">
@@ -499,7 +499,7 @@
             const jsonStatusElement = document.getElementById('jsonStatus');
 
             if (dbStatusElement) {
-                dbStatusElement.textContent = `Database: Indexing [${databaseStatus === 'done' ? 'Done' : 'Ongoing'}]`;
+                dbStatusElement.textContent = `FTP: Indexing [${databaseStatus === 'done' ? 'Done' : 'Ongoing'}]`;
                 dbStatusElement.className = `status-indicator ${databaseStatus === 'done' ? 'indexing-done' : 'indexing-ongoing'}`;
                 console.log("Database indexing status updated to:", databaseStatus);
             } else {
