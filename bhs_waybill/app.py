@@ -136,6 +136,7 @@ def ftp_download(file_path):
             # Explicitly set the Location header to include the port
             response.headers['Location'] = hardcoded_url
             response.headers['Content-Location'] = hardcoded_url
+            logger.info(f"Successfully downloaded file: {response}")
             
             return response
         else:
