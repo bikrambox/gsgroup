@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 
 def index_ftp_files(ftp_connection, base_path='/Reports/ELON_data/Nomeco_environments/PROD_internally'):
-    """Index all files in the FTP server and store in SQLite database, with path validation."""
+    """Index all files in the FTP server and store in SQLite database, with path validation for Windows FTP."""
     logger.info("Starting FTP file indexing process for base path: %s", base_path)
     
     # Create or update database indexing status file

@@ -29,8 +29,8 @@ class FTPConnection:
         if self.connected:
             return {"status": "success", "message": "Already connected"}
         try:
-            # Create FTP_TLS object with custom SSL context for better TLS handling
-            context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)  # Specify TLS version for compatibility
+            # Use a modern, non-deprecated TLS protocol
+            context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)  # Use TLSv1.2 for compatibility (non-deprecated in Python 3.12+)
             context.load_default_certs()  # Load default certificates
             self.ftp = ftplib.FTP_TLS(context=context, timeout=600)  # Set timeout to 10 minutes
             logger.info(f"Attempting FTPS connection to {self.host}:{self.port} with TLSv1.2 and timeout 600s")
@@ -117,10 +117,10 @@ class FTPConnection:
             current_dir = self.ftp.pwd()
             logger.info(f"Current FTP working directory: {current_dir}")
             
-            # Change to the specified directory
-            if path:
-                logger.info(f"Navigating to directory: {path}")
-                self.ftp.cwd(path)
+            # Normalize path for Windows FTP (use forward slashes for FTP commands)
+            normalized_path = path.replace('\\', '/')
+            logger.info(f"Navigating to directory: {normalized_path}")
+            self.ftp.cwd(normalized_path)
             
             # Get directory listing with details to distinguish folders/files
             files = []
@@ -137,14 +137,14 @@ class FTPConnection:
                     items.append({
                         "name": name,
                         "is_dir": is_dir,
-                        "path": f"{path}/{name}" if path.endswith('/') else f"{path}/{name}"
+                        "path": f"{normalized_path}/{name}" if normalized_path.endswith('/') else f"{normalized_path}/{name}"
                     })
             
-            logger.info(f"Successfully retrieved directory listing from {path}")
+            logger.info(f"Successfully retrieved directory listing from {normalized_path}")
             return {
                 "status": "success",
                 "data": items,
-                "message": f"Directory listing retrieved successfully from {path}"
+                "message": f"Directory listing retrieved successfully from {normalized_path}"
             }
         except ftplib.error_perm as e:
             logger.error(f"Permission error accessing directory: {e}")
@@ -166,7 +166,7 @@ class FTPConnection:
             }
 
     def direct_ftp_download(self, file_path):
-        """Directly download a file from the FTP server and return its contents without using SIZE command."""
+        """Directly download a file from the FTP server and return its contents, optimized for Windows FTP."""
         if not self.ensure_connected():
             logger.warning("Attempted to download file without active connection")
             return {
@@ -174,17 +174,26 @@ class FTPConnection:
                 "message": "Not connected to FTPS server"
             }
         try:
-            # Normalize the file path to ensure it starts with the base path and handles case sensitivity
+            # Normalize the file path for Windows FTP, ensuring no duplicate base paths
             base_path = '/Reports/ELON_data/Nomeco_environments/PROD_internally'
-            if not file_path.startswith(base_path):
-                file_path = f"{base_path}/{file_path}" if not file_path.startswith('/') else f"{base_path}{file_path}"
-            logger.info(f"Normalized FTP path for download: {file_path}")
+            if file_path.startswith(base_path):
+                normalized_path = file_path  # Use the path as-is if it already starts with the base
+            else:
+                normalized_path = f"{base_path}/{file_path}" if not file_path.startswith('/') else f"{base_path}{file_path}"
+            
+            # Remove any duplicate base paths
+            while normalized_path.count(base_path) > 1:
+                normalized_path = normalized_path.replace(base_path + base_path, base_path)
+            
+            # Use forward slashes for FTP commands, as Windows FTP servers often accept them
+            normalized_path = normalized_path.replace('\\', '/')
+            logger.info(f"Normalized FTP path for download (Windows): {normalized_path}")
 
             # Navigate to the directory containing the file (remove filename from path)
-            directory = '/'.join(file_path.split('/')[:-1]) or '/'
-            filename = file_path.split('/')[-1]
+            directory = '/'.join(normalized_path.split('/')[:-1]) or '/'
+            filename = normalized_path.split('/')[-1]
             
-            logger.info(f"Attempting to retrieve file: {filename} from {directory} via FTP")
+            logger.info(f"Attempting to retrieve file: {filename} from {directory} via FTP (Windows)")
             
             # Verify the directory exists before attempting to download
             try:
@@ -197,9 +206,11 @@ class FTPConnection:
                     "message": f"Directory verification failed: {e}"
                 }
 
-            # Attempt to download the file directly in binary mode (avoiding ASCII mode issues)
-            file_buffer = io.BytesIO()
+            # Switch to binary mode for file transfer (avoid ASCII mode issues on Windows)
             self.ftp.voidcmd("TYPE I")  # Switch to binary mode (Image mode)
+            
+            # Use a BytesIO buffer to store the file content
+            file_buffer = io.BytesIO()
             self.ftp.retrbinary(f"RETR {filename}", file_buffer.write)
             file_content = file_buffer.getvalue()
             
