@@ -191,8 +191,11 @@
     </div>
 
     <script>
-        const baseUrl = 'https://vps1139.basicserver.io:42030'; // Ensure HTTPS
+        const baseUrl = 'https://vps1139.basicserver.io:42030'; // Ensure HTTPS for all requests
         let currentPath = '/Reports/ELON_data/Nomeco_environments/PROD_internally';
+
+        // Hardcode the download base URL
+        const downloadBaseUrl = 'https://vps1139.basicserver.io:42030/api/ftp/download';
 
         // Initialize IndexedDB for storing file index
         let db;
@@ -303,7 +306,7 @@
         async function viewFile(filePath) {
             console.log("Viewing file:", filePath);
             try {
-                const response = await fetch(`${baseUrl}/api/ftp/download/${encodeURIComponent(filePath)}`, { 
+                const response = await fetch(`${downloadBaseUrl}/${encodeURIComponent(filePath)}`, { 
                     mode: 'cors', 
                     credentials: 'include' 
                 });
@@ -334,7 +337,7 @@
                     const downloadLink = document.createElement('a');
                     downloadLink.textContent = 'Download PDF';
                     downloadLink.className = 'download-link';
-                    downloadLink.href = `${baseUrl}/api/ftp/download/${encodeURIComponent(filePath)}`;
+                    downloadLink.href = `${downloadBaseUrl}/${encodeURIComponent(filePath)}`;
                     downloadLink.download = filePath.split('/').pop();
                     fileViewer.appendChild(downloadLink);
                 } else if (contentType === 'text/csv') {
@@ -356,7 +359,7 @@
                     const downloadLink = document.createElement('a');
                     downloadLink.textContent = 'Download CSV';
                     downloadLink.className = 'download-link';
-                    downloadLink.href = `${baseUrl}/api/ftp/download/${encodeURIComponent(filePath)}`;
+                    downloadLink.href = `${downloadBaseUrl}/${encodeURIComponent(filePath)}`;
                     downloadLink.download = filePath.split('/').pop();
                     fileViewer.appendChild(downloadLink);
                 } else if (contentType === 'text/plain') {
@@ -368,7 +371,7 @@
                     const downloadLink = document.createElement('a');
                     downloadLink.textContent = 'Download TXT';
                     downloadLink.className = 'download-link';
-                    downloadLink.href = `${baseUrl}/api/ftp/download/${encodeURIComponent(filePath)}`;
+                    downloadLink.href = `${downloadBaseUrl}/${encodeURIComponent(filePath)}`;
                     downloadLink.download = filePath.split('/').pop();
                     fileViewer.appendChild(downloadLink);
                 } else {
@@ -494,11 +497,11 @@
                     fileItem.className = 'file-item';
                     fileItem.textContent = file;
 
-                    // Add download link next to file name
+                    // Add download link next to file name, hardcoded to HTTPS
                     const downloadLink = document.createElement('a');
                     downloadLink.textContent = ' (Download)';
                     downloadLink.className = 'download-link';
-                    downloadLink.href = `${baseUrl}/api/ftp/download/${encodeURIComponent(`/Reports/ELON_data/Nomeco_environments/PROD_internally/${folderName}/${file}`)}`;
+                    downloadLink.href = `https://vps1139.basicserver.io:42030/api/ftp/download/${encodeURIComponent(`/Reports/ELON_data/Nomeco_environments/PROD_internally/${folderName}/${file}`)}`;
                     downloadLink.download = file;
 
                     fileItem.appendChild(document.createTextNode(' '));
