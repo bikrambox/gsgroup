@@ -129,7 +129,7 @@ def download_file(ftp, file_path, local_path):
 
 def main():
     """Main function to test FTP connection, list directories, and download a file."""
-    file_path = 'Reports/ELON_data/Nomeco_environments/PROD_internally/Nomeco_2024-10-01/20241001000000_BZ760818_Investigate.txt'
+    file_path = 'Reports/ELON_data/Nomeco_environments/PROD_internally/Nomeco_2024-10-16/20241016163203_BZ761831_Final.csv'
     local_filename = os.path.basename(file_path)  # Get the filename from the path
     local_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), local_filename)  # Save in the same directory as this script
     
@@ -151,7 +151,7 @@ def main():
                     'Reports/ELON_data',
                     'Reports/ELON_data/Nomeco_environments',
                     'Reports/ELON_data/Nomeco_environments/PROD_internally',
-                    'Reports/ELON_data/Nomeco_environments/PROD_internally/Nomeco_2024-10-01'
+                    'Reports/ELON_data/Nomeco_environments/PROD_internally/Nomeco_2024-10-16'
                 ]
                 for dir_path in potential_dirs:
                     full_dir = f"{root_path}{dir_path}".replace('//', '/').replace('\\\\', '\\')
