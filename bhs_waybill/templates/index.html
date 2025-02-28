@@ -18,6 +18,22 @@
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        .indexing-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 14px;
+            padding: 5px 10px;
+            border-radius: 3px;
+            color: white;
+        }
+        .indexing-ongoing {
+            background-color: red;
+        }
+        .indexing-done {
+            background-color: green;
         }
         .search-container {
             margin-bottom: 20px;
@@ -132,6 +148,7 @@
 <body>
     <div class="file-manager">
         <h1>BHS Waybill FTPS File Manager</h1>
+        <div class="indexing-status" id="indexingStatus">Indexing <span id="statusText">[Ongoing]</span></div>
         <div class="search-container">
             <input type="text" id="searchInput" placeholder="Search file names (e.g., BZ760919)...">
             <button id="searchButton">Search</button>
@@ -167,6 +184,7 @@
         request.onsuccess = function(event) {
             db = event.target.result;
             loadIndexFromServer();
+            startPollingIndexingStatus();
         };
 
         request.onerror = function(event) {
@@ -451,6 +469,33 @@
 
         // Add search event listener
         document.getElementById('searchButton').addEventListener('click', searchFiles);
+
+        async function updateIndexingStatus() {
+            try {
+                const response = await fetch(`${baseUrl}/api/indexing_status`);
+                if (!response.ok) throw new Error('Failed to fetch indexing status');
+                const data = await response.json();
+                const statusElement = document.getElementById('statusText');
+                const statusDiv = document.getElementById('indexingStatus');
+                
+                if (data.status === 'ongoing') {
+                    statusElement.textContent = '[Ongoing]';
+                    statusDiv.className = 'indexing-status indexing-ongoing';
+                } else if (data.status === 'done') {
+                    statusElement.textContent = '[Done]';
+                    statusDiv.className = 'indexing-status indexing-done';
+                }
+            } catch (error) {
+                console.error("Error updating indexing status:", error);
+                document.getElementById('statusText').textContent = '[Error]';
+                document.getElementById('indexingStatus').className = 'indexing-status indexing-ongoing';
+            }
+        }
+
+        function startPollingIndexingStatus() {
+            updateIndexingStatus(); // Initial check
+            setInterval(updateIndexingStatus, 5000); // Poll every 5 seconds
+        }
 
         // Load initial directory
         window.onload = () => loadDirectory();

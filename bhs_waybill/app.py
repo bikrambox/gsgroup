@@ -114,6 +114,17 @@ def get_ftp_index():
         logger.error(f"Error serving FTP index database: {e}")
         return jsonify({"status": "error", "message": f"Failed to serve FTP index: {e}"}), 500
 
+@app.route('/api/indexing_status', methods=['GET'])
+def get_indexing_status():
+    """Return the current indexing status."""
+    try:
+        with open('indexing_status.txt', 'r') as f:
+            status = f.read().strip()
+        return jsonify({"status": status})
+    except Exception as e:
+        logger.error(f"Error reading indexing status: {e}")
+        return jsonify({"status": "ongoing"}), 500
+
 @app.route('/favicon.ico')
 def favicon():
     return app.send_static_file('favicon.ico')
