@@ -32,8 +32,8 @@ class FTPConnection:
             # Create FTP_TLS object with custom SSL context for better TLS handling
             context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)  # Specify TLS version for compatibility
             context.load_default_certs()  # Load default certificates
-            self.ftp = ftplib.FTP_TLS(context=context)
-            logger.info(f"Attempting FTPS connection to {self.host}:{self.port} with TLSv1.2")
+            self.ftp = ftplib.FTP_TLS(context=context, timeout=600)  # Set timeout to 10 minutes
+            logger.info(f"Attempting FTPS connection to {self.host}:{self.port} with TLSv1.2 and timeout 600s")
             self.ftp.connect(self.host, self.port)
             self.ftp.login(self.username, self.password)
             self.ftp.prot_p()  # Enable protected data connection
@@ -177,7 +177,7 @@ class FTPConnection:
             # Use a BytesIO buffer to store the file content
             file_buffer = io.BytesIO()
             self.ftp.retrbinary(f"RETR {filename}", file_buffer.write)
-            file_content = file_buffer.getvalue().decode('utf-8', errors='ignore')  # Decode to string, handle encoding issues
+            file_content = file_buffer.getvalue()
             
             logger.info(f"Successfully retrieved file: {filename}")
             return {

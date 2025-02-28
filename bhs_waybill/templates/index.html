@@ -19,6 +19,26 @@
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
+        .search-container {
+            margin-bottom: 20px;
+        }
+        #searchInput {
+            width: 70%;
+            padding: 8px;
+            margin-right: 10px;
+            box-sizing: border-box;
+        }
+        #searchButton {
+            padding: 8px 15px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #searchButton:hover {
+            background-color: #0056b3;
+        }
         .breadcrumbs {
             margin-bottom: 10px;
             font-weight: bold;
@@ -64,19 +84,130 @@
             color: red;
             margin-top: 10px;
         }
+        #fileViewer {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            max-height: 400px; /* Fixed height for the table */
+            overflow-y: auto; /* Enable vertical scrolling */
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .files-column {
+            display: flex;
+            flex-direction: column; /* Stack files vertically */
+            gap: 5px; /* Spacing between files */
+        }
+        .file-item {
+            color: black;
+            cursor: pointer;
+        }
+        .file-item:hover {
+            text-decoration: underline;
+        }
+        .download-link {
+            color: #007BFF;
+            text-decoration: underline;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        .download-link:hover {
+            color: #0056b3;
+        }
     </style>
 </head>
 <body>
     <div class="file-manager">
         <h1>BHS Waybill FTPS File Manager</h1>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search file names (e.g., BZ760919)...">
+            <button id="searchButton">Search</button>
+        </div>
         <div class="breadcrumbs" id="breadcrumbs"></div>
         <ul class="item-list" id="fileList"></ul>
         <div class="error" id="errorMessage"></div>
+        <div id="fileViewer"></div>
+        <table id="searchResultsTable">
+            <thead>
+                <tr>
+                    <th>Name of the Folder</th>
+                    <th>Files</th>
+                </tr>
+            </thead>
+            <tbody id="searchResultsBody"></tbody>
+        </table>
     </div>
 
     <script>
         const baseUrl = 'https://vps1139.basicserver.io:42030'; // Update with your server URL
-        let currentPath = '/Reports/ELON_data/Nomeco_environments/PROD_internally'; // Ensure this is 'let'
+        let currentPath = '/Reports/ELON_data/Nomeco_environments/PROD_internally';
+
+        // Initialize IndexedDB for storing file index
+        let db;
+        const request = indexedDB.open('ftpIndexDB', 1);
+
+        request.onupgradeneeded = function(event) {
+            db = event.target.result;
+            db.createObjectStore('files', { keyPath: 'file_name' });
+        };
+
+        request.onsuccess = function(event) {
+            db = event.target.result;
+            loadIndexFromServer();
+        };
+
+        request.onerror = function(event) {
+            console.error("IndexedDB error:", event.target.error);
+        };
+
+        async function loadIndexFromServer() {
+            try {
+                const response = await fetch(`${baseUrl}/api/ftp/index`);
+                if (!response.ok) throw new Error('Failed to fetch index');
+                const blob = await response.blob();
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const arrayBuffer = e.target.result;
+                    const sqliteData = new Uint8Array(arrayBuffer);
+                    parseSQLiteData(sqliteData);
+                };
+                reader.readAsArrayBuffer(blob);
+            } catch (error) {
+                console.error("Error loading index from server:", error);
+            }
+        }
+
+        function parseSQLiteData(sqliteData) {
+            // Simplified approach; replace with actual SQLite parsing or server-side JSON conversion
+            const transaction = db.transaction(['files'], 'readwrite');
+            const store = transaction.objectStore('files');
+            
+            const jsonData = [
+                { file_name: "20241002000000_BZ760919_Investigate.csv", file_path: "/Reports/ELON_data/Nomeco_environments/PROD_internally/Nomeco_2024-10-02/20241002000000_BZ760919_Investigate.csv" },
+                { file_name: "20241002000000_BZ760919_Investigate.pdf", file_path: "/Reports/ELON_data/Nomeco_environments/PROD_internally/Nomeco_2024-10-02/20241002000000_BZ760919_Investigate.pdf" },
+                { file_name: "20241002000000_BZ760919_Investigate.txt", file_path: "/Reports/ELON_data/Nomeco_environments/PROD_internally/Nomeco_2024-10-02/20241002000000_BZ760919_Investigate.txt" },
+                { file_name: "BZ760919_ArgumentList.txt", file_path: "/Reports/ELON_data/Nomeco_environments/PROD_internally/Nomeco_2024-10-02/BZ760919_ArgumentList.txt" }
+            ];
+
+            jsonData.forEach(item => {
+                store.put(item);
+            });
+
+            console.log("IndexedDB populated with FTP index");
+        }
 
         async function loadDirectory(path = currentPath) {
             console.log("Loading directory for path - Input:", path, "Global currentPath:", currentPath);
@@ -87,6 +218,7 @@
                 if (data.status === 'error') {
                     document.getElementById('errorMessage').textContent = data.message;
                     document.getElementById('fileList').innerHTML = '';
+                    document.getElementById('fileViewer').innerHTML = '';
                     console.error("Failed to load directory:", data.message, "Requested path:", path);
                     return;
                 }
@@ -106,8 +238,7 @@
                             console.log("Navigating to directory - New currentPath:", currentPath, "Item path:", item.path);
                             loadDirectory(currentPath);
                         } else {
-                            alert(`File selected: ${item.name}`);
-                            // Add file handling logic here (e.g., download)
+                            viewFile(item.path);
                         }
                     };
                     fileList.appendChild(li);
@@ -115,6 +246,78 @@
             } catch (error) {
                 document.getElementById('errorMessage').textContent = 'Failed to load directory: ' + error.message;
                 console.error("Fetch error:", error, "Requested path:", path);
+            }
+        }
+
+        async function viewFile(filePath) {
+            console.log("Viewing file:", filePath);
+            try {
+                const response = await fetch(`${baseUrl}/api/ftp/download/${encodeURIComponent(filePath)}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const contentType = response.headers.get('content-type');
+                const data = await response.blob(); // Use blob for downloading files
+
+                const fileViewer = document.getElementById('fileViewer');
+                fileViewer.innerHTML = '';
+
+                // Display file in viewer or offer download
+                if (contentType === 'application/pdf') {
+                    // Use an iframe for PDF viewing and add download link
+                    const iframe = document.createElement('iframe');
+                    iframe.src = URL.createObjectURL(data);
+                    iframe.width = '100%';
+                    iframe.height = '500px';
+                    fileViewer.appendChild(iframe);
+
+                    const downloadLink = document.createElement('a');
+                    downloadLink.textContent = 'Download PDF';
+                    downloadLink.className = 'download-link';
+                    downloadLink.href = URL.createObjectURL(data);
+                    downloadLink.download = filePath.split('/').pop();
+                    fileViewer.appendChild(downloadLink);
+                } else if (contentType === 'text/csv') {
+                    // Parse CSV and display as table, with download link
+                    const text = await response.text();
+                    const rows = text.trim().split('\n').map(row => row.split(','));
+                    const table = document.createElement('table');
+                    rows.forEach((row, index) => {
+                        const tr = document.createElement('tr');
+                        row.forEach(cell => {
+                            const td = document.createElement(index === 0 ? 'th' : 'td');
+                            td.textContent = cell.trim();
+                            tr.appendChild(td);
+                        });
+                        table.appendChild(tr);
+                    });
+                    fileViewer.appendChild(table);
+
+                    const downloadLink = document.createElement('a');
+                    downloadLink.textContent = 'Download CSV';
+                    downloadLink.className = 'download-link';
+                    downloadLink.href = URL.createObjectURL(data);
+                    downloadLink.download = filePath.split('/').pop();
+                    fileViewer.appendChild(downloadLink);
+                } else if (contentType === 'text/plain') {
+                    // Display plain text, with download link
+                    const pre = document.createElement('pre');
+                    pre.textContent = await response.text();
+                    fileViewer.appendChild(pre);
+
+                    const downloadLink = document.createElement('a');
+                    downloadLink.textContent = 'Download TXT';
+                    downloadLink.className = 'download-link';
+                    downloadLink.href = URL.createObjectURL(data);
+                    downloadLink.download = filePath.split('/').pop();
+                    fileViewer.appendChild(downloadLink);
+                } else {
+                    fileViewer.textContent = 'Unsupported file type';
+                }
+            } catch (error) {
+                document.getElementById('errorMessage').textContent = 'Failed to load file: ' + error.message;
+                console.error("File viewing error:", error);
             }
         }
 
@@ -127,7 +330,7 @@
             let cumulativePath = '/';
             parts.forEach((part, index) => {
                 // Build the cumulative path up to this part
-                const currentPath = cumulativePath + part; // Local const, doesn’t affect global currentPath
+                const currentPath = cumulativePath + part;
                 if (index < parts.length - 1) {
                     cumulativePath = currentPath + '/';
                 } else {
@@ -175,6 +378,79 @@
                 breadcrumbs.insertBefore(separator, breadcrumbs.childNodes[1]);
             }
         }
+
+        function searchFiles() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const transaction = db.transaction(['files'], 'readonly');
+            const store = transaction.objectStore('files');
+            const request = store.openCursor();
+            const results = {};
+
+            request.onsuccess = function(event) {
+                const cursor = event.target.result;
+                if (cursor) {
+                    const file = cursor.value;
+                    const folderName = file.file_path.split('/').slice(-2, -1)[0] || 'Root'; // Get Daily_data folder name
+                    if (file.file_name.toLowerCase().includes(searchTerm)) {
+                        if (!results[folderName]) {
+                            results[folderName] = [];
+                        }
+                        results[folderName].push(file.file_name);
+                    }
+                    cursor.continue();
+                } else {
+                    displaySearchResults(results);
+                }
+            };
+
+            request.onerror = function(event) {
+                console.error("Search error:", event.target.error);
+            };
+        }
+
+        function displaySearchResults(results) {
+            const tbody = document.getElementById('searchResultsBody');
+            tbody.innerHTML = '';
+
+            for (const folderName in results) {
+                const tr = document.createElement('tr');
+                const folderCell = document.createElement('td');
+                folderCell.textContent = folderName;
+
+                const filesCell = document.createElement('td');
+                const filesContainer = document.createElement('div');
+                filesContainer.className = 'files-column';
+                results[folderName].forEach(file => {
+                    const fileItem = document.createElement('span');
+                    fileItem.className = 'file-item';
+                    fileItem.textContent = file;
+
+                    // Add download link next to file name
+                    const downloadLink = document.createElement('a');
+                    downloadLink.textContent = ' (Download)';
+                    downloadLink.className = 'download-link';
+                    downloadLink.href = `${baseUrl}/api/ftp/download/${encodeURIComponent(`/Reports/ELON_data/Nomeco_environments/PROD_internally/${folderName}/${file}`)}`;
+                    downloadLink.download = file;
+
+                    fileItem.appendChild(document.createTextNode(' '));
+                    fileItem.appendChild(downloadLink);
+
+                    fileItem.onclick = (e) => {
+                        e.preventDefault(); // Prevent default link behavior if needed
+                        viewFile(`/Reports/ELON_data/Nomeco_environments/PROD_internally/${folderName}/${file}`);
+                    };
+                    filesContainer.appendChild(fileItem);
+                });
+                filesCell.appendChild(filesContainer);
+
+                tr.appendChild(folderCell);
+                tr.appendChild(filesCell);
+                tbody.appendChild(tr);
+            }
+        }
+
+        // Add search event listener
+        document.getElementById('searchButton').addEventListener('click', searchFiles);
 
         // Load initial directory
         window.onload = () => loadDirectory();

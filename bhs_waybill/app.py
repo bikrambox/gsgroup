@@ -1,10 +1,12 @@
-from flask import Flask, render_template, jsonify, request, Response
+from flask import Flask, render_template, jsonify, request, Response, send_file
 from flask_cors import CORS
 from waybill_ftp import FTPConnection  # Updated import
 import logging
 import os
 from dotenv import load_dotenv
 import io
+import sqlite3
+import time
 
 # Load environment variables before anything else
 load_dotenv()
@@ -85,18 +87,32 @@ def ftp_download(file_path):
             if result["status"] == "error":
                 return jsonify(result), 404
         
-        # Determine file type and return appropriate response
-        if file_path.endswith('.pdf'):
-            return Response(result["data"], mimetype='application/pdf')
-        elif file_path.endswith('.csv'):
-            return Response(result["data"], mimetype='text/csv')
-        elif file_path.endswith('.txt'):
-            return Response(result["data"], mimetype='text/plain')
+        # Determine file type and return as downloadable file
+        filename = decoded_path.split('/')[-1]
+        if file_path.endswith(('.pdf', '.csv', '.txt')):
+            return Response(
+                result["data"],
+                mimetype={
+                    '.pdf': 'application/pdf',
+                    '.csv': 'text/csv',
+                    '.txt': 'text/plain'
+                }[file_path[-4:]],
+                headers={'Content-Disposition': f'attachment; filename="{filename}"'}
+            )
         else:
             return jsonify({"status": "error", "message": "Unsupported file type"}), 400
     except Exception as e:
         logger.error(f"Error downloading file: {e}")
         return jsonify({"status": "error", "message": f"Failed to download file: {e}"}), 500
+
+@app.route('/api/ftp/index', methods=['GET'])
+def get_ftp_index():
+    logger.info("Serving FTP index database")
+    try:
+        return send_file('ftp_index.db', as_attachment=True, download_name='ftp_index.db', mimetype='application/x-sqlite3')
+    except Exception as e:
+        logger.error(f"Error serving FTP index database: {e}")
+        return jsonify({"status": "error", "message": f"Failed to serve FTP index: {e}"}), 500
 
 @app.route('/favicon.ico')
 def favicon():
