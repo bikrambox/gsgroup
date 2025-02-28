@@ -160,7 +160,7 @@ class FTPConnection:
             }
 
     def direct_ftp_download(self, file_path):
-        """Directly download a file from the FTP server and return its contents."""
+        """Directly download a file from the FTP server and return its contents with path validation."""
         if not self.ensure_connected():
             logger.warning("Attempted to download file without active connection")
             return {
@@ -168,6 +168,12 @@ class FTPConnection:
                 "message": "Not connected to FTPS server"
             }
         try:
+            # Normalize the file path to ensure it starts with the base path
+            base_path = '/Reports/ELON_data/Nomeco_environments/PROD_internally'
+            if not file_path.startswith(base_path):
+                file_path = f"{base_path}/{file_path}" if not file_path.startswith('/') else f"{base_path}{file_path}"
+            logger.info(f"Normalized FTP path for download: {file_path}")
+
             # Navigate to the directory containing the file (remove filename from path)
             directory = '/'.join(file_path.split('/')[:-1]) or '/'
             self.ftp.cwd(directory)
@@ -175,6 +181,17 @@ class FTPConnection:
             
             logger.info(f"Attempting to retrieve file: {filename} from {directory} via FTP")
             
+            # Verify the file exists before attempting to download
+            try:
+                self.ftp.size(filename)  # Check if the file exists and is accessible
+                logger.info(f"Verified file exists: {filename}")
+            except ftplib.error_perm as e:
+                logger.error(f"File verification failed for {filename}: {e}")
+                return {
+                    "status": "error",
+                    "message": f"File verification failed: {e}"
+                }
+
             # Use a BytesIO buffer to store the file content
             file_buffer = io.BytesIO()
             self.ftp.retrbinary(f"RETR {filename}", file_buffer.write)
