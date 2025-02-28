@@ -3,552 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BHS Waybill FTPS File Manager</title>
+    <title>BHS Waybill Download Test</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 0;
-            background-color: #f0f0f0;
-        }
-        .file-manager {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
             padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            position: relative;
-        }
-        .indexing-status {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            display: flex;
-            gap: 10px;
-        }
-        .status-indicator {
-            font-size: 14px;
-            padding: 5px 10px;
-            border-radius: 3px;
-            color: white;
-        }
-        .indexing-ongoing {
-            background-color: red;
-        }
-        .indexing-done {
-            background-color: green;
-        }
-        .left-panel, .right-panel {
-            width: 48%;
-            box-sizing: border-box;
-        }
-        .left-panel {
-            border-right: 1px solid #ddd;
-            padding-right: 20px;
-        }
-        .search-container {
-            margin-bottom: 20px;
-            width: 100%;
-        }
-        #searchInput {
-            width: 70%;
-            padding: 8px;
-            margin-right: 10px;
-            box-sizing: border-box;
-        }
-        #searchButton {
-            padding: 8px 15px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        #searchButton:hover {
-            background-color: #0056b3;
-        }
-        .breadcrumbs {
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-        .breadcrumb {
-            display: inline-block;
-            color: #333;
-            text-decoration: none;
-            padding: 2px 5px;
-        }
-        .breadcrumb:not(:last-child):after {
-            content: " / ";
-            color: #666;
-            margin: 0 5px;
-        }
-        .breadcrumb:hover {
-            text-decoration: underline;
-            cursor: pointer;
-        }
-        .breadcrumb.active {
-            color: #666;
-            pointer-events: none;
-        }
-        .item-list {
-            list-style: none;
-            padding: 0;
-        }
-        .item {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            cursor: pointer;
-        }
-        .item.dir {
-            color: blue;
-        }
-        .item.file {
-            color: black;
-        }
-        .item:hover {
-            background-color: #f5f5f5;
-        }
-        .error {
-            color: red;
-            margin-top: 10px;
-        }
-        #fileViewer {
-            margin-top: 20px;
-            border: 1px solid #ccc;
-            padding: 10px;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .files-column {
+            background-color: #f0f0f0;
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
         }
-        .file-item {
-            color: black;
-            cursor: pointer;
+        .container {
+            max-width: 800px;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            text-align: center;
         }
-        .file-item:hover {
-            text-decoration: underline;
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
         }
-        .download-link {
-            color: #007BFF;
-            text-decoration: underline;
-            cursor: pointer;
-            margin-left: 5px;
+        .download-button {
+            display: inline-block;
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 18px;
+            margin: 20px 0;
+            transition: background-color 0.3s;
         }
-        .download-link:hover {
-            color: #0056b3;
+        .download-button:hover {
+            background-color: #45a049;
+        }
+        .url-display {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            word-break: break-all;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+        .error {
+            background-color: #f2dede;
+            color: #a94442;
         }
     </style>
 </head>
 <body>
-    <!-- <div class="file-manager"> -->
-    <div class="">
-        <h1>BHS Waybill FTPS File Manager</h1>
-        <div class="indexing-status">
-            <div class="status-indicator" id="databaseStatus">Database: Indexing [Ongoing]</div>
-            <div class="status-indicator" id="jsonStatus">JSON: Indexing [Ongoing]</div>
+    <div class="container">
+        <h1>BHS Waybill Download Test</h1>
+        
+        <p>Click the button below to download the test file:</p>
+        
+        <a href="https://vps1139.basicserver.io:42030/api/ftp/download/Reports/ELON_data/Nomeco_environments/PROD_internally/Nomeco_2024-10-16/20241016163203_BZ761831_Final.csv" 
+           class="download-button" 
+           id="downloadButton" 
+           target="_blank">
+            Download Test File
+        </a>
+        
+        <div class="url-display">
+            <strong>Download URL:</strong><br>
+            https://vps1139.basicserver.io:42030/api/ftp/download/Reports/ELON_data/Nomeco_environments/PROD_internally/Nomeco_2024-10-16/20241016163203_BZ761831_Final.csv
         </div>
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="Search file names (e.g., BZ760919)...">
-            <button id="searchButton">Search</button>
-        </div>
-        <div class="left-panel">
-            <!-- <div class="breadcrumbs" id="breadcrumbs"></div>
-            <ul class="item-list" id="fileList"></ul>
-            <div class="error" id="errorMessage"></div>
-            <div id="fileViewer"></div> -->
-        </div>
-        <div class="right-panel">
-            <table id="searchResultsTable">
-                <thead>
-                    <tr>
-                        <th>Name of the Folder</th>
-                        <th>Files</th>
-                    </tr>
-                </thead>
-                <tbody id="searchResultsBody"></tbody>
-            </table>
-        </div>
+        
+        <div id="status"></div>
     </div>
 
     <script>
-        const baseUrl = 'https://vps1139.basicserver.io:42030';
-        let currentPath = '/Reports/ELON_data/Nomeco_environments/PROD_internally';
-
-        // Hardcode the download base URL
-        const downloadBaseUrl = 'https://vps1139.basicserver.io:42030/api/ftp/download';
-
-        // Initialize IndexedDB for storing file index
-        let db;
-        const request = indexedDB.open('ftpIndexDB', 1);
-
-        request.onupgradeneeded = function(event) {
-            db = event.target.result;
-            const store = db.createObjectStore('files', { keyPath: 'file_name' });
-            console.log("IndexedDB upgraded: Created 'files' object store with keyPath 'file_name'");
+        // Function to automatically trigger download when page loads
+        window.onload = function() {
+            // Wait a moment before triggering the download
+            setTimeout(function() {
+                console.log("Auto-triggering download...");
+                document.getElementById("downloadButton").click();
+            }, 1000);
         };
 
-        request.onsuccess = function(event) {
-            db = event.target.result;
-            console.log("IndexedDB opened successfully");
-            loadIndexFromServer();
-            startPollingIndexingStatus();
-        };
-
-        request.onerror = function(event) {
-            console.error("IndexedDB error:", event.target.error);
-        };
-
-        async function loadIndexFromServer() {
-            console.log("Starting to load index from server");
-            try {
-                const response = await fetch(`${baseUrl}/api/ftp/index`, { mode: 'cors', credentials: 'include' });
-                if (!response.ok) {
-                    if (response.status === 200 && response.headers.get('content-type') === 'application/json') {
-                        console.log("Fetched index database successfully, but status not OK, checking JSON");
-                        const jsonData = await response.json();
-                        if (jsonData.status === 'ongoing') {
-                            console.log("JSON indexing ongoing, retrying later...");
-                            setTimeout(loadIndexFromServer, 5000); // Retry after 5 seconds
-                            updateStatuses('done', 'ongoing');
-                            return;
-                        }
-                    }
-                    throw new Error('Failed to fetch index: ' + response.status);
-                }
-                console.log("Fetched index database successfully");
-                const jsonData = await response.json();
-                console.log("Received JSON data:", jsonData);
-                parseSQLiteData(jsonData);
-                updateStatuses('done', 'done');
-            } catch (error) {
-                console.error("Error loading index from server:", error);
-                updateStatuses('done', 'ongoing'); // Assume database is done, JSON failed
-            }
-        }
-
-        function parseSQLiteData(jsonData) {
-            console.log("Parsing JSON data into IndexedDB");
-            const transaction = db.transaction(['files'], 'readwrite');
-            const store = transaction.objectStore('files');
+        // Function to manually download the file
+        function downloadFile() {
+            const url = "https://vps1139.basicserver.io:42030/api/ftp/download/Reports/ELON_data/Nomeco_environments/PROD_internally/Nomeco_2024-10-16/20241016163203_BZ761831_Final.csv";
+            console.log("Manual download initiated for URL:", url);
             
-            jsonData.forEach(item => {
-                if (!item.file_name || !item.file_path) {
-                    console.warn("Invalid data in JSON:", item);
-                    return;
+            fetch(url, {
+                method: 'GET',
+                mode: 'cors',
+                headers: {
+                    'Accept': 'text/csv'
                 }
-                store.put(item);
-                console.log("Stored in IndexedDB:", item.file_name, item.file_path);
-            });
-
-            console.log("IndexedDB populated with FTP index");
-        }
-
-        async function loadDirectory(path = currentPath) {
-            console.log("Loading directory for path - Input:", path, "Global currentPath:", currentPath);
-            try {
-                const response = await fetch(`${baseUrl}/api/ftp/list?path=${encodeURIComponent(path)}`, { mode: 'cors', credentials: 'include' });
-                const data = await response.json();
-
-                if (data.status === 'error') {
-                    document.getElementById('errorMessage').textContent = data.message;
-                    document.getElementById('fileList').innerHTML = '';
-                    document.getElementById('fileViewer').innerHTML = '';
-                    console.error("Failed to load directory:", data.message, "Requested path:", path);
-                    return;
+            })
+            .then(response => {
+                console.log("Response status:", response.status);
+                console.log("Response headers:", Object.fromEntries(response.headers.entries()));
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
                 }
-
-                document.getElementById('errorMessage').textContent = '';
-                updateBreadcrumbs(path);
-                const fileList = document.getElementById('fileList');
-                fileList.innerHTML = '';
-
-                data.data.forEach(item => {
-                    const li = document.createElement('li');
-                    li.className = `item ${item.is_dir ? 'dir' : 'file'}`;
-                    li.textContent = item.name;
-                    li.onclick = () => {
-                        console.log("Clicked item:", item.name, "Is directory?", item.is_dir, "Path:", item.path);
-                        if (item.is_dir) {
-                            currentPath = item.path;
-                            console.log("Navigating to directory - New currentPath:", currentPath, "Item path:", item.path);
-                            loadDirectory(currentPath);
-                        } else {
-                            downloadFile(item.path); // Trigger direct download
-                        }
-                    };
-                    fileList.appendChild(li);
-                });
-            } catch (error) {
-                document.getElementById('errorMessage').textContent = 'Failed to load directory: ' + error.message;
-                console.error("Fetch error:", error, "Requested path:", path);
-            }
-        }
-
-        // async function downloadFile(filePath) {
-        //     console.log("Starting to download file:", filePath);
-        //     const requestedUrl = `${downloadBaseUrl}/${encodeURIComponent(filePath)}`;
-        //     console.log("Requested URL for download:", requestedUrl);
-
-        //     // try {
-        //     //     const response = await fetch(requestedUrl, { 
-        //     //         mode: 'cors', 
-        //     //         credentials: 'include' 
-        //     //     });
-        //     //     if (!response.ok) {
-        //     //         throw new Error(`HTTP error! status: ${response.status}`);
-        //     //     }
-
-        //     //     console.log("Response received for download:", response.url, "Headers:", Object.fromEntries(response.headers.entries()));
-
-        //     //     const contentType = response.headers.get('content-type');
-        //     //     const data = await response.blob(); // Use blob for downloading files
-
-        //     //     // Directly trigger download for all supported file types
-        //     //     const blob = new Blob([data]);
-        //     //     const url = window.URL.createObjectURL(blob);
-        //     //     const a = document.createElement('a');
-        //     //     a.href = url;
-        //     //     a.download = filePath.split('/').pop();
-        //     //     document.body.appendChild(a);
-        //     //     a.click();
-        //     //     window.URL.revokeObjectURL(url);
-        //     //     document.body.removeChild(a);
-
-        //     //     document.getElementById('fileViewer').innerHTML = 'File download initiated.';
-        //     // } catch (error) {
-        //     //     document.getElementById('errorMessage').textContent = 'Failed to download file: ' + error.message;
-        //     //     console.error("Download error:", error);
-        //     // }
-        // }
-
-        async function downloadFile(filePath) {
-            console.log("Starting to download file:", filePath);
-            const requestedUrl = `${downloadBaseUrl}/${encodeURIComponent(filePath)}`;
-            console.log("Requested URL for download:", requestedUrl);
-
-            try {
-                // Create a temporary <a> element to trigger the download
+                
+                return response.blob();
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
-                a.href = requestedUrl;
-                a.download = filePath.split('/').pop(); // Set the filename for the download
-                a.target = '_blank'; // Open in a new tab/window to avoid navigating away from the current page
-
-                // Append to the document, click programmatically, and remove
+                a.style.display = 'none';
+                a.href = url;
+                a.download = "20241016163203_BZ761831_Final.csv";
                 document.body.appendChild(a);
                 a.click();
-                document.body.removeChild(a);
-
-                console.log("Download initiated for:", requestedUrl);
-            } catch (error) {
-                document.getElementById('errorMessage').textContent = 'Failed to initiate download: ' + error.message;
-                console.error("Download initiation error:", error);
-            }
-        }
-
-
-
-
-
-        function updateBreadcrumbs(path) {
-            console.log("Updating breadcrumbs for path:", path);
-            const parts = path.split('/').filter(part => part.length > 0);
-            const breadcrumbs = document.getElementById('breadcrumbs');
-            breadcrumbs.innerHTML = '';
-
-            let cumulativePath = '/';
-            parts.forEach((part, index) => {
-                const currentPath = cumulativePath + part;
-                if (index < parts.length - 1) {
-                    cumulativePath = currentPath + '/';
-                } else {
-                    cumulativePath = currentPath;
-                }
-
-                const breadcrumb = document.createElement('a');
-                breadcrumb.className = 'breadcrumb';
-                breadcrumb.textContent = part;
-
-                if (index === parts.length - 1) {
-                    breadcrumb.classList.add('active');
-                    console.log("Active breadcrumb (current directory):", currentPath);
-                } else {
-                    breadcrumb.href = '#';
-                    breadcrumb.onclick = (e) => {
-                        e.preventDefault();
-                        console.log("Clicked breadcrumb - Before update:", currentPath, "Global currentPath:", window.currentPath);
-                        window.currentPath = currentPath;
-                        console.log("Clicked breadcrumb - After update:", window.currentPath);
-                        loadDirectory(window.currentPath);
-                    };
-                }
-
-                breadcrumbs.appendChild(breadcrumb);
+                window.URL.revokeObjectURL(url);
+                
+                const statusDiv = document.getElementById("status");
+                statusDiv.className = "status success";
+                statusDiv.textContent = "Download successful!";
+            })
+            .catch(error => {
+                console.error("Download error:", error);
+                
+                const statusDiv = document.getElementById("status");
+                statusDiv.className = "status error";
+                statusDiv.textContent = `Download failed: ${error.message}`;
             });
-
-            if (parts.length > 0) {
-                const homeBreadcrumb = document.createElement('a');
-                homeBreadcrumb.className = 'breadcrumb';
-                homeBreadcrumb.textContent = 'Home';
-                homeBreadcrumb.href = '#';
-                homeBreadcrumb.onclick = (e) => {
-                    e.preventDefault();
-                    console.log("Clicked Home breadcrumb, navigating to root. Current global currentPath:", window.currentPath);
-                    window.currentPath = '/';
-                    console.log("Clicked Home breadcrumb, new currentPath:", window.currentPath);
-                    loadDirectory(window.currentPath);
-                };
-                breadcrumbs.insertBefore(homeBreadcrumb, breadcrumbs.firstChild);
-
-                const separator = document.createTextNode(' / ');
-                breadcrumbs.insertBefore(separator, breadcrumbs.childNodes[1]);
-            }
-        }
-
-        function searchFiles() {
-            console.log("Search button clicked, initiating search with term:", document.getElementById('searchInput').value);
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
-            const transaction = db.transaction(['files'], 'readonly');
-            const store = transaction.objectStore('files');
-            const request = store.openCursor();
-            const results = {};
-
-            console.log("Opening IndexedDB cursor for search with term:", searchTerm);
-
-            request.onsuccess = function(event) {
-                console.log("Cursor success event triggered");
-                const cursor = event.target.result;
-                if (cursor) {
-                    const file = cursor.value;
-                    console.log("Processing file:", file.file_name, file.file_path);
-                    const folderName = file.file_path.split('/').slice(-2, -1)[0] || 'Root';
-                    if (file.file_name.toLowerCase().includes(searchTerm)) {
-                        console.log("Match found:", file.file_name);
-                        if (!results[folderName]) {
-                            results[folderName] = [];
-                        }
-                        results[folderName].push(file.file_name);
-                    }
-                    cursor.continue();
-                } else {
-                    console.log("Search completed, results:", results);
-                    displaySearchResults(results);
-                }
-            };
-
-            request.onerror = function(event) {
-                console.error("Search error:", event.target.error);
-            };
-        }
-
-        function displaySearchResults(results) {
-            console.log("Displaying search results:", results);
-            const tbody = document.getElementById('searchResultsBody');
-            tbody.innerHTML = '';
-
-            for (const folderName in results) {
-                const tr = document.createElement('tr');
-                const folderCell = document.createElement('td');
-                folderCell.textContent = folderName;
-                console.log("Adding folder to table:", folderName);
-
-                const filesCell = document.createElement('td');
-                const filesContainer = document.createElement('div');
-                filesContainer.className = 'files-column';
-                results[folderName].forEach(file => {
-                    console.log("Adding file to folder:", file);
-                    const fileItem = document.createElement('span');
-                    fileItem.className = 'file-item';
-                    fileItem.textContent = file;
-
-                    fileItem.onclick = (e) => {
-                        console.log("Clicked file item:", file, "Folder:", folderName);
-                        e.preventDefault(); // Prevent default link behavior if needed
-                        downloadFile(`/Reports/ELON_data/Nomeco_environments/PROD_internally/${folderName}/${file}`);
-                    };
-
-                    filesContainer.appendChild(fileItem);
-                });
-                filesCell.appendChild(filesContainer);
-
-                tr.appendChild(folderCell);
-                tr.appendChild(filesCell);
-                tbody.appendChild(tr);
-            }
-        }
-
-        // Add search event listener
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log("DOM fully loaded, attaching search listener");
-            const button = document.getElementById('searchButton');
-            if (button) {
-                button.addEventListener('click', searchFiles);
-                console.log("Search button listener attached");
-            } else {
-                console.error("Search button not found in DOM");
-            }
-            loadDirectory();
-        });
-
-        async function updateIndexingStatus() {
-            console.log("Checking indexing status");
-            try {
-                const response = await fetch(`${baseUrl}/api/indexing_status`, { mode: 'cors', credentials: 'include' });
-                if (!response.ok) throw new Error('Failed to fetch indexing status');
-                const data = await response.json();
-                console.log("Indexing statuses received:", data);
-                updateStatuses(data.database_status, data.json_status);
-            } catch (error) {
-                console.error("Error updating indexing status:", error);
-                updateStatuses('ongoing', 'ongoing'); // Default to ongoing if error
-            }
-        }
-
-        function updateStatuses(databaseStatus, jsonStatus) {
-            const dbStatusElement = document.getElementById('databaseStatus');
-            const jsonStatusElement = document.getElementById('jsonStatus');
-
-            if (dbStatusElement) {
-                dbStatusElement.textContent = `Database: Indexing [${databaseStatus === 'done' ? 'Done' : 'Ongoing'}]`;
-                dbStatusElement.className = `status-indicator ${databaseStatus === 'done' ? 'indexing-done' : 'indexing-ongoing'}`;
-                console.log("Database indexing status updated to:", databaseStatus);
-            } else {
-                console.error("Database status element not found");
-            }
-
-            if (jsonStatusElement) {
-                jsonStatusElement.textContent = `JSON: Indexing [${jsonStatus === 'done' ? 'Done' : 'Ongoing'}]`;
-                jsonStatusElement.className = `status-indicator ${jsonStatus === 'done' ? 'indexing-done' : 'indexing-ongoing'}`;
-                console.log("JSON indexing status updated to:", jsonStatus);
-            } else {
-                console.error("JSON status element not found");
-            }
-        }
-
-        function startPollingIndexingStatus() {
-            console.log("Starting polling for indexing status");
-            updateIndexingStatus(); // Initial check
-            setInterval(updateIndexingStatus, 5000); // Poll every 5 seconds
         }
     </script>
 </body>
