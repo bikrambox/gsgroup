@@ -310,36 +310,36 @@
             const requestedUrl = `${downloadBaseUrl}/${encodeURIComponent(filePath)}`;
             console.log("Requested URL for download:", requestedUrl);
 
-            try {
-                const response = await fetch(requestedUrl, { 
-                    mode: 'cors', 
-                    credentials: 'include' 
-                });
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+            // try {
+            //     const response = await fetch(requestedUrl, { 
+            //         mode: 'cors', 
+            //         credentials: 'include' 
+            //     });
+            //     if (!response.ok) {
+            //         throw new Error(`HTTP error! status: ${response.status}`);
+            //     }
 
-                console.log("Response received for download:", response.url, "Headers:", Object.fromEntries(response.headers.entries()));
+            //     console.log("Response received for download:", response.url, "Headers:", Object.fromEntries(response.headers.entries()));
 
-                const contentType = response.headers.get('content-type');
-                const data = await response.blob(); // Use blob for downloading files
+            //     const contentType = response.headers.get('content-type');
+            //     const data = await response.blob(); // Use blob for downloading files
 
-                // Directly trigger download for all supported file types
-                const blob = new Blob([data]);
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = filePath.split('/').pop();
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                document.body.removeChild(a);
+            //     // Directly trigger download for all supported file types
+            //     const blob = new Blob([data]);
+            //     const url = window.URL.createObjectURL(blob);
+            //     const a = document.createElement('a');
+            //     a.href = url;
+            //     a.download = filePath.split('/').pop();
+            //     document.body.appendChild(a);
+            //     a.click();
+            //     window.URL.revokeObjectURL(url);
+            //     document.body.removeChild(a);
 
-                document.getElementById('fileViewer').innerHTML = 'File download initiated.';
-            } catch (error) {
-                document.getElementById('errorMessage').textContent = 'Failed to download file: ' + error.message;
-                console.error("Download error:", error);
-            }
+            //     document.getElementById('fileViewer').innerHTML = 'File download initiated.';
+            // } catch (error) {
+            //     document.getElementById('errorMessage').textContent = 'Failed to download file: ' + error.message;
+            //     console.error("Download error:", error);
+            // }
         }
 
         function updateBreadcrumbs(path) {
