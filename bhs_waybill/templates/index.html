@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BHS Waybill FTPS File Manager</title>
     <style>
-        /* Keep your existing CSS styles here (unchanged) */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -53,6 +52,7 @@
         .search-container {
             margin-bottom: 20px;
             width: 100%;
+            position: relative;
         }
         #searchInput {
             width: 70%;
@@ -70,6 +70,12 @@
         }
         #searchButton:hover {
             background-color: #0056b3;
+        }
+        .no-waybill {
+            color: #666;
+            font-style: italic;
+            margin-top: 5px;
+            display: none; /* Hidden by default, shown via JavaScript */
         }
         .breadcrumbs {
             margin-bottom: 10px;
@@ -107,7 +113,8 @@
             color: blue;
         }
         .item.file {
-            color: black;
+            color: royalblue; /* Changed to royal blue for downloadable files */
+            text-decoration: underline; /* Underlined for downloadable files */
         }
         .item:hover {
             background-color: #f5f5f5;
@@ -144,17 +151,17 @@
             gap: 5px;
         }
         .file-item {
-            color: black;
+            color: royalblue; /* Changed to royal blue for searchable files */
+            text-decoration: underline; /* Underlined for searchable files */
             cursor: pointer;
         }
         .file-item:hover {
-            text-decoration: underline;
+            text-decoration: underline; /* Ensure underline remains on hover */
         }
     </style>
 </head>
 <body>
     <div class="">
-    <!-- <div class="file-manager"> -->
         <h1>BHS Waybill FTPS File Manager</h1>
         <div class="indexing-status">
             <div class="status-indicator" id="databaseStatus">Database: Indexing [Ongoing]</div>
@@ -163,6 +170,7 @@
         <div class="search-container">
             <input type="text" id="searchInput" placeholder="Search file names (e.g., BZ760919)...">
             <button id="searchButton">Search</button>
+            <div class="no-waybill" id="noWaybill">No Waybill found</div>
         </div>
         <div class="left-panel">
             <!-- <div class="breadcrumbs" id="breadcrumbs"></div>
@@ -197,12 +205,12 @@
         request.onupgradeneeded = function(event) {
             db = event.target.result;
             const store = db.createObjectStore('files', { keyPath: 'file_name' });
-            // console.log("IndexedDB upgraded: Created 'files' object store with keyPath 'file_name'");
+            console.log("IndexedDB upgraded: Created 'files' object store with keyPath 'file_name'");
         };
 
         request.onsuccess = function(event) {
             db = event.target.result;
-            // console.log("IndexedDB opened successfully");
+            console.log("IndexedDB opened successfully");
             loadIndexFromServer();
             startPollingIndexingStatus();
         };
@@ -212,15 +220,15 @@
         };
 
         async function loadIndexFromServer() {
-            // console.log("Starting to load index from server");
+            console.log("Starting to load index from server");
             try {
                 const response = await fetch(`${baseUrl}/api/ftp/index`, { mode: 'cors', credentials: 'include' });
                 if (!response.ok) {
                     if (response.status === 200 && response.headers.get('content-type') === 'application/json') {
-                        // console.log("Fetched index database successfully, but status not OK, checking JSON");
+                        console.log("Fetched index database successfully, but status not OK, checking JSON");
                         const jsonData = await response.json();
                         if (jsonData.status === 'ongoing') {
-                            // console.log("JSON indexing ongoing, retrying later...");
+                            console.log("JSON indexing ongoing, retrying later...");
                             setTimeout(loadIndexFromServer, 5000); // Retry after 5 seconds
                             updateStatuses('done', 'ongoing');
                             return;
@@ -230,7 +238,7 @@
                 }
                 console.log("Fetched index database successfully");
                 const jsonData = await response.json();
-                // console.log("Received JSON data:", jsonData);
+                console.log("Received JSON data:", jsonData);
                 parseSQLiteData(jsonData);
                 updateStatuses('done', 'done');
             } catch (error) {
@@ -240,7 +248,7 @@
         }
 
         function parseSQLiteData(jsonData) {
-            // console.log("Parsing JSON data into IndexedDB");
+            console.log("Parsing JSON data into IndexedDB");
             const transaction = db.transaction(['files'], 'readwrite');
             const store = transaction.objectStore('files');
             
@@ -275,22 +283,28 @@
                 const fileList = document.getElementById('fileList');
                 fileList.innerHTML = '';
 
-                data.data.forEach(item => {
-                    const li = document.createElement('li');
-                    li.className = `item ${item.is_dir ? 'dir' : 'file'}`;
-                    li.textContent = item.name;
-                    li.onclick = () => {
-                        console.log("Clicked item:", item.name, "Is directory?", item.is_dir, "Path:", item.path);
-                        if (item.is_dir) {
-                            currentPath = item.path;
-                            console.log("Navigating to directory - New currentPath:", currentPath, "Item path:", item.path);
-                            loadDirectory(currentPath);
-                        } else {
-                            downloadFile(item.path); // Trigger direct download via URL
-                        }
-                    };
-                    fileList.appendChild(li);
-                });
+                if (data.data.length === 0) {
+                    // Show "No Waybill found" if no files or directories exist
+                    document.getElementById('noWaybill').style.display = 'block';
+                } else {
+                    document.getElementById('noWaybill').style.display = 'none';
+                    data.data.forEach(item => {
+                        const li = document.createElement('li');
+                        li.className = `item ${item.is_dir ? 'dir' : 'file'}`;
+                        li.textContent = item.name;
+                        li.onclick = () => {
+                            console.log("Clicked item:", item.name, "Is directory?", item.is_dir, "Path:", item.path);
+                            if (item.is_dir) {
+                                currentPath = item.path;
+                                console.log("Navigating to directory - New currentPath:", currentPath, "Item path:", item.path);
+                                loadDirectory(currentPath);
+                            } else {
+                                downloadFile(item.path); // Trigger direct download via URL
+                            }
+                        };
+                        fileList.appendChild(li);
+                    });
+                }
             } catch (error) {
                 document.getElementById('errorMessage').textContent = 'Failed to load directory: ' + error.message;
                 console.error("Fetch error:", error, "Requested path:", path);
@@ -399,12 +413,21 @@
                     cursor.continue();
                 } else {
                     console.log("Search completed, results:", results);
-                    displaySearchResults(results);
+                    if (Object.keys(results).length === 0) {
+                        // Show "No Waybill found" if no search results
+                        document.getElementById('noWaybill').style.display = 'block';
+                        document.getElementById('searchResultsBody').innerHTML = '';
+                    } else {
+                        document.getElementById('noWaybill').style.display = 'none';
+                        displaySearchResults(results);
+                    }
                 }
             };
 
             request.onerror = function(event) {
                 console.error("Search error:", event.target.error);
+                document.getElementById('noWaybill').style.display = 'block';
+                document.getElementById('searchResultsBody').innerHTML = '';
             };
         }
 
