@@ -111,6 +111,7 @@ def ftp_navigate():
 @app.route('/api/ftp/download/<path:file_path>', methods=['GET'])
 def ftp_download(file_path):
     logger.info(f"API request to download file: {file_path} over HTTPS (Windows FTP)")
+    logger.info("HELLO FROM DOWNLOAD#####################################")
     try:
         # Decode the URL-encoded path
         decoded_path = file_path.replace('%2F', '/')
