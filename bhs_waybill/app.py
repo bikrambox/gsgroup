@@ -41,6 +41,14 @@ def initialize_ftp():
 # Initialize FTPS when the app starts
 initialize_ftp()
 
+@app.before_request
+def before_request():
+    """Detect if the request is coming through a proxy (e.g., Nginx) and set the URL scheme to HTTPS if X-Forwarded-Proto is 'https'."""
+    if request.headers.get('X-Forwarded-Proto') == 'https':
+        request.environ['wsgi.url_scheme'] = 'https'
+    else:
+        request.environ['wsgi.url_scheme'] = 'http'
+
 @app.route('/')
 def index():
     logger.info("Serving SPA index page")
@@ -164,5 +172,5 @@ def favicon():
 if __name__ == '__main__':
     # This will only be used in development
     host = os.getenv('HOST', '0.0.0.0')
-    port = int(os.getenv('PORT', 5500))
+    port = int(os.getenv('PORT', 8000))
     app.run(debug=True, host=host, port=port, ssl_context=None)  # Remove SSL context for local testing

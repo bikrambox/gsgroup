@@ -89,7 +89,7 @@ if __name__ == '__main__':
     logger.info(f"FTP_PASSWORD: {os.getenv('FTP_PASSWORD')}")
     
     host = os.getenv('HOST', '0.0.0.0')
-    port = int(os.getenv('PORT', 42030))  # Match the public port (adjust if different)
+    port = int(os.getenv('PORT', 8000))  # Updated to match your environment (port 8000)
     
     logger.info(f"Starting BHS Waybill in production mode on {host}:{port}...")
     
@@ -101,5 +101,5 @@ if __name__ == '__main__':
     start_indexing_in_background(ftp_connection)
     
     # Serve without SSL context (SSL should be handled by a reverse proxy like Nginx)
-    logger.info("Starting Flask server with Waitress (SSL handled externally)")
+    logger.info(f"Starting Flask server with Waitress on port {port} (SSL handled externally)")
     serve(app, host=host, port=port)  # Removed ssl_context
