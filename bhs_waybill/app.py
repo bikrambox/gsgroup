@@ -125,7 +125,7 @@ def ftp_download(file_path):
             logger.info(f"Successfully downloaded file: {filename} over HTTPS (Windows FTP)")
             # Hardcode the HTTPS URL in the response, ensuring all headers use HTTPS with port
             port = request.environ.get('SERVER_PORT', '42030')
-            hardcoded_url = f"https://vps1139.basicserver.io:{port}/api/ftp/download/{file_path}"
+            hardcoded_url = f"https://vps1139.basicserver.io:{port}/api/ftp/download{file_path}"
             
             # Set the Content-Type based on file extension
             content_type = {
