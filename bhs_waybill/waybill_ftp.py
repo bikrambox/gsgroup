@@ -166,7 +166,7 @@ class FTPConnection:
             }
 
     def direct_ftp_download(self, file_path):
-        """Directly download a file from the FTP server and return its contents with path validation and retries."""
+        """Directly download a file from the FTP server and return its contents without using SIZE command."""
         if not self.ensure_connected():
             logger.warning("Attempted to download file without active connection")
             return {
@@ -197,35 +197,17 @@ class FTPConnection:
                     "message": f"Directory verification failed: {e}"
                 }
 
-            # Verify the file exists and is accessible with retries
-            max_retries = 3
-            for attempt in range(max_retries):
-                try:
-                    self.ftp.size(filename)  # Check if the file exists and is accessible
-                    logger.info(f"Verified file exists: {filename} on attempt {attempt + 1}")
-                    break
-                except ftplib.error_perm as e:
-                    if attempt < max_retries - 1:
-                        logger.warning(f"File verification failed for {filename} on attempt {attempt + 1}: {e}, retrying...")
-                        time.sleep(5)  # Wait before retrying
-                        self.ensure_connected()  # Reconnect if necessary
-                        continue
-                    logger.error(f"File verification failed for {filename} after {max_retries} attempts: {e}")
-                    return {
-                        "status": "error",
-                        "message": f"File verification failed after retries: {e}"
-                    }
-
-            # Use a BytesIO buffer to store the file content
+            # Attempt to download the file directly in binary mode (avoiding ASCII mode issues)
             file_buffer = io.BytesIO()
+            self.ftp.voidcmd("TYPE I")  # Switch to binary mode (Image mode)
             self.ftp.retrbinary(f"RETR {filename}", file_buffer.write)
             file_content = file_buffer.getvalue()
             
-            logger.info(f"Successfully retrieved file: {filename} via FTP")
+            logger.info(f"Successfully retrieved file: {filename} via FTP in binary mode")
             return {
                 "status": "success",
                 "data": file_content,
-                "message": f"File {filename} retrieved successfully via FTP"
+                "message": f"File {filename} retrieved successfully via FTP in binary mode"
             }
         except ftplib.error_perm as e:
             logger.error(f"Permission error accessing file via FTP: {e}")

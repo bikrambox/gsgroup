@@ -55,12 +55,12 @@ def index_ftp_files(ftp_connection, base_path='/Reports/ELON_data/Nomeco_environ
                 else:
                     file_name = item["name"]
                     logger.info(f"Found file: {file_name} at {full_path} (checking FTP access)")
-                    # Verify FTP access to ensure the path exists and is accessible
+                    # Try to verify FTP access, but proceed even if verification fails
                     test_result = ftp_connection.direct_ftp_download(full_path)
                     if test_result["status"] == "error":
-                        logger.warning(f"Cannot access file via FTP: {full_path} - {test_result['message']}")
-                        continue  # Skip indexing if FTP access fails
-                    logger.info(f"Verified FTP access for: {full_path}")
+                        logger.warning(f"Cannot verify file via FTP: {full_path} - {test_result['message']}, indexing anyway")
+                    else:
+                        logger.info(f"Verified FTP access for: {full_path}")
                     c.execute("INSERT OR REPLACE INTO files (file_name, file_path) VALUES (?, ?)", 
                               (file_name, full_path))
                     logger.info("Indexed: %s at %s", file_name, full_path)
