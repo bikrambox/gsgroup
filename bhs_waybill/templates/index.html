@@ -299,7 +299,8 @@
 
         function downloadFile(filePath) {
             console.log("Starting to download file:", filePath);
-            const requestedUrl = `${downloadBaseUrl}/${encodeURIComponent(filePath)}`;
+            const requestedUrl = `${downloadBaseUrl}/${filePath}`;
+            // const requestedUrl = `${downloadBaseUrl}/${encodeURIComponent(filePath)}`;
             console.log("Requested URL for download:", requestedUrl);
 
             // Create a temporary <a> element to trigger the download
