@@ -197,12 +197,12 @@
         request.onupgradeneeded = function(event) {
             db = event.target.result;
             const store = db.createObjectStore('files', { keyPath: 'file_name' });
-            console.log("IndexedDB upgraded: Created 'files' object store with keyPath 'file_name'");
+            // console.log("IndexedDB upgraded: Created 'files' object store with keyPath 'file_name'");
         };
 
         request.onsuccess = function(event) {
             db = event.target.result;
-            console.log("IndexedDB opened successfully");
+            // console.log("IndexedDB opened successfully");
             loadIndexFromServer();
             startPollingIndexingStatus();
         };
@@ -212,15 +212,15 @@
         };
 
         async function loadIndexFromServer() {
-            console.log("Starting to load index from server");
+            // console.log("Starting to load index from server");
             try {
                 const response = await fetch(`${baseUrl}/api/ftp/index`, { mode: 'cors', credentials: 'include' });
                 if (!response.ok) {
                     if (response.status === 200 && response.headers.get('content-type') === 'application/json') {
-                        console.log("Fetched index database successfully, but status not OK, checking JSON");
+                        // console.log("Fetched index database successfully, but status not OK, checking JSON");
                         const jsonData = await response.json();
                         if (jsonData.status === 'ongoing') {
-                            console.log("JSON indexing ongoing, retrying later...");
+                            // console.log("JSON indexing ongoing, retrying later...");
                             setTimeout(loadIndexFromServer, 5000); // Retry after 5 seconds
                             updateStatuses('done', 'ongoing');
                             return;
@@ -230,7 +230,7 @@
                 }
                 console.log("Fetched index database successfully");
                 const jsonData = await response.json();
-                console.log("Received JSON data:", jsonData);
+                // console.log("Received JSON data:", jsonData);
                 parseSQLiteData(jsonData);
                 updateStatuses('done', 'done');
             } catch (error) {
@@ -240,7 +240,7 @@
         }
 
         function parseSQLiteData(jsonData) {
-            console.log("Parsing JSON data into IndexedDB");
+            // console.log("Parsing JSON data into IndexedDB");
             const transaction = db.transaction(['files'], 'readwrite');
             const store = transaction.objectStore('files');
             
