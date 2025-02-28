@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request, Response, send_file, redirect, url_for
+from flask import Flask, render_template, jsonify, request, Response, send_file
 from flask_cors import CORS
 from waybill_ftp import FTPConnection  # Updated import
 import logging
@@ -29,25 +29,6 @@ logger = logging.getLogger(__name__)
 
 # Force HTTPS globally
 app.config['PREFER_HTTPS'] = True
-
-# Add a special route to handle redirects from non-port URL
-@app.before_request
-def redirect_to_port():
-    """Redirect requests without port to the correct URL with port"""
-    logger.info(f"Received request URL: {request.url}")
-    
-    # Check if the URL is missing the port
-    if 'vps1139.basicserver.io/' in request.url and ':42030' not in request.url:
-        logger.info("Detected URL without port, redirecting to URL with port")
-        
-        # Handle both HTTP and HTTPS
-        if request.url.startswith('http://'):
-            new_url = request.url.replace('http://vps1139.basicserver.io/', 'http://vps1139.basicserver.io:42030/')
-        else:
-            new_url = request.url.replace('https://vps1139.basicserver.io/', 'https://vps1139.basicserver.io:42030/')
-        
-        logger.info(f"Redirecting to: {new_url}")
-        return redirect(new_url)
 
 # Global FTPS connection instance
 ftp_connection = FTPConnection()
@@ -130,6 +111,8 @@ def ftp_download(file_path):
         filename = decoded_path.split('/')[-1]
         if file_path.endswith(('.pdf', '.csv', '.txt')):
             logger.info(f"Successfully downloaded file: {filename} over HTTPS (Windows FTP)")
+            # Hardcode the HTTPS URL in the response, ensuring all headers use HTTPS with port
+            hardcoded_url = f"https://vps1139.basicserver.io:42030/api/ftp/download/{file_path}"
             
             # Set the Content-Type based on file extension
             content_type = {
@@ -141,21 +124,18 @@ def ftp_download(file_path):
             # Create a response with the file data
             response = Response(
                 result["data"],
-                mimetype=content_type
+                mimetype=content_type,
+                headers={
+                    'Content-Disposition': f'attachment; filename="{filename}"',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type',
+                }
             )
             
-            # Set headers for download
-            response.headers['Content-Disposition'] = f'attachment; filename="{filename}"'
-            
-            # Add CORS headers directly to this response
-            response.headers['Access-Control-Allow-Origin'] = '*'
-            response.headers['Access-Control-Allow-Methods'] = 'GET, OPTIONS, HEAD'
-            response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
-            
-            # Add Cache-Control header to prevent caching
-            response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
-            response.headers['Pragma'] = 'no-cache'
-            response.headers['Expires'] = '0'
+            # Explicitly set the Location header to include the port
+            response.headers['Location'] = hardcoded_url
+            response.headers['Content-Location'] = hardcoded_url
             
             return response
         else:
@@ -217,14 +197,6 @@ def get_indexing_status():
 def favicon():
     logger.info("Serving favicon over HTTPS (Windows FTP)")
     return app.send_static_file('favicon.ico')
-
-@app.after_request
-def add_cors_headers(response):
-    """Add CORS headers to all responses"""
-    response.headers['Access-Control-Allow-Origin'] = '*'
-    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS, HEAD'
-    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
-    return response
 
 if __name__ == '__main__':
     # This will only be used in development

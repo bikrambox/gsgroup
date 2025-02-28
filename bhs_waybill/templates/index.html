@@ -195,26 +195,8 @@
         const baseUrl = 'https://vps1139.basicserver.io:42030'; // Ensure HTTPS for all requests
         let currentPath = '/Reports/ELON_data/Nomeco_environments/PROD_internally';
 
-        // Hardcode the download base URL with explicit port number
+        // Hardcode the download base URL
         const downloadBaseUrl = 'https://vps1139.basicserver.io:42030/api/ftp/download';
-        
-        // Function to create a download link with the correct URL
-        function createDownloadLink(filePath, linkText) {
-            const downloadLink = document.createElement('a');
-            downloadLink.textContent = linkText;
-            downloadLink.className = 'download-link';
-            
-            // Ensure the URL has the port number
-            const fullUrl = `https://vps1139.basicserver.io:42030/api/ftp/download/${encodeURIComponent(filePath)}`;
-            console.log("Creating download link with URL:", fullUrl);
-            
-            // Set link attributes
-            downloadLink.href = fullUrl;
-            downloadLink.target = "_blank"; // Open in new tab
-            downloadLink.rel = "noopener noreferrer"; // Security best practice
-            
-            return downloadLink;
-        }
 
         // Initialize IndexedDB for storing file index
         let db;
@@ -358,7 +340,13 @@
                     iframe.height = '500px';
                     fileViewer.appendChild(iframe);
 
-                    const downloadLink = createDownloadLink(filePath, 'Download PDF');
+                    const downloadLink = document.createElement('a');
+                    downloadLink.textContent = 'Download PDF';
+                    downloadLink.className = 'download-link';
+                    const hardcodedUrl = `https://vps1139.basicserver.io:42030/api/ftp/download/${encodeURIComponent(filePath)}`;
+                    console.log("Setting download URL to:", hardcodedUrl);
+                    downloadLink.href = hardcodedUrl;
+                    downloadLink.target = "_blank";
                     fileViewer.appendChild(downloadLink);
                 } else if (contentType === 'text/csv') {
                     // Parse CSV and display as table, with download link
@@ -376,7 +364,13 @@
                     });
                     fileViewer.appendChild(table);
 
-                    const downloadLink = createDownloadLink(filePath, 'Download CSV');
+                    const downloadLink = document.createElement('a');
+                    downloadLink.textContent = 'Download CSV';
+                    downloadLink.className = 'download-link';
+                    const hardcodedUrl = `https://vps1139.basicserver.io:42030/api/ftp/download/${encodeURIComponent(filePath)}`;
+                    console.log("Setting download URL to:", hardcodedUrl);
+                    downloadLink.href = hardcodedUrl;
+                    downloadLink.target = "_blank";
                     fileViewer.appendChild(downloadLink);
                 } else if (contentType === 'text/plain') {
                     // Display plain text, with download link
@@ -385,7 +379,13 @@
                     pre.textContent = text;
                     fileViewer.appendChild(pre);
 
-                    const downloadLink = createDownloadLink(filePath, 'Download TXT');
+                    const downloadLink = document.createElement('a');
+                    downloadLink.textContent = 'Download TXT';
+                    downloadLink.className = 'download-link';
+                    const hardcodedUrl = `https://vps1139.basicserver.io:42030/api/ftp/download/${encodeURIComponent(filePath)}`;
+                    console.log("Setting download URL to:", hardcodedUrl);
+                    downloadLink.href = hardcodedUrl;
+                    downloadLink.target = "_blank";
                     fileViewer.appendChild(downloadLink);
                 } else {
                     fileViewer.textContent = 'Unsupported file type';
@@ -511,8 +511,21 @@
                     fileItem.textContent = file;
 
                     // Add download link next to file name
-                    const downloadLink = createDownloadLink(`/Reports/ELON_data/Nomeco_environments/PROD_internally/${folderName}/${file}`, ' (Download)');
+                    const downloadLink = document.createElement('a');
+                    downloadLink.textContent = ' (Download)';
+                    downloadLink.className = 'download-link';
                     
+                    // Use a data attribute to store the file path
+                    const filePath = `/Reports/ELON_data/Nomeco_environments/PROD_internally/${folderName}/${file}`;
+                    
+                    // Hardcode the full URL with port number
+                    const hardcodedUrl = `https://vps1139.basicserver.io:42030/api/ftp/download/${encodeURIComponent(filePath)}`;
+                    console.log("Setting search result download URL to:", hardcodedUrl);
+                    
+                    // Set target to _blank to open in new tab
+                    downloadLink.href = hardcodedUrl;
+                    downloadLink.target = "_blank";
+
                     fileItem.appendChild(document.createTextNode(' '));
                     fileItem.appendChild(downloadLink);
 
