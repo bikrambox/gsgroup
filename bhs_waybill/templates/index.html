@@ -305,42 +305,69 @@
             }
         }
 
+        // async function downloadFile(filePath) {
+        //     console.log("Starting to download file:", filePath);
+        //     const requestedUrl = `${downloadBaseUrl}/${encodeURIComponent(filePath)}`;
+        //     console.log("Requested URL for download:", requestedUrl);
+
+        //     // try {
+        //     //     const response = await fetch(requestedUrl, { 
+        //     //         mode: 'cors', 
+        //     //         credentials: 'include' 
+        //     //     });
+        //     //     if (!response.ok) {
+        //     //         throw new Error(`HTTP error! status: ${response.status}`);
+        //     //     }
+
+        //     //     console.log("Response received for download:", response.url, "Headers:", Object.fromEntries(response.headers.entries()));
+
+        //     //     const contentType = response.headers.get('content-type');
+
+        //     //     // Directly trigger download for all supported file types
+        //     //     const blob = new Blob([data]);
+        //     //     const url = window.URL.createObjectURL(blob);
+        //     //     const a = document.createElement('a');
+        //     //     a.href = url;
+        //     //     a.download = filePath.split('/').pop();
+        //     //     document.body.appendChild(a);
+        //     //     a.click();
+        //     //     window.URL.revokeObjectURL(url);
+        //     //     document.body.removeChild(a);
+
+        //     //     document.getElementById('fileViewer').innerHTML = 'File download initiated.';
+        //     // } catch (error) {
+        //     //     document.getElementById('errorMessage').textContent = 'Failed to download file: ' + error.message;
+        //     //     console.error("Download error:", error);
+        //     // }
+        // }
+
         async function downloadFile(filePath) {
             console.log("Starting to download file:", filePath);
             const requestedUrl = `${downloadBaseUrl}/${encodeURIComponent(filePath)}`;
             console.log("Requested URL for download:", requestedUrl);
 
-            // try {
-            //     const response = await fetch(requestedUrl, { 
-            //         mode: 'cors', 
-            //         credentials: 'include' 
-            //     });
-            //     if (!response.ok) {
-            //         throw new Error(`HTTP error! status: ${response.status}`);
-            //     }
+            try {
+                // Create a temporary <a> element to trigger the download
+                const a = document.createElement('a');
+                a.href = requestedUrl;
+                a.download = filePath.split('/').pop(); // Set the filename for the download
+                a.target = '_blank'; // Open in a new tab/window to avoid navigating away from the current page
 
-            //     console.log("Response received for download:", response.url, "Headers:", Object.fromEntries(response.headers.entries()));
+                // Append to the document, click programmatically, and remove
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
 
-            //     const contentType = response.headers.get('content-type');
-            //     const data = await response.blob(); // Use blob for downloading files
-
-            //     // Directly trigger download for all supported file types
-            //     const blob = new Blob([data]);
-            //     const url = window.URL.createObjectURL(blob);
-            //     const a = document.createElement('a');
-            //     a.href = url;
-            //     a.download = filePath.split('/').pop();
-            //     document.body.appendChild(a);
-            //     a.click();
-            //     window.URL.revokeObjectURL(url);
-            //     document.body.removeChild(a);
-
-            //     document.getElementById('fileViewer').innerHTML = 'File download initiated.';
-            // } catch (error) {
-            //     document.getElementById('errorMessage').textContent = 'Failed to download file: ' + error.message;
-            //     console.error("Download error:", error);
-            // }
+                console.log("Download initiated for:", requestedUrl);
+            } catch (error) {
+                document.getElementById('errorMessage').textContent = 'Failed to initiate download: ' + error.message;
+                console.error("Download initiation error:", error);
+            }
         }
+
+
+
+
 
         function updateBreadcrumbs(path) {
             console.log("Updating breadcrumbs for path:", path);
