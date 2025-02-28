@@ -111,21 +111,33 @@ def ftp_download(file_path):
         filename = decoded_path.split('/')[-1]
         if file_path.endswith(('.pdf', '.csv', '.txt')):
             logger.info(f"Successfully downloaded file: {filename} over HTTPS (Windows FTP)")
-            # Hardcode the HTTPS URL in the response, ensuring all headers use HTTPS
+            # Hardcode the HTTPS URL in the response, ensuring all headers use HTTPS with port
             hardcoded_url = f"https://vps1139.basicserver.io:42030/api/ftp/download/{file_path}"
-            return Response(
+            
+            # Set the Content-Type based on file extension
+            content_type = {
+                '.pdf': 'application/pdf',
+                '.csv': 'text/csv',
+                '.txt': 'text/plain'
+            }[file_path[-4:]]
+            
+            # Create a response with the file data
+            response = Response(
                 result["data"],
-                mimetype={
-                    '.pdf': 'application/pdf',
-                    '.csv': 'text/csv',
-                    '.txt': 'text/plain'
-                }[file_path[-4:]],
+                mimetype=content_type,
                 headers={
                     'Content-Disposition': f'attachment; filename="{filename}"',
-                    'Location': hardcoded_url,  # Ensure redirects use HTTPS
-                    'Content-Location': hardcoded_url  # Additional header to enforce HTTPS in responses
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type',
                 }
             )
+            
+            # Explicitly set the Location header to include the port
+            response.headers['Location'] = hardcoded_url
+            response.headers['Content-Location'] = hardcoded_url
+            
+            return response
         else:
             logger.error(f"Unsupported file type for {filename} over HTTPS (Windows FTP)")
             return jsonify({"status": "error", "message": "Unsupported file type"}), 400
