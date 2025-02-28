@@ -55,7 +55,7 @@ def ftp_status():
 
 @app.route('/api/ftp/list', methods=['GET'])
 def ftp_list():
-    logger.info("API request to list FTPS directory")
+    logger.info("API request to list FTPS directory with path: %s", request.args.get('path', '/Reports/ELON_data/Nomeco_environments/PROD_internally'))
     path = request.args.get('path', '/Reports/ELON_data/Nomeco_environments/PROD_internally')
     result = ftp_connection.list_dir(path)
     if result["status"] == "error" and "Not connected" in result["message"]:
@@ -65,7 +65,7 @@ def ftp_list():
 
 @app.route('/api/ftp/navigate', methods=['GET'])
 def ftp_navigate():
-    logger.info("API request to navigate FTPS directory")
+    logger.info("API request to navigate FTPS directory with path: %s", request.args.get('path', ''))
     path = request.args.get('path', '')
     result = ftp_connection.list_dir(path)
     if result["status"] == "error" and "Not connected" in result["message"]:
@@ -85,11 +85,13 @@ def ftp_download(file_path):
                 ftp_connection.connect()  # Attempt to reconnect
                 result = ftp_connection.get_file(decoded_path)
             if result["status"] == "error":
+                logger.error(f"Failed to download file {file_path}: {result['message']}")
                 return jsonify(result), 404
         
         # Determine file type and return as downloadable file
         filename = decoded_path.split('/')[-1]
         if file_path.endswith(('.pdf', '.csv', '.txt')):
+            logger.info(f"Successfully downloaded file: {filename}")
             return Response(
                 result["data"],
                 mimetype={
@@ -100,9 +102,10 @@ def ftp_download(file_path):
                 headers={'Content-Disposition': f'attachment; filename="{filename}"'}
             )
         else:
+            logger.error(f"Unsupported file type for {filename}")
             return jsonify({"status": "error", "message": "Unsupported file type"}), 400
     except Exception as e:
-        logger.error(f"Error downloading file: {e}")
+        logger.error(f"Error downloading file {file_path}: {e}")
         return jsonify({"status": "error", "message": f"Failed to download file: {e}"}), 500
 
 @app.route('/api/ftp/index', methods=['GET'])
@@ -117,9 +120,11 @@ def get_ftp_index():
 @app.route('/api/indexing_status', methods=['GET'])
 def get_indexing_status():
     """Return the current indexing status."""
+    logger.info("API request for indexing status")
     try:
         with open('indexing_status.txt', 'r') as f:
             status = f.read().strip()
+        logger.info(f"Indexing status returned: {status}")
         return jsonify({"status": status})
     except Exception as e:
         logger.error(f"Error reading indexing status: {e}")

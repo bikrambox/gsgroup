@@ -179,10 +179,12 @@
         request.onupgradeneeded = function(event) {
             db = event.target.result;
             db.createObjectStore('files', { keyPath: 'file_name' });
+            console.log("IndexedDB upgraded: Created 'files' object store");
         };
 
         request.onsuccess = function(event) {
             db = event.target.result;
+            console.log("IndexedDB opened successfully");
             loadIndexFromServer();
             startPollingIndexingStatus();
         };
@@ -192,12 +194,15 @@
         };
 
         async function loadIndexFromServer() {
+            console.log("Starting to load index from server");
             try {
                 const response = await fetch(`${baseUrl}/api/ftp/index`);
                 if (!response.ok) throw new Error('Failed to fetch index');
+                console.log("Fetched index database successfully");
                 const blob = await response.blob();
                 const reader = new FileReader();
                 reader.onload = function(e) {
+                    console.log("Reading index database blob");
                     const arrayBuffer = e.target.result;
                     const sqliteData = new Uint8Array(arrayBuffer);
                     parseSQLiteData(sqliteData);
@@ -209,6 +214,7 @@
         }
 
         function parseSQLiteData(sqliteData) {
+            console.log("Parsing SQLite data into IndexedDB");
             // Simplified approach; replace with actual SQLite parsing or server-side JSON conversion
             const transaction = db.transaction(['files'], 'readwrite');
             const store = transaction.objectStore('files');
@@ -222,6 +228,7 @@
 
             jsonData.forEach(item => {
                 store.put(item);
+                console.log("Stored in IndexedDB:", item.file_name, item.file_path);
             });
 
             console.log("IndexedDB populated with FTP index");
@@ -398,18 +405,24 @@
         }
 
         function searchFiles() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            console.log("Search button clicked, initiating search with term:", document.getElementById('searchInput').value);
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
             const transaction = db.transaction(['files'], 'readonly');
             const store = transaction.objectStore('files');
             const request = store.openCursor();
             const results = {};
 
+            console.log("Opening IndexedDB cursor for search with term:", searchTerm);
+
             request.onsuccess = function(event) {
+                console.log("Cursor success event triggered");
                 const cursor = event.target.result;
                 if (cursor) {
                     const file = cursor.value;
+                    console.log("Processing file:", file.file_name, file.file_path);
                     const folderName = file.file_path.split('/').slice(-2, -1)[0] || 'Root'; // Get Daily_data folder name
                     if (file.file_name.toLowerCase().includes(searchTerm)) {
+                        console.log("Match found:", file.file_name);
                         if (!results[folderName]) {
                             results[folderName] = [];
                         }
@@ -417,6 +430,7 @@
                     }
                     cursor.continue();
                 } else {
+                    console.log("Search completed, results:", results);
                     displaySearchResults(results);
                 }
             };
@@ -427,6 +441,7 @@
         }
 
         function displaySearchResults(results) {
+            console.log("Displaying search results:", results);
             const tbody = document.getElementById('searchResultsBody');
             tbody.innerHTML = '';
 
@@ -434,11 +449,13 @@
                 const tr = document.createElement('tr');
                 const folderCell = document.createElement('td');
                 folderCell.textContent = folderName;
+                console.log("Adding folder to table:", folderName);
 
                 const filesCell = document.createElement('td');
                 const filesContainer = document.createElement('div');
                 filesContainer.className = 'files-column';
                 results[folderName].forEach(file => {
+                    console.log("Adding file to folder:", file);
                     const fileItem = document.createElement('span');
                     fileItem.className = 'file-item';
                     fileItem.textContent = file;
@@ -455,6 +472,7 @@
 
                     fileItem.onclick = (e) => {
                         e.preventDefault(); // Prevent default link behavior if needed
+                        console.log("Clicked to view file:", `/Reports/ELON_data/Nomeco_environments/PROD_internally/${folderName}/${file}`);
                         viewFile(`/Reports/ELON_data/Nomeco_environments/PROD_internally/${folderName}/${file}`);
                     };
                     filesContainer.appendChild(fileItem);
@@ -468,37 +486,44 @@
         }
 
         // Add search event listener
-        document.getElementById('searchButton').addEventListener('click', searchFiles);
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("DOM fully loaded, attaching search listener");
+            document.getElementById('searchButton').addEventListener('click', searchFiles);
+            loadDirectory();
+        });
 
         async function updateIndexingStatus() {
+            console.log("Checking indexing status");
             try {
                 const response = await fetch(`${baseUrl}/api/indexing_status`);
                 if (!response.ok) throw new Error('Failed to fetch indexing status');
                 const data = await response.json();
+                console.log("Indexing status received:", data.status);
                 const statusElement = document.getElementById('statusText');
                 const statusDiv = document.getElementById('indexingStatus');
                 
                 if (data.status === 'ongoing') {
                     statusElement.textContent = '[Ongoing]';
                     statusDiv.className = 'indexing-status indexing-ongoing';
+                    console.log("Indexing status updated to 'Ongoing'");
                 } else if (data.status === 'done') {
                     statusElement.textContent = '[Done]';
                     statusDiv.className = 'indexing-status indexing-done';
+                    console.log("Indexing status updated to 'Done'");
                 }
             } catch (error) {
                 console.error("Error updating indexing status:", error);
                 document.getElementById('statusText').textContent = '[Error]';
                 document.getElementById('indexingStatus').className = 'indexing-status indexing-ongoing';
+                console.log("Indexing status error:", error.message);
             }
         }
 
         function startPollingIndexingStatus() {
+            console.log("Starting polling for indexing status");
             updateIndexingStatus(); // Initial check
             setInterval(updateIndexingStatus, 5000); // Poll every 5 seconds
         }
-
-        // Load initial directory
-        window.onload = () => loadDirectory();
     </script>
 </body>
 </html>
