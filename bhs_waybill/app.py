@@ -24,8 +24,23 @@ CORS(app, resources={r"/api/*": {
     "supports_credentials": True
 }})
 
-logging.basicConfig(level=logging.INFO)
+# logging.basicConfig(level=logging.INFO)
+# logger = logging.getLogger(__name__)
+
+
+
+# Configure logging to output to terminal
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(),  # Output to terminal
+        logging.FileHandler('app.log')  # Optional: Output to file
+    ]
+)
 logger = logging.getLogger(__name__)
+
+
 
 # Force HTTPS globally
 app.config['PREFER_HTTPS'] = True
@@ -100,6 +115,7 @@ def ftp_download(file_path):
         # Decode the URL-encoded path
         decoded_path = file_path.replace('%2F', '/')
         logger.info(f"Decoding file path (Windows FTP): {decoded_path}")
+        logger.info("Testing logger III output in app.py")
         
         # Use the new FTP direct download function
         result = ftp_connection.direct_ftp_download(decoded_path)
@@ -136,7 +152,7 @@ def ftp_download(file_path):
             # Explicitly set the Location header to include the port
             response.headers['Location'] = hardcoded_url
             response.headers['Content-Location'] = hardcoded_url
-            logger.info(f"Successfully downloaded file: {response}")
+            logger.info("Testing logger II output in app.py")
             
             return response
         else:
@@ -203,4 +219,5 @@ if __name__ == '__main__':
     # This will only be used in development
     host = os.getenv('HOST', '0.0.0.0')
     port = int(os.getenv('PORT', 8000))
+    logger.info(f"Starting BHS Waybill in production mode on {os.getenv('HOST')}:{os.getenv('PORT')}")
     app.run(debug=True, host=host, port=port, ssl_context=None)  # Remove SSL context for local testing
