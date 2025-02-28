@@ -161,6 +161,7 @@
     </style>
 </head>
 <body>
+    <!-- <div class="file-manager"> -->
     <div class="">
         <h1>BHS Waybill FTPS File Manager</h1>
         <div class="indexing-status">
@@ -172,8 +173,8 @@
             <button id="searchButton">Search</button>
         </div>
         <div class="left-panel">
-            <!-- <div class="breadcrumbs" id="breadcrumbs"></div> -->
-            <!-- <ul class="item-list" id="fileList"></ul>
+            <!-- <div class="breadcrumbs" id="breadcrumbs"></div>
+            <ul class="item-list" id="fileList"></ul>
             <div class="error" id="errorMessage"></div>
             <div id="fileViewer"></div> -->
         </div>
@@ -293,7 +294,7 @@
                             console.log("Navigating to directory - New currentPath:", currentPath, "Item path:", item.path);
                             loadDirectory(currentPath);
                         } else {
-                            downloadFile(item.path); // Changed to downloadFile for direct download
+                            downloadFile(item.path); // Trigger direct download
                         }
                     };
                     fileList.appendChild(li);

@@ -134,12 +134,12 @@ def ftp_download(file_path):
                 '.txt': 'text/plain'
             }[file_path[-4:]]
             
-            # Create a response with the file data
+            # Create a response with the file data, forcing a download
             response = Response(
                 result["data"],
                 mimetype=content_type,
                 headers={
-                    'Content-Disposition': f'attachment; filename="{filename}"',
+                    'Content-Disposition': f'attachment; filename="{filename}"',  # Forces download
                     'Access-Control-Allow-Origin': 'https://vps1139.basicserver.io:42030',
                     'Access-Control-Allow-Methods': 'GET, OPTIONS',
                     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
