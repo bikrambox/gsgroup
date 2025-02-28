@@ -138,4 +138,4 @@ if __name__ == '__main__':
     # This will only be used in development
     host = os.getenv('HOST', '0.0.0.0')
     port = int(os.getenv('PORT', 5500))
-    app.run(debug=True, host=host, port=port)
+    app.run(debug=True, host=host, port=port, ssl_context=None)  # Remove SSL context for local testing
