@@ -17,7 +17,12 @@ app = Flask(__name__,
             template_folder='templates')
 
 # Enable CORS for all routes, ensuring HTTPS and cross-browser compatibility
-CORS(app, resources={r"/api/*": {"origins": ["https://vps1139.basicserver.io:42030"], "allow_headers": ["Content-Type"]}})
+CORS(app, resources={r"/api/*": {
+    "origins": ["https://vps1139.basicserver.io:42030"],
+    "allow_headers": ["Content-Type", "Authorization"],
+    "methods": ["GET", "POST", "OPTIONS"],
+    "supports_credentials": True
+}})
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
