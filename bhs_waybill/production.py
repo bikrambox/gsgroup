@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 
 def index_ftp_files(ftp_connection, base_path='/Reports/ELON_data/Nomeco_environments/PROD_internally'):
-    """Index all files in the FTP server and store in SQLite database."""
+    """Index all files in the FTP server and store in SQLite database, with path validation."""
     logger.info("Starting FTP file indexing process for base path: %s", base_path)
     
     # Create or update database indexing status file
@@ -54,7 +54,13 @@ def index_ftp_files(ftp_connection, base_path='/Reports/ELON_data/Nomeco_environ
                     index_recursive(full_path)
                 else:
                     file_name = item["name"]
-                    logger.info("Found file: %s at %s", file_name, full_path)
+                    logger.info(f"Found file: {file_name} at {full_path} (checking FTP access)")
+                    # Verify FTP access to ensure the path exists and is accessible
+                    test_result = ftp_connection.direct_ftp_download(full_path)
+                    if test_result["status"] == "error":
+                        logger.warning(f"Cannot access file via FTP: {full_path} - {test_result['message']}")
+                        continue  # Skip indexing if FTP access fails
+                    logger.info(f"Verified FTP access for: {full_path}")
                     c.execute("INSERT OR REPLACE INTO files (file_name, file_path) VALUES (?, ?)", 
                               (file_name, full_path))
                     logger.info("Indexed: %s at %s", file_name, full_path)
@@ -89,7 +95,7 @@ if __name__ == '__main__':
     logger.info(f"FTP_PASSWORD: {os.getenv('FTP_PASSWORD')}")
     
     host = os.getenv('HOST', '0.0.0.0')
-    port = int(os.getenv('PORT', 8000))  # Updated to match your environment (port 8000)
+    port = int(os.getenv('PORT', 8000))  # Matches your environment
     
     logger.info(f"Starting BHS Waybill in production mode on {host}:{port}...")
     

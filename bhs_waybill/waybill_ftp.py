@@ -91,12 +91,18 @@ class FTPConnection:
         logger.info(f"Started keep-alive thread with interval {self.keep_alive_interval} seconds")
 
     def ensure_connected(self):
-        """Ensure the connection is active; reconnect if necessary."""
+        """Ensure the connection is active; reconnect if necessary with retries."""
         if not self.connected or not self.ftp:
             logger.warning("Connection lost, attempting to reconnect...")
-            result = self.connect()
-            if result["status"] == "error":
-                return False
+            max_retries = 3
+            for attempt in range(max_retries):
+                result = self.connect()
+                if result["status"] == "success":
+                    return True
+                logger.error(f"Reconnect attempt {attempt + 1}/{max_retries} failed: {result['message']}")
+                time.sleep(5)  # Wait before retrying
+            logger.error("Failed to reconnect to FTPS server after all retries")
+            return False
         return True
 
     def list_dir(self, path='/Reports/ELON_data/Nomeco_environments/PROD_internally'):
@@ -160,7 +166,7 @@ class FTPConnection:
             }
 
     def direct_ftp_download(self, file_path):
-        """Directly download a file from the FTP server and return its contents."""
+        """Directly download a file from the FTP server and return its contents with path validation and retries."""
         if not self.ensure_connected():
             logger.warning("Attempted to download file without active connection")
             return {
@@ -168,13 +174,48 @@ class FTPConnection:
                 "message": "Not connected to FTPS server"
             }
         try:
+            # Normalize the file path to ensure it starts with the base path and handles case sensitivity
+            base_path = '/Reports/ELON_data/Nomeco_environments/PROD_internally'
+            if not file_path.startswith(base_path):
+                file_path = f"{base_path}/{file_path}" if not file_path.startswith('/') else f"{base_path}{file_path}"
+            logger.info(f"Normalized FTP path for download: {file_path}")
+
             # Navigate to the directory containing the file (remove filename from path)
             directory = '/'.join(file_path.split('/')[:-1]) or '/'
-            self.ftp.cwd(directory)
             filename = file_path.split('/')[-1]
             
             logger.info(f"Attempting to retrieve file: {filename} from {directory} via FTP")
             
+            # Verify the directory exists before attempting to download
+            try:
+                self.ftp.cwd(directory)
+                logger.info(f"Verified directory exists: {directory}")
+            except ftplib.error_perm as e:
+                logger.error(f"Directory verification failed for {directory}: {e}")
+                return {
+                    "status": "error",
+                    "message": f"Directory verification failed: {e}"
+                }
+
+            # Verify the file exists and is accessible with retries
+            max_retries = 3
+            for attempt in range(max_retries):
+                try:
+                    self.ftp.size(filename)  # Check if the file exists and is accessible
+                    logger.info(f"Verified file exists: {filename} on attempt {attempt + 1}")
+                    break
+                except ftplib.error_perm as e:
+                    if attempt < max_retries - 1:
+                        logger.warning(f"File verification failed for {filename} on attempt {attempt + 1}: {e}, retrying...")
+                        time.sleep(5)  # Wait before retrying
+                        self.ensure_connected()  # Reconnect if necessary
+                        continue
+                    logger.error(f"File verification failed for {filename} after {max_retries} attempts: {e}")
+                    return {
+                        "status": "error",
+                        "message": f"File verification failed after retries: {e}"
+                    }
+
             # Use a BytesIO buffer to store the file content
             file_buffer = io.BytesIO()
             self.ftp.retrbinary(f"RETR {filename}", file_buffer.write)
