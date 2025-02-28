@@ -342,8 +342,13 @@
                     const downloadLink = document.createElement('a');
                     downloadLink.textContent = 'Download PDF';
                     downloadLink.className = 'download-link';
-                    downloadLink.href = requestedUrl;
+                    // Create a blob URL for direct download instead of using the API URL
+                    downloadLink.href = URL.createObjectURL(data);
                     downloadLink.download = filePath.split('/').pop();
+                    // Add click handler to handle download manually if needed
+                    downloadLink.onclick = (e) => {
+                        console.log("Download clicked with URL:", downloadLink.href);
+                    };
                     fileViewer.appendChild(downloadLink);
                 } else if (contentType === 'text/csv') {
                     // Parse CSV and display as table, with download link
@@ -364,19 +369,22 @@
                     const downloadLink = document.createElement('a');
                     downloadLink.textContent = 'Download CSV';
                     downloadLink.className = 'download-link';
-                    downloadLink.href = requestedUrl;
+                    // Create a blob URL for direct download instead of using the API URL
+                    downloadLink.href = URL.createObjectURL(new Blob([text], {type: 'text/csv'}));
                     downloadLink.download = filePath.split('/').pop();
                     fileViewer.appendChild(downloadLink);
                 } else if (contentType === 'text/plain') {
                     // Display plain text, with download link
                     const pre = document.createElement('pre');
-                    pre.textContent = await response.text();
+                    const text = await response.text();
+                    pre.textContent = text;
                     fileViewer.appendChild(pre);
 
                     const downloadLink = document.createElement('a');
                     downloadLink.textContent = 'Download TXT';
                     downloadLink.className = 'download-link';
-                    downloadLink.href = requestedUrl;
+                    // Create a blob URL for direct download instead of using the API URL
+                    downloadLink.href = URL.createObjectURL(new Blob([text], {type: 'text/plain'}));
                     downloadLink.download = filePath.split('/').pop();
                     fileViewer.appendChild(downloadLink);
                 } else {
