@@ -10,7 +10,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def connect_to_ftp():
-    """Connect to the FTPS server using credentials from .env."""
+    """Connect to the FTPS server using credentials from .env, optimized for Windows FTP."""
     load_dotenv()
     
     ftp_host = os.getenv('FTP_HOST', '10.6.8.43')
@@ -22,12 +22,12 @@ def connect_to_ftp():
     logger.info(f"Using credentials - Username: '{ftp_username}', Password: '{ftp_password}'")
     
     try:
-        # Create FTP_TLS object with custom SSL context for better TLS handling
-        context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)  # Specify TLS version for compatibility
+        # Use a modern, non-deprecated TLS protocol
+        context = ssl.SSLContext(ssl.PROTOCOL_TLS)  # Use the default TLS protocol (TLS 1.2+)
         context.load_default_certs()  # Load default certificates
         ftp = ftplib.FTP_TLS(context=context, timeout=600)  # Set timeout to 10 minutes
         
-        logger.info(f"Attempting FTPS connection to {ftp_host}:{ftp_port} with TLSv1.2 and timeout 600s")
+        logger.info(f"Attempting FTPS connection to {ftp_host}:{ftp_port} with default TLS and timeout 600s")
         ftp.connect(ftp_host, ftp_port)
         ftp.login(ftp_username, ftp_password)
         ftp.prot_p()  # Enable protected data connection
@@ -45,29 +45,38 @@ def connect_to_ftp():
         raise Exception(f"FTPS connection failed: {e}")
 
 def download_file(ftp, file_path, local_path):
-    """Download a specific file from FTP and save it locally."""
+    """Download a specific file from FTP and save it locally, handling Windows FTP paths."""
     try:
-        # Normalize the file path to ensure it starts with the base path
+        # Normalize the file path for Windows FTP, ensuring no duplicate base paths
         base_path = '/Reports/ELON_data/Nomeco_environments/PROD_internally'
-        if not file_path.startswith(base_path):
-            file_path = f"{base_path}/{file_path}" if not file_path.startswith('/') else f"{base_path}{file_path}"
-        logger.info(f"Normalized FTP path for download: {file_path}")
+        if file_path.startswith(base_path):
+            normalized_path = file_path  # Use the path as-is if it already starts with the base
+        else:
+            normalized_path = f"{base_path}/{file_path}" if not file_path.startswith('/') else f"{base_path}{file_path}"
+        
+        # Remove any duplicate base paths
+        while normalized_path.count(base_path) > 1:
+            normalized_path = normalized_path.replace(base_path + base_path, base_path)
+        
+        # Convert forward slashes to backslashes for Windows FTP, if needed (test and adjust based on server)
+        normalized_path = normalized_path.replace('/', '\\')
+        logger.info(f"Normalized FTP path for download (Windows): {normalized_path}")
 
         # Navigate to the directory containing the file (remove filename from path)
-        directory = '/'.join(file_path.split('/')[:-1]) or '/'
-        filename = file_path.split('/')[-1]
+        directory = os.path.dirname(normalized_path) or '\\'
+        filename = os.path.basename(normalized_path)
         
-        logger.info(f"Attempting to retrieve file: {filename} from {directory} via FTP")
+        logger.info(f"Attempting to retrieve file: {filename} from {directory} via FTP (Windows)")
         
-        # Verify the directory exists before attempting to download
+        # Verify the directory exists before attempting to download (use backslashes for Windows)
         try:
-            ftp.cwd(directory)
+            ftp.cwd(directory.replace('\\', '/'))  # Use forward slashes for FTP commands, as most FTP servers prefer them
             logger.info(f"Verified directory exists: {directory}")
         except ftplib.error_perm as e:
             logger.error(f"Directory verification failed for {directory}: {e}")
             raise Exception(f"Directory verification failed: {e}")
 
-        # Switch to binary mode for file transfer
+        # Switch to binary mode for file transfer (avoid ASCII mode issues on Windows)
         ftp.voidcmd("TYPE I")  # Switch to binary mode (Image mode)
         
         # Download the file in binary mode
