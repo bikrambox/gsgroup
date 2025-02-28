@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 import io
 import sqlite3
 import time
+import threading
 
 # Load environment variables before anything else
 load_dotenv()
@@ -112,12 +113,29 @@ def ftp_download(file_path):
 def get_ftp_index():
     logger.info("Serving FTP index database as JSON")
     try:
+        # Check if database indexing is done
+        with open('database_indexing_status.txt', 'r') as f:
+            db_status = f.read().strip()
+        if db_status != 'done':
+            logger.info("Database indexing not complete, returning ongoing status for JSON")
+            return jsonify({"status": "ongoing", "message": "Database indexing in progress"})
+
+        # Simulate JSON indexing (assuming it happens after database indexing)
+        with open('json_indexing_status.txt', 'w') as f:
+            f.write('ongoing')
+        logger.info("JSON indexing status set to 'ongoing' in json_indexing_status.txt")
+
         conn = sqlite3.connect('ftp_index.db')
         c = conn.cursor()
         c.execute("SELECT file_name, file_path FROM files")
         rows = c.fetchall()
         data = [{"file_name": row[0], "file_path": row[1]} for row in rows]
         conn.close()
+        
+        # Update JSON indexing status to done after processing
+        with open('json_indexing_status.txt', 'w') as f:
+            f.write('done')
+        logger.info("JSON indexing status set to 'done' in json_indexing_status.txt")
         logger.info("Successfully served FTP index as JSON with %d records", len(data))
         return jsonify(data)
     except Exception as e:
@@ -126,16 +144,18 @@ def get_ftp_index():
 
 @app.route('/api/indexing_status', methods=['GET'])
 def get_indexing_status():
-    """Return the current indexing status."""
+    """Return the current indexing statuses for database and JSON."""
     logger.info("API request for indexing status")
     try:
-        with open('indexing_status.txt', 'r') as f:
-            status = f.read().strip()
-        logger.info(f"Indexing status returned: {status}")
-        return jsonify({"status": status})
+        with open('database_indexing_status.txt', 'r') as f:
+            db_status = f.read().strip()
+        with open('json_indexing_status.txt', 'r') as f:
+            json_status = f.read().strip()
+        logger.info(f"Indexing statuses returned: Database: {db_status}, JSON: {json_status}")
+        return jsonify({"database_status": db_status, "json_status": json_status})
     except Exception as e:
         logger.error(f"Error reading indexing status: {e}")
-        return jsonify({"status": "ongoing"}), 500
+        return jsonify({"database_status": "ongoing", "json_status": "ongoing"}), 500
 
 @app.route('/favicon.ico')
 def favicon():

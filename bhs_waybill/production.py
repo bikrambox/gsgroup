@@ -18,10 +18,10 @@ def index_ftp_files(ftp_connection, base_path='/Reports/ELON_data/Nomeco_environ
     """Index all files in the FTP server and store in SQLite database."""
     logger.info("Starting FTP file indexing process for base path: %s", base_path)
     
-    # Create or update indexing status file
-    with open('indexing_status.txt', 'w') as f:
+    # Create or update database indexing status file
+    with open('database_indexing_status.txt', 'w') as f:
         f.write('ongoing')
-    logger.info("Indexing status set to 'ongoing' in indexing_status.txt")
+    logger.info("Database indexing status set to 'ongoing' in database_indexing_status.txt")
     
     conn = sqlite3.connect('ftp_index.db')
     c = conn.cursor()
@@ -65,10 +65,10 @@ def index_ftp_files(ftp_connection, base_path='/Reports/ELON_data/Nomeco_environ
         logger.info("Committed changes to SQLite database")
         logger.info("FTP file indexing completed and saved to ftp_index.db")
         
-        # Update indexing status to done
-        with open('indexing_status.txt', 'w') as f:
+        # Update database indexing status to done
+        with open('database_indexing_status.txt', 'w') as f:
             f.write('done')
-        logger.info("Indexing status set to 'done' in indexing_status.txt")
+        logger.info("Database indexing status set to 'done' in database_indexing_status.txt")
     except Exception as e:
         logger.error("Error during FTP indexing: %s", str(e))
     finally:
@@ -100,6 +100,7 @@ if __name__ == '__main__':
     
     # Start indexing in the background
     start_indexing_in_background(ftp_connection)
+    
     
     logger.info("Starting Flask server with Waitress")
     serve(app, host=host, port=port)

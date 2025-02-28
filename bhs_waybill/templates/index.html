@@ -26,6 +26,10 @@
             position: absolute;
             top: 10px;
             right: 10px;
+            display: flex;
+            gap: 10px;
+        }
+        .status-indicator {
             font-size: 14px;
             padding: 5px 10px;
             border-radius: 3px;
@@ -159,7 +163,10 @@
 <body>
     <div class="file-manager">
         <h1>BHS Waybill FTPS File Manager</h1>
-        <div class="indexing-status" id="indexingStatus">Indexing <span id="statusText">[Ongoing]</span></div>
+        <div class="indexing-status">
+            <div class="status-indicator" id="databaseStatus">Database: Indexing [Ongoing]</div>
+            <div class="status-indicator" id="jsonStatus">JSON: Indexing [Ongoing]</div>
+        </div>
         <div class="search-container">
             <input type="text" id="searchInput" placeholder="Search file names (e.g., BZ760919)...">
             <button id="searchButton">Search</button>
@@ -167,7 +174,7 @@
         <div class="left-panel">
             <div class="breadcrumbs" id="breadcrumbs"></div>
             <ul class="item-list" id="fileList"></ul>
-            <div class="error" id="<|control704|>Message"></div>
+            <div class="error" id="errorMessage"></div>
             <div id="fileViewer"></div>
         </div>
         <div class="right-panel">
@@ -211,14 +218,28 @@
         async function loadIndexFromServer() {
             console.log("Starting to load index from server");
             try {
-                const response = await fetch(`${baseUrl}/api/ftp/index`, { mode: 'cors' });
-                if (!response.ok) throw new Error('Failed to fetch index: ' + response.status);
+                const response = await fetch(`${baseUrl}/api/ftp/index`, { mode: 'cors', credentials: 'include' });
+                if (!response.ok) {
+                    if (response.status === 200 && response.headers.get('content-type') === 'application/json') {
+                        console.log("Fetched index database successfully, but status not OK, checking JSON");
+                        const jsonData = await response.json();
+                        if (jsonData.status === 'ongoing') {
+                            console.log("JSON indexing ongoing, retrying later...");
+                            setTimeout(loadIndexFromServer, 5000); // Retry after 5 seconds
+                            updateStatuses('done', 'ongoing');
+                            return;
+                        }
+                    }
+                    throw new Error('Failed to fetch index: ' + response.status);
+                }
                 console.log("Fetched index database successfully");
                 const jsonData = await response.json();
                 console.log("Received JSON data:", jsonData);
                 parseSQLiteData(jsonData);
+                updateStatuses('done', 'done');
             } catch (error) {
                 console.error("Error loading index from server:", error);
+                updateStatuses('done', 'ongoing'); // Assume database is done, JSON failed
             }
         }
 
@@ -242,7 +263,7 @@
         async function loadDirectory(path = currentPath) {
             console.log("Loading directory for path - Input:", path, "Global currentPath:", currentPath);
             try {
-                const response = await fetch(`${baseUrl}/api/ftp/list?path=${encodeURIComponent(path)}`, { mode: 'cors' });
+                const response = await fetch(`${baseUrl}/api/ftp/list?path=${encodeURIComponent(path)}`, { mode: 'cors', credentials: 'include' });
                 const data = await response.json();
 
                 if (data.status === 'error') {
@@ -284,7 +305,7 @@
             try {
                 const response = await fetch(`${baseUrl}/api/ftp/download/${encodeURIComponent(filePath)}`, { 
                     mode: 'cors', 
-                    credentials: 'include' // Ensure cookies/credentials are included if needed
+                    credentials: 'include' 
                 });
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -294,6 +315,11 @@
                 const data = await response.blob(); // Use blob for downloading files
 
                 const fileViewer = document.getElementById('fileViewer');
+                if (!fileViewer) {
+                    console.error("File viewer element not found");
+                    document.getElementById('errorMessage').textContent = 'File viewer not available';
+                    return;
+                }
                 fileViewer.innerHTML = '';
 
                 // Display file in viewer or offer download
@@ -509,27 +535,35 @@
         async function updateIndexingStatus() {
             console.log("Checking indexing status");
             try {
-                const response = await fetch(`${baseUrl}/api/indexing_status`, { mode: 'cors' });
+                const response = await fetch(`${baseUrl}/api/indexing_status`, { mode: 'cors', credentials: 'include' });
                 if (!response.ok) throw new Error('Failed to fetch indexing status');
                 const data = await response.json();
-                console.log("Indexing status received:", data.status);
-                const statusElement = document.getElementById('statusText');
-                const statusDiv = document.getElementById('indexingStatus');
-                
-                if (data.status === 'ongoing') {
-                    statusElement.textContent = '[Ongoing]';
-                    statusDiv.className = 'indexing-status indexing-ongoing';
-                    console.log("Indexing status updated to 'Ongoing'");
-                } else if (data.status === 'done') {
-                    statusElement.textContent = '[Done]';
-                    statusDiv.className = 'indexing-status indexing-done';
-                    console.log("Indexing status updated to 'Done'");
-                }
+                console.log("Indexing statuses received:", data);
+                updateStatuses(data.database_status, data.json_status);
             } catch (error) {
                 console.error("Error updating indexing status:", error);
-                document.getElementById('statusText').textContent = '[Error]';
-                document.getElementById('indexingStatus').className = 'indexing-status indexing-ongoing';
-                console.log("Indexing status error:", error.message);
+                updateStatuses('ongoing', 'ongoing'); // Default to ongoing if error
+            }
+        }
+
+        function updateStatuses(databaseStatus, jsonStatus) {
+            const dbStatusElement = document.getElementById('databaseStatus');
+            const jsonStatusElement = document.getElementById('jsonStatus');
+
+            if (dbStatusElement) {
+                dbStatusElement.textContent = `Database: Indexing [${databaseStatus === 'done' ? 'Done' : 'Ongoing'}]`;
+                dbStatusElement.className = `status-indicator ${databaseStatus === 'done' ? 'indexing-done' : 'indexing-ongoing'}`;
+                console.log("Database indexing status updated to:", databaseStatus);
+            } else {
+                console.error("Database status element not found");
+            }
+
+            if (jsonStatusElement) {
+                jsonStatusElement.textContent = `JSON: Indexing [${jsonStatus === 'done' ? 'Done' : 'Ongoing'}]`;
+                jsonStatusElement.className = `status-indicator ${jsonStatus === 'done' ? 'indexing-done' : 'indexing-ongoing'}`;
+                console.log("JSON indexing status updated to:", jsonStatus);
+            } else {
+                console.error("JSON status element not found");
             }
         }
 
