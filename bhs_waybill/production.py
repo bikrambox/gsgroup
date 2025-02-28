@@ -4,7 +4,6 @@ import os
 from dotenv import load_dotenv
 import logging
 import sqlite3
-import ssl
 from waybill_ftp import FTPConnection
 import threading
 
@@ -101,9 +100,6 @@ if __name__ == '__main__':
     # Start indexing in the background
     start_indexing_in_background(ftp_connection)
     
-    # Serve with SSL immediately (replace with your certificate and key paths)
-    ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-    ssl_context.load_cert_chain(certfile='/etc/nginx/ssl/yourdomain.crt', keyfile='/etc/nginx/ssl/yourdomain.key')
-    
-    logger.info("Starting Flask server with Waitress")
-    serve(app, host=host, port=port, ssl_context=ssl_context)
+    # Serve without SSL context (SSL should be handled by a reverse proxy like Nginx)
+    logger.info("Starting Flask server with Waitress (SSL handled externally)")
+    serve(app, host=host, port=port)  # Removed ssl_context
