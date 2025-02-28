@@ -8,16 +8,18 @@
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 0;
             background-color: #f0f0f0;
         }
         .file-manager {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
             background: white;
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
             position: relative;
         }
         .indexing-status {
@@ -34,6 +36,14 @@
         }
         .indexing-done {
             background-color: green;
+        }
+        .left-panel, .right-panel {
+            width: 48%; /* Adjust to match screenshot layout */
+            box-sizing: border-box;
+        }
+        .left-panel {
+            border-right: 1px solid #ddd;
+            padding-right: 20px;
         }
         .search-container {
             margin-bottom: 20px;
@@ -149,27 +159,31 @@
     <div class="file-manager">
         <h1>BHS Waybill FTPS File Manager</h1>
         <div class="indexing-status" id="indexingStatus">Indexing <span id="statusText">[Ongoing]</span></div>
-        <div class="search-container">
+        <div class="search-container" style="width: 100%;">
             <input type="text" id="searchInput" placeholder="Search file names (e.g., BZ760919)...">
             <button id="searchButton">Search</button>
         </div>
-        <div class="breadcrumbs" id="breadcrumbs"></div>
-        <ul class="item-list" id="fileList"></ul>
-        <div class="error" id="errorMessage"></div>
-        <div id="fileViewer"></div>
-        <table id="searchResultsTable">
-            <thead>
-                <tr>
-                    <th>Name of the Folder</th>
-                    <th>Files</th>
-                </tr>
-            </thead>
-            <tbody id="searchResultsBody"></tbody>
-        </table>
+        <div class="left-panel">
+            <div class="breadcrumbs" id="breadcrumbs"></div>
+            <ul class="item-list" id="fileList"></ul>
+            <div class="error" id="errorMessage"></div>
+            <div id="fileViewer"></div>
+        </div>
+        <div class="right-panel">
+            <table id="searchResultsTable">
+                <thead>
+                    <tr>
+                        <th>Name of the Folder</th>
+                        <th>Files</th>
+                    </tr>
+                </thead>
+                <tbody id="searchResultsBody"></tbody>
+            </table>
+        </div>
     </div>
 
     <script>
-        const baseUrl = 'https://vps1139.basicserver.io:42030'; // Update with your server URL
+        const baseUrl = 'https://vps1139.basicserver.io:42030'; // Ensure HTTPS
         let currentPath = '/Reports/ELON_data/Nomeco_environments/PROD_internally';
 
         // Initialize IndexedDB for storing file index
@@ -277,7 +291,7 @@
         async function viewFile(filePath) {
             console.log("Viewing file:", filePath);
             try {
-                const response = await fetch(`${baseUrl}/api/ftp/download/${encodeURIComponent(filePath)}`);
+                const response = await fetch(`${baseUrl}/api/ftp/download/${encodeURIComponent(filePath)}`, { mode: 'cors' });
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -300,7 +314,7 @@
                     const downloadLink = document.createElement('a');
                     downloadLink.textContent = 'Download PDF';
                     downloadLink.className = 'download-link';
-                    downloadLink.href = URL.createObjectURL(data);
+                    downloadLink.href = `${baseUrl}/api/ftp/download/${encodeURIComponent(filePath)}`;
                     downloadLink.download = filePath.split('/').pop();
                     fileViewer.appendChild(downloadLink);
                 } else if (contentType === 'text/csv') {
@@ -322,7 +336,7 @@
                     const downloadLink = document.createElement('a');
                     downloadLink.textContent = 'Download CSV';
                     downloadLink.className = 'download-link';
-                    downloadLink.href = URL.createObjectURL(data);
+                    downloadLink.href = `${baseUrl}/api/ftp/download/${encodeURIComponent(filePath)}`;
                     downloadLink.download = filePath.split('/').pop();
                     fileViewer.appendChild(downloadLink);
                 } else if (contentType === 'text/plain') {
@@ -334,7 +348,7 @@
                     const downloadLink = document.createElement('a');
                     downloadLink.textContent = 'Download TXT';
                     downloadLink.className = 'download-link';
-                    downloadLink.href = URL.createObjectURL(data);
+                    downloadLink.href = `${baseUrl}/api/ftp/download/${encodeURIComponent(filePath)}`;
                     downloadLink.download = filePath.split('/').pop();
                     fileViewer.appendChild(downloadLink);
                 } else {
@@ -488,7 +502,13 @@
         // Add search event listener
         document.addEventListener('DOMContentLoaded', () => {
             console.log("DOM fully loaded, attaching search listener");
-            document.getElementById('searchButton').addEventListener('click', searchFiles);
+            const button = document.getElementById('searchButton');
+            if (button) {
+                button.addEventListener('click', searchFiles);
+                console.log("Search button listener attached");
+            } else {
+                console.error("Search button not found in DOM");
+            }
             loadDirectory();
         });
 

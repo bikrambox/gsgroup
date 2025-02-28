@@ -15,8 +15,8 @@ app = Flask(__name__,
             static_folder='static',
             template_folder='templates')
 
-# Enable CORS for all routes (or specify origins if needed)
-CORS(app, resources={r"/api/*": {"origins": "*"}})  # Allows all origins; restrict if needed
+# Enable CORS for all routes, ensuring HTTPS only
+CORS(app, resources={r"/api/*": {"origins": "https://vps1139.basicserver.io:42030"}})  # Restrict to HTTPS origin
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -88,7 +88,7 @@ def ftp_download(file_path):
                 logger.error(f"Failed to download file {file_path}: {result['message']}")
                 return jsonify(result), 404
         
-        # Determine file type and return as downloadable file
+        # Determine file type and return as downloadable file over HTTPS
         filename = decoded_path.split('/')[-1]
         if file_path.endswith(('.pdf', '.csv', '.txt')):
             logger.info(f"Successfully downloaded file: {filename}")
