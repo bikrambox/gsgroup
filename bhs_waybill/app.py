@@ -8,7 +8,6 @@ import io
 import sqlite3
 import time
 import threading
-from urllib.parse import urlparse
 
 # Load environment variables before anything else
 load_dotenv()
@@ -95,21 +94,20 @@ def ftp_download(file_path):
     try:
         # Decode the URL-encoded path
         decoded_path = file_path.replace('%2F', '/')
-        result = ftp_connection.get_file(decoded_path)
-        if result["status"] == "error":
-            if "Not connected" in result["message"]:
-                ftp_connection.connect()  # Attempt to reconnect
-                result = ftp_connection.get_file(decoded_path)
-            if result["status"] == "error":
-                logger.error(f"Failed to download file {file_path} over HTTPS: {result['message']}")
-                return jsonify(result), 404
+        logger.info(f"Decoding file path: {decoded_path}")
         
-        # Determine file type and return as downloadable file over HTTPS
+        # Use the new FTP direct download function
+        result = ftp_connection.direct_ftp_download(decoded_path)
+        if result["status"] == "error":
+            logger.error(f"Failed to download file {file_path} over HTTPS: {result['message']}")
+            return jsonify(result), 404
+        
+        # Determine file type and return as downloadable file over HTTPS with hardcoded URL
         filename = decoded_path.split('/')[-1]
         if file_path.endswith(('.pdf', '.csv', '.txt')):
             logger.info(f"Successfully downloaded file: {filename} over HTTPS")
-            # Use a hardcoded HTTPS base URL to ensure HTTPS in responses
-            base_url = 'https://vps1139.basicserver.io:42030/'
+            # Hardcode the HTTPS URL in the response
+            hardcoded_url = f"https://vps1139.basicserver.io:42030/api/ftp/download/{file_path}"
             return Response(
                 result["data"],
                 mimetype={
@@ -117,7 +115,10 @@ def ftp_download(file_path):
                     '.csv': 'text/csv',
                     '.txt': 'text/plain'
                 }[file_path[-4:]],
-                headers={'Content-Disposition': f'attachment; filename="{filename}"'}
+                headers={
+                    'Content-Disposition': f'attachment; filename="{filename}"',
+                    'Location': hardcoded_url  # Ensure redirects use HTTPS
+                }
             )
         else:
             logger.error(f"Unsupported file type for {filename} over HTTPS")

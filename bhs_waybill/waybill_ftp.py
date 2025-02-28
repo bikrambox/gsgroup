@@ -159,9 +159,10 @@ class FTPConnection:
                 "message": f"Error listing directory: {e}"
             }
 
-    def get_file(self, file_path):
+    def direct_ftp_download(self, file_path):
+        """Directly download a file from the FTP server and return its contents."""
         if not self.ensure_connected():
-            logger.warning("Attempted to get file without active connection")
+            logger.warning("Attempted to download file without active connection")
             return {
                 "status": "error",
                 "message": "Not connected to FTPS server"
@@ -172,36 +173,36 @@ class FTPConnection:
             self.ftp.cwd(directory)
             filename = file_path.split('/')[-1]
             
-            logger.info(f"Attempting to retrieve file: {filename} from {directory}")
+            logger.info(f"Attempting to retrieve file: {filename} from {directory} via FTP")
             
             # Use a BytesIO buffer to store the file content
             file_buffer = io.BytesIO()
             self.ftp.retrbinary(f"RETR {filename}", file_buffer.write)
             file_content = file_buffer.getvalue()
             
-            logger.info(f"Successfully retrieved file: {filename}")
+            logger.info(f"Successfully retrieved file: {filename} via FTP")
             return {
                 "status": "success",
                 "data": file_content,
-                "message": f"File {filename} retrieved successfully"
+                "message": f"File {filename} retrieved successfully via FTP"
             }
         except ftplib.error_perm as e:
-            logger.error(f"Permission error accessing file: {e}")
+            logger.error(f"Permission error accessing file via FTP: {e}")
             return {
                 "status": "error",
-                "message": f"Permission error accessing file: {e}"
+                "message": f"Permission error accessing file via FTP: {e}"
             }
         except ssl.SSLError as e:
-            logger.error(f"TLS/SSL error retrieving file: {e}")
+            logger.error(f"TLS/SSL error retrieving file via FTP: {e}")
             return {
                 "status": "error",
-                "message": f"TLS/SSL error retrieving file: {e}"
+                "message": f"TLS/SSL error retrieving file via FTP: {e}"
             }
         except Exception as e:
-            logger.error(f"Error retrieving file: {e}")
+            logger.error(f"Error retrieving file via FTP: {e}")
             return {
                 "status": "error",
-                "message": f"Error retrieving file: {e}"
+                "message": f"Error retrieving file via FTP: {e}"
             }
 
     def get_status(self):
