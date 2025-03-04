@@ -208,10 +208,6 @@ def get_indexing_status():
         logger.error(f"Error reading indexing status over HTTPS (Windows FTP): {e}")
         return jsonify({"database_status": "ongoing", "json_status": "ongoing"}), 500
 
-@app.route('/favicon.ico')
-def favicon():
-    logger.info("Serving favicon over HTTPS (Windows FTP)")
-    return app.send_static_file('favicon.ico')
 
 if __name__ == '__main__':
     # This will only be used in development
