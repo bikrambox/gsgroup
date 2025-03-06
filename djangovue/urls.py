@@ -15,6 +15,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('APIServer.urls')),  # Add this line to include your app URLs
 ]
+# ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
 

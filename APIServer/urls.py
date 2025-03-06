@@ -16,9 +16,10 @@ urlpatterns = [
     path('auth/login/', views.CustomLoginView.as_view(), name='custom-login'),
     path('auth/logout/', views.logout_view, name='custom-logout'),
     path('auth/', include('rest_framework.urls')),
-    # JWT Token endpoints
     path('auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('auth/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     path('auth/register/', views.register_user, name='register'),
+    path('upload/', views.upload_json_file, name='upload-json'),  # Add this line
+    # path('upload/<int:file_id>/', views.serve_uploaded_file, name='serve-uploaded-file'),
 ]

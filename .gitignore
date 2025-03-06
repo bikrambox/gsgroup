@@ -1,5 +1,5 @@
 /apienv/
 /frontend/node_modules
 
-
 /bhs_waybill/bhsenv
+db.sqlite3

@@ -4,18 +4,18 @@
       <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight">Sign in to your account</h2>
     </div>
     <div class="pt-12 sm:mx-auto sm:w-full sm:max-w-sm">
-      <form @submit.prevent="handleLogin" class="space-y-6">
+      <form class="space-y-6" action="#" method="POST">
         <div>
-          <label for="username" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Username</label>
+          <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email address</label>
           <div class="mt-2">
-            <input type="text" v-model="username" placeholder="YourUsername" name="username" id="username" autocomplete="username" required=""
+            <input type="email" placeholder="John@doe.com" name="email" id="email" autocomplete="email" required=""
               class="shadow-xs bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-xs-light" />
           </div>
         </div>
         <div class="mb-5">
           <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
           <div class="relative">
-            <input :type="showPassword ? 'text' : 'password'" v-model="password" id="password" placeholder="**** ****"
+            <input :type="showPassword ? 'text' : 'password'" id="password" v-model="password" placeholder="**** ****"
               class="shadow-xs bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               required />
             <button type="button" @click="togglePassword"
@@ -50,61 +50,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import api from '../api'  // Assuming you have an API client (e.g., Axios) in src/api/index.js
+import { ref } from 'vue'
 
-const username = ref('')
 const password = ref('')
 const showPassword = ref(false)
-let csrfToken = ref('')  // Store CSRF token
 
 const togglePassword = () => {
   showPassword.value = !showPassword.value
 }
-
-const getCsrfToken = async () => {
-  try {
-    // Use /api/auth/login/ (GET) to fetch CSRF cookie, no auth required
-    const response = await api.get('api/auth/login/', {
-      headers: {
-        'Accept': 'application/json',
-      },
-    })
-    const cookieValue = document.cookie
-      .split('; ')
-      .find(row => row.startsWith('csrftoken='))
-      ?.split('=')[1]
-    if (cookieValue) {
-      csrfToken.value = cookieValue
-    }
-  } catch (error) {
-    console.error('Failed to fetch CSRF token:', error)
-  }
-}
-
-const handleLogin = async () => {
-  try {
-    const response = await api.post('api/auth/login/', {
-      username: username.value,
-      password: password.value,
-    }, {
-      headers: {
-        'X-CSRFToken': csrfToken.value,  // Include CSRF token in headers
-      },
-    })
-
-    if (response.status === 200) {
-      console.log('Login successful in frontend!')
-      // Optionally store the token or user data
-      const token = response.data.token  // Adjust based on your backend response
-      localStorage.setItem('token', token)  // Store token for future authenticated requests
-    }
-  } catch (error) {
-    console.error('Login failed:', error.response?.data || error.message)
-  }
-}
-
-onMounted(() => {
-  getCsrfToken()  // Fetch CSRF token when the component mounts
-})
 </script>

@@ -1,15 +1,15 @@
 <template>
   <div class="min-h-screen dark:bg-gray-800 dark:text-slate-50">
   <!-- <div class="min-h-screen "> -->
-    <Navbar />
+    <!-- <Navbar /> -->
     <!-- <Navbar_ /> -->
      <!-- <Navbar_clone /> -->
-    <!-- <Login /> -->
+    <Login />
     <!-- <Sign_up /> -->
     <!-- <Intro /> -->
     <!-- <Profile /> -->
     <!-- <Footer /> -->
-     <Dashboard />
+     <!-- <Dashboard /> -->
   </div>
 </template>
 

@@ -16,19 +16,31 @@ from datetime import timedelta
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-m2)6ean)z5@%d(ttf+g2k__9d30mj+4qhv)4k(i@0olvr5m+r*'
 
-# Hosts/Domains this Django site can serve (simplified for local testing)
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '10.42.0.14']
 
-# Development settings
-DEBUG = True
+# When DEBUG is False, you need to set ALLOWED_HOSTS
+
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '0.0.0.0', '192.168.194.78', '192.168.194.48']
+
+# settings.py
+DEBUG = True  # Ensure DEBUG is False in production
+
+# Add this to force custom error handlers even in DEBUG mode
+# DEBUG_PROPAGATE_EXCEPTIONS = True
+
+
+# STATIC_URL = '/static/'  # URL prefix for static files
+# # STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]  # For development
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # For production
 
 # Application definition
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -39,16 +51,17 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
-    'corsheaders',  # Add CORS headers for frontend testing
+    'corsheaders',  # Add CORS headers
     'APIServer'
 ]
+
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',  # Default backend
     'APIServer.authentication.APIKeyAuthentication',  # Our custom backend
 ]
 
-# Logging configuration for local debugging
+# Logging configuration
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -61,12 +74,6 @@ LOGGING = {
         'APIServer.authentication': {
             'handlers': ['console'],
             'level': 'INFO',
-            'propagate': True,
-        },
-        '': {  # Root logger to catch all logs
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': True,
         },
     },
 }
@@ -89,11 +96,13 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': False,
+
     'ALGORITHM': 'HS256',
     'SIGNING_KEY': SECRET_KEY,
     'VERIFYING_KEY': None,
     'AUDIENCE': None,
     'ISSUER': None,
+
     'AUTH_HEADER_TYPES': ('Bearer',),
     'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
     'USER_ID_FIELD': 'id',
@@ -109,30 +118,28 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # 'APIServer.middleware.encryption.EncryptionMiddleware',  # Comment out for local testing
+    'APIServer.middleware.encryption.EncryptionMiddleware',  # Add encryption middleware
 ]
 
-# CORS settings for local development
-CORS_ALLOW_ALL_ORIGINS = False  # More secure, specify origins
+# CORS settings
+CORS_ALLOW_ALL_ORIGINS = False  # More secure than allowing all origins
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173',  # Your Vue.js development server
-    'http://127.0.0.1:5173',  # Localhost for testing
-    'http://10.42.0.14:8000',  # Docker container IP for testing
-    'http://10.42.0.14:5173',  # Docker container IP for testing
+    'http://localhost:5173',
+    'http://0.0.0.0:5173',
+    'http://127.0.0.1:5173',
 ]
 CORS_ALLOW_CREDENTIALS = True  # Allow credentials (cookies, authorization headers)
 
-# CSRF settings for cross-origin requests (local development)
+# CSRF settings for cross-origin requests
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:5173',
+    'http://0.0.0.0:5173',
     'http://127.0.0.1:5173',
-    'http://10.42.0.14:8000',
-    'http://10.42.0.14:5173',
 ]
 
-# Session settings (local development, no HTTPS)
-SESSION_COOKIE_SAMESITE = 'Lax'  # Suitable for local HTTP
-SESSION_COOKIE_SECURE = False  # Keep False for local HTTP testing
+# Session settings
+SESSION_COOKIE_SAMESITE = 'Lax'  # or 'None' if using HTTPS
+SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
 
 ROOT_URLCONF = 'djangovue.urls'
 
@@ -142,6 +149,7 @@ TEMPLATES = [
         'DIRS': [
             BASE_DIR / 'templates',  # Add your templates directory
         ],
+        # 'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -156,7 +164,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'djangovue.wsgi.application'
 
-# Database (SQLite for local development)
+
+# Database
+# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -164,7 +175,10 @@ DATABASES = {
     }
 }
 
+
 # Password validation
+# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -180,21 +194,25 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
 # Internationalization
+# https://docs.djangoproject.com/en/5.1/topics/i18n/
+
 LANGUAGE_CODE = 'en-us'
+
 TIME_ZONE = 'UTC'
+
 USE_I18N = True
+
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images) for local development
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'  # Enable for static file testing
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/5.1/howto/static-files/
+
+STATIC_URL = 'static/'
 
 # Default primary key field type
+# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
-
-# Media settings
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
