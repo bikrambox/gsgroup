@@ -1,0 +1,22 @@
+[uwsgi]
+chdir = /var/www/html/gsgroup
+
+module = djangovue.wsgi
+
+home = /var/www/html/gsgroup/apienv
+
+master = true
+processes = 4
+
+socket = /var/www/html/gsgroup/uwsgi.sock
+chmod-socket = 666
+
+http = :8000
+
+vacuum = true
+die-on-term = true
+
+uid = user  # Add this
+gid = www-data  # Add this
+
+daemonize = /var/www/html/gsgroup/uwsgi-emperor.log
