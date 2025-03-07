@@ -1,52 +1,50 @@
-// FileName: frontend\src\stores\auth.js
-
 import { defineStore } from 'pinia'
-import api from '../api' // Use the axios instance from api/auth/index.js
+import axios from 'axios'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null,
     token: localStorage.getItem('token')
   }),
-
+  
   getters: {
     isAuthenticated: (state) => !!state.token,
   },
-
+  
   actions: {
     async login(username, password) {
       try {
-        const response = await api.post('/api/auth/token/', {
+        const response = await axios.post('/api/token/', {
           username,
           password
         })
-
+        
         this.token = response.data.access
         localStorage.setItem('token', this.token)
-
-        // Fetch user profile after successful login
+        
+        // Fetch user profile
         await this.fetchUserProfile()
-
+        
         return true
       } catch (error) {
-        console.error('Login failed in auth store:', error.response?.data || error.message)
+        console.error('Login failed:', error)
         return false
       }
     },
-
+    
     async fetchUserProfile() {
       try {
-        const response = await api.get('/api/profile/', {
+        const response = await axios.get('/api/profile/', {
           headers: {
             Authorization: `Bearer ${this.token}`
           }
         })
         this.user = response.data
       } catch (error) {
-        console.error('Failed to fetch user profile:', error.response?.data || error.message)
+        console.error('Failed to fetch user profile:', error)
       }
     },
-
+    
     logout() {
       this.user = null
       this.token = null

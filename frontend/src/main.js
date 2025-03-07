@@ -1,40 +1,17 @@
+// FileName: frontend\src\main.js
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import { createRouter, createWebHistory } from 'vue-router'
 import App from './App.vue'
 import './style.css'
 
-
-
-
-// import Vueform from '@vueform/vueform'
-// import vueformConfig from './../vueform.config'
-// import Builder from '@vueform/builder'
-// import builderConfig from './../builder.config'
-
-
-
-// Import routes
-import routes from './router'
-
-// Create router instance
-const router = createRouter({
-  history: createWebHistory(),
-  routes
-})
+// Import the router instance
+import router from './router'
 
 // Create Pinia instance
 const pinia = createPinia()
 
 // Create and mount the Vue application
 const app = createApp(App)
-
-
-// app.use(Vueform, vueformConfig)
-// app.use(Builder, builderConfig)
-
-
-
 app.use(pinia)
-app.use(router)
+app.use(router) // Use the imported router instance
 app.mount('#app')

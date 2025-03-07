@@ -1,23 +1,22 @@
+// FileName: frontend\src\router\index.js
+import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
+import Dashboard from '../views/Dashboard.vue'
 import Login from '../views/Login.vue'
+import SignUp from '../views/Sign_up.vue'
+import FileUpload from '../views/file_upload.vue'
 
 const routes = [
-  {
-    path: '/',
-    name: 'Home',
-    component: Home
-  },
-  {
-    path: '/login',
-    name: 'Login',
-    component: Login
-  },
-  {
-    path: '/profile',
-    name: 'Profile',
-    component: () => import('../views/Profile.vue'),
-    meta: { requiresAuth: true }
-  }
+  { path: '/', component: Home },
+  { path: '/dashboard', component: Dashboard },
+  { path: '/login', component: Login },
+  { path: '/signup', component: SignUp },
+  { path: '/file-upload', component: FileUpload },
 ]
 
-export default routes
+const router = createRouter({
+  history: createWebHistory(),
+  routes
+})
+
+export default router
