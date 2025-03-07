@@ -21,5 +21,4 @@ urlpatterns = [
     path('auth/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     path('auth/register/', views.register_user, name='register'),
     path('upload/', views.upload_json_file, name='upload-json'),  # Add this line
-    # path('upload/<int:file_id>/', views.serve_uploaded_file, name='serve-uploaded-file'),
 ]
