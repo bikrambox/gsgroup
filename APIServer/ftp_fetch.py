@@ -33,8 +33,10 @@ class FTPConnection:
         if self.connected:
             return {"status": "success", "message": "Already connected"}
         try:
-            # Use a specific TLS protocol (TLSv1.2) for compatibility
-            context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+            # Use modern TLS version settings
+            context = ssl.SSLContext()
+            context.minimum_version = ssl.TLSVersion.TLSv1_2
+            context.maximum_version = ssl.TLSVersion.TLSv1_2
             context.check_hostname = False
             context.verify_mode = ssl.CERT_NONE
             self.ftp = ftplib.FTP_TLS(context=context, timeout=1200)
@@ -42,8 +44,10 @@ class FTPConnection:
             self.ftp.connect(self.host, self.port)
             self.ftp.login(self.username, self.password)
             logger.info("Login successful, enabling protection")
-            self.ftp.prot_p()  # Enable protected data connection
-            self.ftp.set_pasv(True)  # Enable passive mode for uploads
+            self.ftp.prot_c()  # Use clear data channel to avoid TLS error
+            logger.info("Set data channel to clear (PROT C) for debugging")
+            self.ftp.set_pasv(True)  # Enable passive mode
+            logger.info(f"Passive mode response: {self.ftp.voidcmd('PASV')}")
             self.connected = True
             logger.info(f"Successfully connected to FTPS server at {self.host}:{self.port}")
             
@@ -99,7 +103,7 @@ class FTPConnection:
             return False
         return True
 
-    def list_dir(self, path='/Reports/ELON_data/Nomeco_environments/PROD_internally'):
+    def list_dir(self, path='/Reports/ELON_data/Upload_test/'):
         if not self.ensure_connected():
             logger.warning("Attempted to list directory without active connection")
             return {"status": "error", "message": "Not connected to FTPS server"}
@@ -139,7 +143,7 @@ class FTPConnection:
             logger.warning("Attempted to download file without active connection")
             return {"status": "error", "message": "Not connected to FTPS server"}
         try:
-            base_path = '/Reports/ELON_data/Nomeco_environments/PROD_internally'
+            base_path = '/Reports/ELON_data/Upload_test/'
             normalized_path = file_path if file_path.startswith(base_path) else f"{base_path}/{file_path}" if not file_path.startswith('/') else f"{base_path}{file_path}"
             while normalized_path.count(base_path) > 1:
                 normalized_path = normalized_path.replace(base_path + base_path, base_path)
@@ -228,6 +232,7 @@ class FTPConnection:
             # Upload the file
             file_buffer.seek(0)
             self.ftp.voidcmd("TYPE I")  # Set binary mode
+            logger.info("Starting file upload with STOR command...")
             self.ftp.storbinary(f"STOR {new_filename}", file_buffer)
             logger.info(f"Successfully uploaded {original_filename} as {new_filename} to {upload_dir}")
 
