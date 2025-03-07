@@ -124,6 +124,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://10.42.0.14:8000',  # Docker container IP for testing
     'http://10.42.0.14:5173',  # Docker container IP for testing
     'https://vps1139.basicserver.io:42030',  # Your production frontend URL with port
+    'https://vps1139.basicserver.io:42032',  # Your production frontend URL with port
 ]
 CORS_ALLOW_CREDENTIALS = True  # Allow credentials (cookies, authorization headers)
 
@@ -134,6 +135,7 @@ CSRF_TRUSTED_ORIGINS = [
     'http://10.42.0.14:8000',
     'http://10.42.0.14:5173',
     'https://vps1139.basicserver.io:42030',  # Your production frontend URL with port
+    'https://vps1139.basicserver.io:42032',  # Your production frontend URL with port
 ]
 
 # # Session settings (local development, no HTTPS)
