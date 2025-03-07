@@ -170,7 +170,6 @@ def upload_json_file(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    # Get the list of files (key 'files' in form-data)
     files = request.FILES.getlist('files')
     if not files:
         return Response(
@@ -178,8 +177,7 @@ def upload_json_file(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    # Initialize FTPS connection with the authenticated username
-    username = request.user.username  # Get the authenticated username from API key
+    username = request.user.username
     ftp = FTPConnection(authenticated_username=username)
     ftp_connect_result = ftp.connect()
     if ftp_connect_result['status'] != 'success':
@@ -189,10 +187,8 @@ def upload_json_file(request):
         )
 
     try:
-        # Process each file
         results = []
         for uploaded_file in files:
-            # Validate file extension
             if not uploaded_file.name.lower().endswith('.json'):
                 results.append({
                     'filename': uploaded_file.name,
@@ -201,20 +197,29 @@ def upload_json_file(request):
                 })
                 continue
 
-            # Step 1: Read the file into RAM and validate JSON
             try:
                 file_content = uploaded_file.read()
-                json_data = file_content.decode('utf-8')
+                json_data = file_content.decode('utf-8-sig')  # Use utf-8-sig to handle BOM
                 json.loads(json_data)  # Validate JSON
-                file_buffer = io.BytesIO(file_content)  # Create a file buffer for FTPS upload
+                file_buffer = io.BytesIO(file_content)
             except json.JSONDecodeError as e:
+                logger.error(f"Invalid JSON in {uploaded_file.name}: {str(e)}")
                 results.append({
                     'filename': uploaded_file.name,
                     'status': 'error',
                     'message': f'Invalid JSON file: {str(e)}'
                 })
                 continue
+            except UnicodeDecodeError as e:
+                logger.error(f"Encoding error in {uploaded_file.name}: {str(e)}")
+                results.append({
+                    'filename': uploaded_file.name,
+                    'status': 'error',
+                    'message': f'Encoding error: {str(e)}'
+                })
+                continue
             except Exception as e:
+                logger.error(f"Error processing {uploaded_file.name}: {str(e)}")
                 results.append({
                     'filename': uploaded_file.name,
                     'status': 'error',
@@ -222,7 +227,6 @@ def upload_json_file(request):
                 })
                 continue
 
-            # Step 2: Upload to FTPS server
             ftp_result = ftp.upload_stream(file_buffer, uploaded_file.name)
             if ftp_result['status'] == 'success':
                 results.append({
@@ -232,13 +236,13 @@ def upload_json_file(request):
                     'message': ftp_result['message']
                 })
             else:
+                logger.error(f"FTPS upload failed for {uploaded_file.name}: {ftp_result['message']}")
                 results.append({
                     'filename': uploaded_file.name,
                     'status': 'error',
                     'message': ftp_result['message']
                 })
 
-        # Step 3: Return results for all files
         return Response({
             'message': 'File upload processing completed',
             'results': results,
@@ -252,5 +256,4 @@ def upload_json_file(request):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
     finally:
-        # Disconnect FTPS
         ftp.disconnect()

@@ -1,3 +1,4 @@
+# APIServer/ftp_fetch.py
 import ftplib
 import os
 import threading
@@ -21,7 +22,7 @@ class FTPConnection:
         self.password = os.getenv('FTP_PASSWORD', 'Hundekoldt2006!')
         self.authenticated_username = authenticated_username
         self.connected = False
-        self.keep_alive_interval = 300  # Keep-alive check every 5 minutes
+        self.keep_alive_interval = 300
         self.keep_alive_thread = None
         logger.info(f"Initializing FTPS connection from bastion host to {self.host}:{self.port}")
         logger.info(f"Using credentials - Username: '{self.username}', Password: '***'")
@@ -32,13 +33,12 @@ class FTPConnection:
         if self.connected:
             return {"status": "success", "message": "Already connected"}
         try:
-            # Use TLSv1.3
             context = ssl.SSLContext()
             context.minimum_version = ssl.TLSVersion.TLSv1_3
             context.maximum_version = ssl.TLSVersion.TLSv1_3
             context.check_hostname = False
             context.verify_mode = ssl.CERT_NONE
-            context.options |= ssl.OP_NO_TLSv1  # Disable older TLS versions
+            context.options |= ssl.OP_NO_TLSv1
             context.options |= ssl.OP_NO_TLSv1_1
             context.options |= ssl.OP_NO_TLSv1_2
             self.ftp = ftplib.FTP_TLS(context=context, timeout=1200)
@@ -46,9 +46,9 @@ class FTPConnection:
             self.ftp.connect(self.host, self.port)
             self.ftp.login(self.username, self.password)
             logger.info("Login successful, enabling protection")
-            self.ftp.prot_p()  # Re-enable secure data channel
+            self.ftp.prot_p()
             logger.info("Set data channel to protected (PROT P)")
-            self.ftp.set_pasv(True)  # Enable passive mode
+            self.ftp.set_pasv(True)
             logger.info(f"Passive mode response: {self.ftp.voidcmd('PASV')}")
             self.connected = True
             logger.info(f"Successfully connected to FTPS server at {self.host}:{self.port}")
@@ -190,50 +190,43 @@ class FTPConnection:
             return {"status": "error", "message": "Not connected to FTPS server"}
 
         try:
-            # Validate file is .json
             if not original_filename.lower().endswith('.json'):
                 return {"status": "error", "message": "Only JSON files are allowed"}
 
-            # Validate JSON content
             file_buffer.seek(0)
-            json_data = file_buffer.read().decode('utf-8')
-            json.loads(json_data)  # Validate JSON
-            file_buffer.seek(0)  # Reset buffer position
+            json_data = file_buffer.read().decode('utf-8-sig')  # Use utf-8-sig to handle BOM
+            json.loads(json_data)
+            file_buffer.seek(0)
 
-            # Define base path and folder structure
             base_path = '/Reports/ELON_data/Upload_test'
             today = time.strftime('%Y-%m-%d')
             username = self.authenticated_username if self.authenticated_username else self.username.split('\\')[-1]
-            folder_name = f"{username}_{today}"  # e.g., administrator_2025-03-07
+            folder_name = f"{username}_{today}"
             upload_dir = f"{base_path}/{folder_name}"
 
-            # Check if directory exists, create if it doesn't
             try:
                 self.ftp.cwd(upload_dir)
                 logger.info(f"Directory {upload_dir} already exists")
             except ftplib.error_perm:
                 logger.info(f"Creating directory {upload_dir}")
-                self.ftp.mkd(upload_dir)  # Create directory if it doesn't exist
+                self.ftp.mkd(upload_dir)
 
-            # Get existing files in the directory to determine the next index
             self.ftp.cwd(upload_dir)
             files = []
             self.ftp.retrlines('NLST', files.append)
             file_count = len([f for f in files if f.startswith(f"{folder_name}_")])
             logger.info(f"Found {file_count} existing files in {upload_dir}")
 
-            # Determine new filename with index
-            base_name = original_filename.rsplit('.', 1)[0]  # Get filename without extension
+            base_name = original_filename.rsplit('.', 1)[0]
             extension = '.json'
             new_filename = f"{folder_name}_{base_name}"
             if file_count > 0:
-                new_filename += f"_{file_count:02d}"  # Add index (e.g., _01, _02)
+                new_filename += f"_{file_count:02d}"
             new_filename += extension
             logger.info(f"Uploading file as {new_filename} to {upload_dir}")
 
-            # Upload the file
             file_buffer.seek(0)
-            self.ftp.voidcmd("TYPE I")  # Set binary mode
+            self.ftp.voidcmd("TYPE I")
             logger.info("Starting file upload with STOR command...")
             self.ftp.storbinary(f"STOR {new_filename}", file_buffer)
             logger.info(f"Successfully uploaded {original_filename} as {new_filename} to {upload_dir}")
