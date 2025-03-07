@@ -1,20 +1,21 @@
 // frontend/src/api/index.js
 import axios from 'axios';
 
+const baseURL = import.meta.env.VITE_API_URL;
+
 const api = axios.create({
-    baseURL: 'http://localhost:8000/',  // Remove the /api/ to avoid duplication
-    withCredentials: true,  // Enable credentials (cookies, authorization headers) for CSRF
+    baseURL,
+    withCredentials: true,
     headers: {
         'Content-Type': 'application/json',
     },
 });
 
 api.interceptors.request.use(config => {
-    const token = localStorage.getItem('token');  // Or wherever you store your JWT
+    const token = localStorage.getItem('token');
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
-    // Get CSRF token from cookies if available
     const csrfToken = document.cookie
         .split('; ')
         .find(row => row.startsWith('csrftoken='))
