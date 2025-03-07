@@ -20,9 +20,9 @@ class FTPConnection:
         self.port = int(os.getenv('FTP_PORT', 21))
         self.username = os.getenv('FTP_USERNAME', r'BHSR\jeba').replace('\\\\', '\\')
         self.password = os.getenv('FTP_PASSWORD', 'Hundekoldt2006!')
-        self.authenticated_username = authenticated_username  # Store the authenticated username from API key
+        self.authenticated_username = authenticated_username
         self.connected = False
-        self.keep_alive_interval = 300  # Keep-alive check every 5 minutes (300 seconds)
+        self.keep_alive_interval = 300  # Keep-alive check every 5 minutes
         self.keep_alive_thread = None
         logger.info(f"Initializing FTPS connection from bastion host to {self.host}:{self.port}")
         logger.info(f"Using credentials - Username: '{self.username}', Password: '***'")
@@ -33,26 +33,19 @@ class FTPConnection:
         if self.connected:
             return {"status": "success", "message": "Already connected"}
         try:
-            # Try multiple TLS protocols to handle server compatibility
-            for protocol in [ssl.PROTOCOL_TLSv1_2, ssl.PROTOCOL_TLSv1_1, ssl.PROTOCOL_TLS]:
-                context = ssl.SSLContext(protocol)
-                context.check_hostname = False  # Disable for testing
-                context.verify_mode = ssl.CERT_NONE  # Disable cert verification for testing
-                try:
-                    self.ftp = ftplib.FTP_TLS(context=context, timeout=1200)  # Increased timeout to 20 minutes
-                    logger.info(f"Attempting FTPS connection to {self.host}:{self.port} with protocol {protocol}")
-                    self.ftp.connect(self.host, self.port)
-                    self.ftp.login(self.username, self.password)
-                    self.ftp.prot_p()  # Enable protected data connection
-                    self.ftp.set_pasv(True)  # Enable passive mode for uploads
-                    self.connected = True
-                    logger.info(f"Successfully connected to FTPS server at {self.host}:{self.port} with protocol {protocol}")
-                    break
-                except Exception as e:
-                    logger.warning(f"Connection failed with protocol {protocol}: {e}")
-                    continue
-            else:
-                raise Exception("No compatible TLS protocol found")
+            # Use a specific TLS protocol (TLSv1.2) for compatibility
+            context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+            context.check_hostname = False
+            context.verify_mode = ssl.CERT_NONE
+            self.ftp = ftplib.FTP_TLS(context=context, timeout=1200)
+            logger.info(f"Attempting FTPS connection to {self.host}:{self.port} with TLSv1.2")
+            self.ftp.connect(self.host, self.port)
+            self.ftp.login(self.username, self.password)
+            logger.info("Login successful, enabling protection")
+            self.ftp.prot_p()  # Enable protected data connection
+            self.ftp.set_pasv(True)  # Enable passive mode for uploads
+            self.connected = True
+            logger.info(f"Successfully connected to FTPS server at {self.host}:{self.port}")
             
             self.start_keep_alive()
             return {
@@ -204,7 +197,6 @@ class FTPConnection:
             # Define base path and folder structure
             base_path = '/Reports/ELON_data/Upload_test'
             today = time.strftime('%Y-%m-%d')
-            # Use the authenticated username (e.g., 'firedrake') instead of FTPS username
             username = self.authenticated_username if self.authenticated_username else self.username.split('\\')[-1]
             folder_name = f"{username}_{today}"  # e.g., firedrake_2025-03-07
             upload_dir = f"{base_path}/{folder_name}"
@@ -222,6 +214,7 @@ class FTPConnection:
             files = []
             self.ftp.retrlines('NLST', files.append)
             file_count = len([f for f in files if f.startswith(f"{folder_name}_")])
+            logger.info(f"Found {file_count} existing files in {upload_dir}")
 
             # Determine new filename with index
             base_name = original_filename.rsplit('.', 1)[0]  # Get filename without extension
@@ -230,9 +223,11 @@ class FTPConnection:
             if file_count > 0:
                 new_filename += f"_{file_count:02d}"  # Add index (e.g., _01, _02)
             new_filename += extension
+            logger.info(f"Uploading file as {new_filename} to {upload_dir}")
 
             # Upload the file
             file_buffer.seek(0)
+            self.ftp.voidcmd("TYPE I")  # Set binary mode
             self.ftp.storbinary(f"STOR {new_filename}", file_buffer)
             logger.info(f"Successfully uploaded {original_filename} as {new_filename} to {upload_dir}")
 
