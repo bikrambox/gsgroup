@@ -1,4 +1,4 @@
-# myapp/views.py
+# APIServer/views.py
 import os
 import io
 import json
@@ -178,8 +178,9 @@ def upload_json_file(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    # Initialize FTPS connection
-    ftp = FTPConnection()
+    # Initialize FTPS connection with the authenticated username
+    username = request.user.username  # Get the authenticated username from API key
+    ftp = FTPConnection(authenticated_username=username)
     ftp_connect_result = ftp.connect()
     if ftp_connect_result['status'] != 'success':
         return Response(
@@ -241,7 +242,7 @@ def upload_json_file(request):
         return Response({
             'message': 'File upload processing completed',
             'results': results,
-            'user': request.user.username
+            'user': username
         }, status=status.HTTP_200_OK)
 
     except Exception as e:

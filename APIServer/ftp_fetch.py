@@ -1,3 +1,4 @@
+# APIServer/ftp_fetch.py
 import ftplib
 import os
 import threading
@@ -12,19 +13,21 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class FTPConnection:
-    def __init__(self):
+    def __init__(self, authenticated_username=None):
         load_dotenv()
         self.ftp = None
         self.host = os.getenv('FTP_HOST', '10.6.8.43')
         self.port = int(os.getenv('FTP_PORT', 21))
         self.username = os.getenv('FTP_USERNAME', r'BHSR\jeba').replace('\\\\', '\\')
         self.password = os.getenv('FTP_PASSWORD', 'Hundekoldt2006!')
+        self.authenticated_username = authenticated_username  # Store the authenticated username from API key
         self.connected = False
         self.keep_alive_interval = 300  # Keep-alive check every 5 minutes (300 seconds)
         self.keep_alive_thread = None
         logger.info(f"Initializing FTPS connection from bastion host to {self.host}:{self.port}")
         logger.info(f"Using credentials - Username: '{self.username}', Password: '***'")
         logger.info(f"Raw username (repr): {repr(self.username)}")
+        logger.info(f"Authenticated username: {self.authenticated_username}")
 
     def connect(self):
         if self.connected:
@@ -201,8 +204,9 @@ class FTPConnection:
             # Define base path and folder structure
             base_path = '/Reports/ELON_data/Upload_test'
             today = time.strftime('%Y-%m-%d')
-            username = self.username.split('\\')[-1]  # Extract username (e.g., 'jeba' from 'BHSR\jeba')
-            folder_name = f"{username}_{today}"
+            # Use the authenticated username (e.g., 'firedrake') instead of FTPS username
+            username = self.authenticated_username if self.authenticated_username else self.username.split('\\')[-1]
+            folder_name = f"{username}_{today}"  # e.g., firedrake_2025-03-07
             upload_dir = f"{base_path}/{folder_name}"
 
             # Check if directory exists, create if it doesn't
@@ -271,7 +275,7 @@ class FTPConnection:
         return True
 
 if __name__ == "__main__":
-    ftp = FTPConnection()
+    ftp = FTPConnection(authenticated_username="testuser")
     ftp.connect()
     with open("test.json", 'rb') as f:
         result = ftp.upload_stream(io.BytesIO(f.read()), "test.json")
