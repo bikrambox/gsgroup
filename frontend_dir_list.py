@@ -72,7 +72,7 @@ start_path = r'C:\Users\Hemanta\Documents\Github\gsgroup'  # Replace with the ac
 start_path = normalize_path(start_path)
 
 # Read the ignores.txt file
-ignore_folders, ignore_files = read_ignore_file('ignores.txt')
+ignore_folders, ignore_files = read_ignore_file('frontend_ignores.txt')
 
 # Call the function
 list_files_and_folders(start_path, ignore_folders, ignore_files)

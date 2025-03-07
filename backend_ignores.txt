@@ -29,8 +29,12 @@ djangovue\settings_copy.py
 uwsgi_copy.ini
 uwsgi-emperor.log
 uwsgi.ini_Pr
-dir_list.py
-ignores.txt
+backend_dir_list.py
+backend_ignores.txt
+backend_output.txt
+frontend_ignores.txt
+frontend_dir_list.py
+frontend_output.txt
 .gitignore
 db.sqlite3
 debug.log
