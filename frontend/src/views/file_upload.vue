@@ -47,13 +47,14 @@
     <!-- Error Message -->
     <div v-if="error" class="mt-4 p-4 bg-red-100 text-red-700 rounded-lg">
       <h3 class="font-semibold">Upload Failed</h3>
-      <ul class="list-disc pl-5 mt-2">
+      <ul v-if="Array.isArray(error.results)" class="list-disc pl-5 mt-2">
         <li v-for="(result, index) in error.results" :key="index">
-          <strong>File:</strong> {{ result.filename }}<br>
-          <strong>Status:</strong> {{ result.status }}<br>
-          <strong>Message:</strong> {{ result.message || 'Unknown error occurred' }}
+          <strong>File:</strong> {{ result.filename || 'Unknown' }}<br>
+          <strong>Status:</strong> {{ result.status || 'error' }}<br>
+          <strong>Message:</strong> {{ result.message || error.message || 'Unknown error occurred' }}
         </li>
       </ul>
+      <p v-else class="mt-2">{{ error.message || 'Unknown error occurred' }}</p>
       <p v-if="error.user" class="mt-2"><strong>User:</strong> {{ error.user }}</p>
     </div>
   </div>
@@ -85,35 +86,42 @@ const uploadFiles = async () => {
   loading.value = true
   uploadProgress.value = 0
   const formData = new FormData()
-  selectedFiles.value.forEach(file => {
+  selectedFiles.value.forEach((file, index) => {
     if (!file.name.toLowerCase().endsWith('.json')) {
-      error.value = { message: 'Please upload only JSON files' }
+      error.value = { message: `File ${file.name} is not a JSON file` }
       loading.value = false
       return
     }
-    formData.append('files', file)
+    formData.append('files', file) // Append each file with the same key 'files'
   })
 
   if (error.value) return
 
   try {
     const response = await api.post('/api/upload/', formData, {
-      timeout: 30000, // 30 seconds timeout
+      timeout: 30000,
       onUploadProgress: (progressEvent) => {
         const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)
         uploadProgress.value = percentCompleted
       }
     })
 
-    if (response.data.message === 'File upload processing completed' && response.data.results) {
-      const hasError = response.data.results.some(result => result.status === 'error')
-      if (hasError) {
-        error.value = response.data
+    // Handle the response
+    if (response.status === 200 && response.data) {
+      if (response.data.message === 'File upload processing completed' && response.data.results) {
+        const hasError = response.data.results.some(result => result.status === 'error')
+        if (hasError) {
+          error.value = response.data
+        } else {
+          uploadComplete.value = true
+        }
+      } else if (response.data.error) {
+        error.value = { message: response.data.error }
       } else {
-        uploadComplete.value = true
+        throw new Error('Unexpected response format')
       }
     } else {
-      throw new Error('Unexpected response format')
+      throw new Error('Upload request failed')
     }
   } catch (err) {
     console.error('Upload failed:', err)
