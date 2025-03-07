@@ -1,158 +1,132 @@
-<!-- FileName: frontend\src\views\file_upload.vue -->
-
 <template>
-  <div class="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-900">
-    <div class="w-full max-w-md mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-      <h2 class="text-center text-xl font-semibold text-gray-900 dark:text-white mb-6">File Upload</h2>
-
-      <!-- Drag and Drop Area -->
-      <div
-        class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center"
-        :class="{ 'border-blue-500 bg-blue-50 dark:bg-blue-900': isDragging }"
-        @dragover.prevent="isDragging = true"
-        @dragleave.prevent="isDragging = false"
-        @drop.prevent="handleFileDrop"
+  <div class="max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg">
+    <h2 class="text-2xl font-semibold text-gray-900 mb-4">File Upload</h2>
+    
+    <!-- File Input -->
+    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+      <input
+        type="file"
+        ref="fileInput"
+        @change="handleFileChange"
+        class="hidden"
+        accept=".json"
+        multiple
+      />
+      <button
+        @click="$refs.fileInput.click()"
+        class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 focus:outline-none"
+        :disabled="loading"
       >
-        <label for="file-upload" class="cursor-pointer">
-          <div v-if="!selectedFile" class="flex flex-col items-center">
-            <svg class="w-12 h-12 text-gray-400 dark:text-gray-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V8m0 0L3 12m4-4l4 4m6-4v8m0 0l4-4m-4 4l-4-4"></path>
-            </svg>
-            <p class="text-gray-500 dark:text-gray-400">Drag and drop or <span class="text-blue-600 dark:text-blue-400 hover:underline">browse</span> your files</p>
-          </div>
+        Choose File(s)
+      </button>
+      <p v-if="selectedFiles.length > 0" class="mt-2 text-gray-600">
+        Selected: {{ selectedFiles.map(f => f.name).join(', ') }}
+      </p>
+      <p v-if="uploadProgress > 0" class="mt-2 text-gray-600">Upload Progress: {{ uploadProgress }}%</p>
+    </div>
 
-          <!-- File Info, Progress, and Error Message -->
-          <div v-if="selectedFile" class="flex flex-col items-center">
-            <p class="text-gray-900 dark:text-white font-medium">{{ selectedFile.name }}</p>
-            <p class="text-sm text-gray-500 dark:text-gray-400">{{ formatFileSize(selectedFile.size) }}</p>
-            <div v-if="uploadProgress < 100" class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mt-2">
-              <div
-                class="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
-                :style="{ width: `${uploadProgress}%` }"
-              ></div>
-            </div>
-            <p v-if="uploadProgress < 100" class="text-sm text-gray-500 dark:text-gray-400 mt-1">Uploading... {{ uploadProgress }}%</p>
-            <p v-if="uploadError" class="text-sm text-red-500 dark:text-red-400 mt-1">{{ uploadError }}</p>
-            <p v-if="uploadProgress === 100" class="text-sm text-green-500 dark:text-green-400 mt-1">Upload complete!</p>
-          </div>
-        </label>
-        <input
-          id="file-upload"
-          type="file"
-          class="hidden"
-          @change="handleFileSelect"
-          multiple
-        />
+    <!-- Spinner and Status -->
+    <div class="mt-4 text-center">
+      <div v-if="loading" class="flex justify-center">
+        <svg class="animate-spin h-6 w-6 text-green-600" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+        </svg>
       </div>
+      <button
+        v-if="!loading && selectedFiles.length > 0"
+        @click="uploadFiles"
+        class="mt-4 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 focus:outline-none"
+        :disabled="loading"
+      >
+        Upload
+      </button>
+      <p v-if="uploadComplete && !error" class="mt-2 text-green-600">Upload to FTP complete!</p>
+    </div>
 
-      <!-- Done and Upload Buttons -->
-      <div class="mt-6 space-x-4">
-        <button
-          v-if="selectedFile && uploadProgress < 100"
-          @click="handleUpload"
-          class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition duration-300"
-          :disabled="isUploading"
-        >
-          <span v-if="!isUploading">Upload</span>
-          <span v-else class="flex items-center justify-center">Uploading... <span class="ml-2 animate-spin h-4 w-4 border-t-2 border-b-2 border-white rounded-full"></span></span>
-        </button>
-        <button
-          v-if="selectedFile && uploadProgress === 100"
-          @click="handleDone"
-          class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 transition duration-300"
-        >
-          Done
-        </button>
-      </div>
+    <!-- Error Message -->
+    <div v-if="error" class="mt-4 p-4 bg-red-100 text-red-700 rounded-lg">
+      <h3 class="font-semibold">Upload Failed</h3>
+      <ul class="list-disc pl-5 mt-2">
+        <li v-for="(result, index) in error.results" :key="index">
+          <strong>File:</strong> {{ result.filename }}<br>
+          <strong>Status:</strong> {{ result.status }}<br>
+          <strong>Message:</strong> {{ result.message || 'Unknown error occurred' }}
+        </li>
+      </ul>
+      <p v-if="error.user" class="mt-2"><strong>User:</strong> {{ error.user }}</p>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import api from '../api'
+import api from '../api/index'
 
-const isDragging = ref(false)
-const selectedFile = ref(null)
+const fileInput = ref(null)
+const selectedFiles = ref([])
+const loading = ref(false)
 const uploadProgress = ref(0)
-const isUploading = ref(false)
-const uploadError = ref(null)
+const uploadComplete = ref(false)
+const error = ref(null)
 
-const handleFileDrop = (event) => {
-  isDragging.value = false
-  const file = event.dataTransfer.files[0]
-  if (file) {
-    selectedFile.value = file
-    uploadProgress.value = 0
-    uploadError.value = null
+const handleFileChange = (event) => {
+  selectedFiles.value = Array.from(event.target.files)
+  uploadComplete.value = false
+  error.value = null
+}
+
+const uploadFiles = async () => {
+  if (selectedFiles.value.length === 0) {
+    error.value = { message: 'Please select at least one file' }
+    return
   }
-}
 
-const handleFileSelect = (event) => {
-  const file = event.target.files[0]
-  if (file) {
-    selectedFile.value = file
-    uploadProgress.value = 0
-    uploadError.value = null
-  }
-}
-
-const formatFileSize = (bytes) => {
-  if (bytes === 0) return '0 Bytes'
-  const k = 1024
-  const sizes = ['Bytes', 'KB', 'MB', 'GB']
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
-}
-
-const handleUpload = async () => {
-  if (!selectedFile.value) return
-
-  isUploading.value = true
-  uploadError.value = null
+  loading.value = true
+  uploadProgress.value = 0
   const formData = new FormData()
-  formData.append('files', selectedFile.value) // Changed from 'file' to 'files' to match backend expectation
+  selectedFiles.value.forEach(file => {
+    if (!file.name.toLowerCase().endsWith('.json')) {
+      error.value = { message: 'Please upload only JSON files' }
+      loading.value = false
+      return
+    }
+    formData.append('files', file)
+  })
+
+  if (error.value) return
 
   try {
     const response = await api.post('/api/upload/', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+      timeout: 30000, // 30 seconds timeout
       onUploadProgress: (progressEvent) => {
         const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)
         uploadProgress.value = percentCompleted
-      },
+      }
     })
-    uploadProgress.value = 100
-    console.log('Upload successful:', response.data)
-  } catch (error) {
-    uploadError.value = 'Upload failed: ' + (error.response?.data?.error || error.message)
-    uploadProgress.value = 0
-    console.error('Upload error:', error)
-  } finally {
-    isUploading.value = false
-  }
-}
 
-const handleDone = () => {
-  selectedFile.value = null
-  uploadProgress.value = 0
-  uploadError.value = null
-  console.log('File upload completed')
+    if (response.data.message === 'File upload processing completed' && response.data.results) {
+      const hasError = response.data.results.some(result => result.status === 'error')
+      if (hasError) {
+        error.value = response.data
+      } else {
+        uploadComplete.value = true
+      }
+    } else {
+      throw new Error('Unexpected response format')
+    }
+  } catch (err) {
+    console.error('Upload failed:', err)
+    error.value = err.response?.data || {
+      message: 'Upload failed due to an unexpected error',
+      results: [{ status: 'error', message: err.message }]
+    }
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 
 <style scoped>
-.animate-spin {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
+/* Add any custom styles if needed */
 </style>
