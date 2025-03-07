@@ -23,8 +23,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-m2)6ean)z5@%d(ttf+g2k__9d30mj+4qhv)4k(i@0olvr5m+r*'
 
 # Hosts/Domains this Django site can serve (simplified for local testing)
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '10.42.0.14']
-
+# ALLOWED_HOSTS = ['localhost', '127.0.0.1', '10.42.0.14']
+ALLOWED_HOSTS = [
+    'vps1139.basicserver.io',  # Your public domain
+    'localhost',               # For local testing if needed
+    '127.0.0.1',              # For local testing if needed
+]
 # Development settings
 DEBUG = True
 
@@ -119,6 +123,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:5173',  # Localhost for testing
     'http://10.42.0.14:8000',  # Docker container IP for testing
     'http://10.42.0.14:5173',  # Docker container IP for testing
+    'https://vps1139.basicserver.io:42030',  # Your production frontend URL with port
 ]
 CORS_ALLOW_CREDENTIALS = True  # Allow credentials (cookies, authorization headers)
 
@@ -128,11 +133,21 @@ CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:5173',
     'http://10.42.0.14:8000',
     'http://10.42.0.14:5173',
+    'https://vps1139.basicserver.io:42030',  # Your production frontend URL with port
 ]
 
-# Session settings (local development, no HTTPS)
-SESSION_COOKIE_SAMESITE = 'Lax'  # Suitable for local HTTP
-SESSION_COOKIE_SECURE = False  # Keep False for local HTTP testing
+# # Session settings (local development, no HTTPS)
+# SESSION_COOKIE_SAMESITE = 'Lax'  # Suitable for local HTTP
+# SESSION_COOKIE_SECURE = False  # Keep False for local HTTP testing
+
+# Session settings for production
+
+SESSION_COOKIE_SECURE = True  # Require HTTPS
+SESSION_COOKIE_SAMESITE = 'Strict'  # Protect against CSRF
+SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access
+
+
+
 
 ROOT_URLCONF = 'djangovue.urls'
 
@@ -186,15 +201,25 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images) for local development
+# Static files (configured for production with collectstatic)
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'  # Enable for static file testing
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # Collectstatic will populate this
+STATICFILES_DIRS = [BASE_DIR / 'static']  # Optional: for development static files
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-
 # Media settings
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Security settings
+
+SECURE_HSTS_SECONDS = 31536000  # Enable HSTS for 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+SECURE_SSL_REDIRECT = True  # Redirect HTTP to HTTPS
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')  # For reverse proxies
+X_FRAME_OPTIONS = 'DENY'  # Prevent clickjacking
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
