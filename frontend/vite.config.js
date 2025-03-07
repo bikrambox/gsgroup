@@ -12,7 +12,7 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0',
-    port: 4432, // Default Vite port, adjust if needed
+    port: 4430, // Default Vite port, adjust if needed
     proxy: {
       '/api': {
         target: 'http://localhost:8000',
