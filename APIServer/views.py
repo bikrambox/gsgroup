@@ -227,48 +227,11 @@ def upload_json_file(request):
                 all_successful = False
                 continue
 
-            # Removed JSON validation
-            # try:
-            #     file_content = uploaded_file.read()
-            #     json_data = file_content.decode('utf-8-sig')
-            #     json.loads(json_data)
-            #     file_buffer = io.BytesIO(file_content)
-            # except json.JSONDecodeError as e:
-            #     logger.error(f"Invalid JSON in {uploaded_file.name}: {str(e)}")
-            #     result = {
-            #         'filename': uploaded_file.name,
-            #         'status': 'error',
-            #         'message': f'Invalid JSON file: {str(e)}'
-            #     }
-            #     results.append(result)
-            #     all_successful = False
-            #     continue
-            # except UnicodeDecodeError as e:
-            #     logger.error(f"Encoding error in {uploaded_file.name}: {str(e)}")
-            #     result = {
-            #         'filename': uploaded_file.name,
-            #         'status': 'error',
-            #         'message': f'Encoding error: {str(e)}'
-            #     }
-            #     results.append(result)
-            #     all_successful = False
-            #     continue
-            # except Exception as e:
-            #     logger.error(f"Error processing {uploaded_file.name}: {str(e)}")
-            #     result = {
-            #         'filename': uploaded_file.name,
-            #         'status': 'error',
-            #         'message': f'Error processing file: {str(e)}'
-            #     }
-            #     results.append(result)
-            #     all_successful = False
-            #     continue
-
             # Create file buffer without validation
             file_buffer = io.BytesIO(uploaded_file.read())
 
-            # Attempt FTP upload
-            ftp_result = ftp.upload_stream(file_buffer, uploaded_file.name)
+            # Attempt FTP upload with username prefix
+            ftp_result = ftp.upload_stream(file_buffer, uploaded_file.name, username)
             if ftp_result['status'] == 'success':
                 result = {
                     'filename': uploaded_file.name,

@@ -227,7 +227,7 @@ class FTPConnection:
 
         return {"status": "success", "message": f"Directory {normalized_path} ensured"}
 
-    def upload_stream(self, file_buffer, original_filename):
+    def upload_stream(self, file_buffer, original_filename, username):
         """Upload a file stream to the FTPS server with the specified naming convention."""
         if not self.ensure_connected():
             logger.warning("Attempted to upload file without active connection")
@@ -237,28 +237,12 @@ class FTPConnection:
             if not original_filename.lower().endswith('.json'):
                 return {"status": "error", "message": "Only JSON files are allowed"}
 
-            # Removed JSON validation for now
-            # file_buffer.seek(0)
-            # json_data = file_buffer.read().decode('utf-8-sig')
-            # json.loads(json_data)  # Validate JSON
-            # file_buffer.seek(0)
-
-            # Commented code for future JSON validation
-            # try:
-            #     file_buffer.seek(0)
-            #     json_data = file_buffer.read().decode('utf-8-sig')
-            #     json.loads(json_data)  # Re-enable this to validate JSON in the future
-            #     file_buffer.seek(0)
-            # except json.JSONDecodeError as e:
-            #     logger.error(f"Invalid JSON file: {e}")
-            #     return {"status": "error", "message": f"Invalid JSON file: {e}"}
-            # except UnicodeDecodeError as e:
-            #     logger.error(f"Encoding error in {original_filename}: {e}")
-            #     return {"status": "error", "message": f"Encoding error: {e}"}
+            # Prepare the base filename with username prefix and replace whitespace with underscore
+            base_filename = original_filename.replace(' ', '_')
+            prefixed_filename = f"{username}_{base_filename}"
 
             base_path = '/Reports/ELON_data/Upload_test'
             today = time.strftime('%Y_%m_%d')
-            username = self.authenticated_username if self.authenticated_username else self.username.split('\\')[-1]
             folder_name = f"{username}_{today}"
             upload_dir = f"{base_path}/{folder_name}"
 
@@ -275,11 +259,23 @@ class FTPConnection:
                 logger.error(f"Failed to navigate to {upload_dir}: {e}")
                 return {"status": "error", "message": f"Failed to navigate to directory {upload_dir}: {str(e)}"}
 
+            # Check for existing files to handle duplicates
+            list_result = self.list_dir(upload_dir)
+            if list_result['status'] != 'success':
+                logger.warning(f"Could not list directory {upload_dir} to check for duplicates")
+            else:
+                existing_files = [item['name'] for item in list_result['data'] if not item['is_dir']]
+                counter = 0
+                new_filename = prefixed_filename
+                while new_filename in existing_files:
+                    counter += 1
+                    name, ext = os.path.splitext(prefixed_filename)
+                    new_filename = f"{name}_{counter:02d}{ext}"
+
             # Set binary mode and upload
             self.ftp.voidcmd("TYPE I")
             logger.info("Set binary mode")
             file_buffer.seek(0)
-            new_filename = original_filename
             logger.info(f"Attempting to upload file {original_filename} as {new_filename}...")
             self.ftp.storbinary(f"STOR {new_filename}", file_buffer)
             logger.info(f"Successfully uploaded {original_filename} as {new_filename} to {upload_dir}")
@@ -323,6 +319,6 @@ if __name__ == "__main__":
     ftp = FTPConnection(authenticated_username="testuser")
     ftp.connect()
     with open("test.json", 'rb') as f:
-        result = ftp.upload_stream(io.BytesIO(f.read()), "test.json")
+        result = ftp.upload_stream(io.BytesIO(f.read()), "test.json", "testuser")
     print(result)
     ftp.disconnect()
