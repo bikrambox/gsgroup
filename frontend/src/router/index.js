@@ -1,38 +1,57 @@
-// FileName: frontend\src\router\index.js
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from '../views/Home.vue'
-import Dashboard from '../views/Dashboard.vue'
-import Login from '../views/Login.vue'
-import SignUp from '../views/Sign_up.vue'
-import FileUpload from '../views/file_upload.vue'
+import { useAuthStore } from '../stores/auth' // Assuming an auth store exists
 
 // Define routes
 const routes = [
   {
     path: '/',
-    component: () => import('../views/Home.vue'), // Dynamic import
+    component: () => import('../views/Home.vue'),
+    meta: { requiresAuth: false },
   },
   {
     path: '/login',
-    component: () => import('../views/Login.vue'), // Dynamic import
+    component: () => import('../views/Login.vue'),
+    meta: { requiresAuth: false },
   },
   {
     path: '/dashboard',
     component: () => import('../views/Dashboard.vue'),
+    meta: { requiresAuth: true },
   },
   {
     path: '/signup',
     component: () => import('../views/Sign_up.vue'),
+    meta: { requiresAuth: false },
   },
   {
-    path: '/fileupload', // Changed from '/file-upload' to '/fileupload'
+    path: '/fileupload',
     component: () => import('../views/file_upload.vue'),
+    meta: { requiresAuth: true },
   },
 ];
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes
-})
+  routes,
+});
 
-export default router
+// Navigation guard to handle authentication
+router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore();
+  const isAuthenticated = authStore.isAuthenticated; // Assuming this method exists
+
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    // If route requires auth and user is not authenticated, redirect to login
+    next('/login');
+  } else if (to.path === '/login' && isAuthenticated) {
+    // If already authenticated and trying to access login, redirect to fileupload
+    next('/fileupload');
+  } else if (to.path === '/' && isAuthenticated) {
+    // If on root and authenticated, redirect to fileupload
+    next('/fileupload');
+  } else {
+    next();
+  }
+});
+
+export default router;

@@ -67,21 +67,17 @@
         <!-- User menu -->
         <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
           <!-- Dark Mode Toggle -->
-          <button 
-            @click="toggleDarkMode"
-            class="group relative rounded-full p-1 text-gray-900 dark:text-gray-50 hover:bg-gray-300 dark:hover:bg-gray-700 mr-2"
-          >
+          <button @click="toggleDarkMode"
+            class="group relative rounded-full p-1 text-gray-900 dark:text-gray-50 hover:bg-gray-300 dark:hover:bg-gray-700 mr-2">
             <!-- Sun icon for dark mode -->
             <svg v-if="isDarkMode" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" 
-              />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
             </svg>
             <!-- Moon icon for light mode -->
             <svg v-else class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" 
-              />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
             </svg>
           </button>
 
@@ -122,18 +118,28 @@
             <div v-show="hoveredDropdown === 'profile'"
               class="absolute right-0 z-10 w-48 origin-top-right py-2 bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-50 rounded-lg shadow-lg">
               <div class="">
-                <button @click="handleItemClick('Profile')"
+                <!-- <button @click="handleItemClick('Profile')"
                   class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-300 dark:hover:bg-gray-700">
                   Your Profile
                 </button>
                 <button @click="handleItemClick('Settings')"
                   class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-300 dark:hover:bg-gray-700">
                   Settings
-                </button>
-                <button @click="handleItemClick('Sign out')"
+                </button> -->
+                <!-- <button @click="handleItemClick('Sign out')"
                   class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-300 dark:hover:bg-gray-700">
                   Sign out
-                </button>
+                </button> -->
+
+                <div v-show="hoveredDropdown === 'profile'"
+                  class="absolute right-0 z-10 w-48 origin-top-right py-2 bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-50 rounded-lg shadow-lg">
+                  <div class="">
+                    <button v-for="item in profileDropdownItems" :key="item.name" @click="item.action"
+                      class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-300 dark:hover:bg-gray-700">
+                      {{ item.name }}
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -178,7 +184,7 @@
   </nav>
 </template>
 
-<script setup>
+<!-- <script setup>
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 
 const hoveredDropdown = ref(null)
@@ -285,5 +291,133 @@ const navigation = ref([
     ]
   },
   { name: 'Calendar', href: '#', current: false }
+])
+</script> -->
+
+
+<script setup>
+import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '../stores/auth' // Import auth store
+
+const hoveredDropdown = ref(null)
+const isMobileMenuOpen = ref(false)
+const navRef = ref(null)
+const tooltipPosition = ref('left')
+const isDarkMode = ref(true)
+const router = useRouter()
+const authStore = useAuthStore() // Access auth store
+
+const updateTooltipPosition = () => {
+  if (window.innerWidth < 640) {
+    tooltipPosition.value = 'bottom'
+  } else {
+    tooltipPosition.value = 'left'
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('mousedown', handleClickOutside)
+  window.addEventListener('resize', updateTooltipPosition)
+  updateTooltipPosition()
+  const savedDarkMode = localStorage.getItem('darkMode')
+  isDarkMode.value = savedDarkMode !== null ? savedDarkMode === 'true' : true
+  if (isDarkMode.value) {
+    document.documentElement.classList.add('dark')
+  } else {
+    document.documentElement.classList.remove('dark')
+  }
+})
+
+onUnmounted(() => {
+  document.removeEventListener('mousedown', handleClickOutside)
+  window.removeEventListener('resize', updateTooltipPosition)
+})
+
+const handleItemClick = (itemName) => {
+  console.log(`${itemName} item clicked`)
+  if (itemName === 'Sign out') {
+    handleLogout()
+  } else if (itemName === 'Log In') {
+    router.push('/login')
+  } else {
+    // Handle other clicks (e.g., Profile, Settings)
+    console.log(`Navigating to ${itemName}`)
+  }
+}
+
+const resetDropdowns = () => {
+  navigation.value.forEach(item => {
+    if (item.hasDropdown) {
+      item.isOpen = false
+    }
+  })
+}
+
+const handleClickOutside = (event) => {
+  if (navRef.value && !navRef.value.contains(event.target)) {
+    isMobileMenuOpen.value = false
+    resetDropdowns()
+  }
+}
+
+watch(isMobileMenuOpen, (newValue) => {
+  if (!newValue) {
+    resetDropdowns()
+  }
+})
+
+const toggleDarkMode = () => {
+  isDarkMode.value = !isDarkMode.value
+  if (isDarkMode.value) {
+    document.documentElement.classList.add('dark')
+  } else {
+    document.documentElement.classList.remove('dark')
+  }
+  localStorage.setItem('darkMode', isDarkMode.value)
+}
+
+const handleLogout = () => {
+  authStore.logout() // Clear auth state
+  router.push('/login') // Redirect to login after logout
+}
+
+// Dynamically compute the navigation items based on auth status
+const navigation = ref([
+  { name: 'Dashboard', href: '#', current: true },
+  { name: 'Team', href: '#', current: false },
+  {
+    name: 'Projects',
+    href: '#',
+    current: false,
+    hasDropdown: true,
+    isOpen: false,
+    subItems: [
+      { name: 'Nomeco', href: '#' },
+      { name: 'Novonordis', href: '#' }
+    ]
+  },
+  {
+    name: 'Jester',
+    href: '#',
+    current: false,
+    hasDropdown: true,
+    isOpen: false,
+    subItems: [
+      { name: 'TT', href: '#' },
+      { name: 'TXT', href: '#' }
+    ]
+  },
+  { name: 'Calendar', href: '#', current: false }
+])
+
+// Computed property to dynamically adjust the profile dropdown
+const profileDropdownItems = computed(() => [
+  { name: 'Your Profile', action: () => handleItemClick('Profile') },
+  { name: 'Settings', action: () => handleItemClick('Settings') },
+  {
+    name: authStore.isAuthenticated ? 'Sign out' : 'Log In',
+    action: () => handleItemClick(authStore.isAuthenticated ? 'Sign out' : 'Log In')
+  },
 ])
 </script>
