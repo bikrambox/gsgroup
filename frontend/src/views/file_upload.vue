@@ -75,7 +75,13 @@ const error = ref(null)
 
 // Handle file selection
 const handleFileChange = (event) => {
-  selectedFiles.value = Array.from(event.target.files)
+  const files = Array.from(event.target.files || [])
+  console.log('Selected files:', files) // Debug log
+  if (files.length === 0) {
+    error.value = { message: 'No files selected' }
+    return
+  }
+  selectedFiles.value = files
   uploadComplete.value = false
   error.value = null
 }
@@ -91,33 +97,33 @@ const uploadFiles = async () => {
   uploadProgress.value = 0
   const formData = new FormData()
 
-  // Append each file with the key 'files' as expected by the backend
   selectedFiles.value.forEach(file => {
-    if (!file.name.toLowerCase().endswith('.json')) {
+    if (file && typeof file.name === 'string' && !file.name.toLowerCase().endsWith('.json')) {
       error.value = { message: `File ${file.name} is not a JSON file` }
       loading.value = false
       return
     }
-    formData.append('files', file) // Key 'files' matches backend expectation
+    if (file) formData.append('files', file) // Append only if file is valid
   })
 
   if (error.value) return
 
   try {
+    console.log('Sending request to:', `${import.meta.env.VITE_API_URL}/api/upload/`) // Debug URL
     const response = await api.post('/api/upload/', formData, {
       timeout: 30000,
       onUploadProgress: (progressEvent) => {
         if (progressEvent.total) {
           const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)
           uploadProgress.value = percentCompleted
+          console.log(`Upload progress: ${percentCompleted}%`) // Debug progress
         }
       },
       headers: {
-        'Content-Type': 'multipart/form-data', // Ensure correct content type
+        'Content-Type': 'multipart/form-data',
       },
     })
 
-    // Handle the response
     if (response.status === 200) {
       if (response.data.message === 'File upload processing completed' && response.data.results) {
         const hasError = response.data.results.some(result => result.status === 'error')
@@ -142,12 +148,11 @@ const uploadFiles = async () => {
     }
   } finally {
     loading.value = false
-    // Reset file input to allow re-uploading the same file
-    fileInput.value.value = null
+    fileInput.value.value = null // Reset file input
   }
 }
 
-// Ensure the API URL is correctly set based on the environment
+// Debug API URL on mount
 onMounted(() => {
   console.log('API URL:', import.meta.env.VITE_API_URL)
 })
