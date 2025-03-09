@@ -34,19 +34,16 @@ class FTPConnection:
             return {"status": "success", "message": "Already connected"}
         try:
             context = ssl.SSLContext()
-            context.minimum_version = ssl.TLSVersion.TLSv1_3
-            context.maximum_version = ssl.TLSVersion.TLSv1_3
+            context.minimum_version = ssl.TLSVersion.TLSv1_2  # Align with ftp_test.py
+            context.maximum_version = ssl.TLSVersion.TLSv1_2  # Align with ftp_test.py
             context.check_hostname = False
             context.verify_mode = ssl.CERT_NONE
-            context.options |= ssl.OP_NO_TLSv1
-            context.options |= ssl.OP_NO_TLSv1_1
-            context.options |= ssl.OP_NO_TLSv1_2
             self.ftp = ftplib.FTP_TLS(context=context, timeout=1200)
-            logger.info(f"Attempting FTPS connection to {self.host}:{self.port} with TLSv1.3")
+            logger.info(f"Attempting FTPS connection to {self.host}:{self.port} with TLSv1.2")
             self.ftp.connect(self.host, self.port)
             self.ftp.login(self.username, self.password)
             logger.info("Login successful, enabling protection")
-            self.ftp.prot_p()
+            self.ftp.prot_p()  # Use protected data channel (PROT P)
             logger.info("Set data channel to protected (PROT P)")
             self.ftp.set_pasv(True)
             logger.info(f"Passive mode response: {self.ftp.voidcmd('PASV')}")
@@ -228,23 +225,34 @@ class FTPConnection:
             file_buffer.seek(0)
 
             base_path = '/Reports/ELON_data/Upload_test'
-            today = time.strftime('%Y-%m-%d')
+            today = time.strftime('%Y_%m_%d')  # Use underscores
             username = self.authenticated_username if self.authenticated_username else self.username.split('\\')[-1]
             folder_name = f"{username}_{today}"
             upload_dir = f"{base_path}/{folder_name}"
 
+            # Ensure the directory exists
+            mkdir_result = self.mkdir(upload_dir)
+            if mkdir_result['status'] != 'success':
+                return mkdir_result
+
+            # Navigate to the directory
             try:
                 self.ftp.cwd(upload_dir)
-                logger.info(f"Directory {upload_dir} already exists")
-            except ftplib.error_perm:
-                logger.info(f"Creating directory {upload_dir}")
-                self.ftp.mkd(upload_dir)
+                logger.info(f"Successfully navigated to {upload_dir}")
+            except ftplib.error_perm as e:
+                logger.error(f"Failed to navigate to {upload_dir}: {e}")
+                return {"status": "error", "message": f"Failed to navigate to directory {upload_dir}: {str(e)}"}
 
-            self.ftp.cwd(upload_dir)
-            files = []
-            self.ftp.retrlines('NLST', files.append)
-            file_count = len([f for f in files if f.startswith(f"{folder_name}_")])
-            logger.info(f"Found {file_count} existing files in {upload_dir}")
+            # List existing files to determine the sequence number
+            try:
+                files = []
+                self.ftp.retrlines('NLST', files.append)
+                logger.info(f"Files in {upload_dir}: {files}")
+                file_count = len([f for f in files if f.startswith(f"{folder_name}_")])
+                logger.info(f"Found {file_count} existing files in {upload_dir}")
+            except Exception as e:
+                logger.error(f"Failed to list files in {upload_dir}: {e}")
+                file_count = 0
 
             base_name = original_filename.rsplit('.', 1)[0]
             extension = '.json'

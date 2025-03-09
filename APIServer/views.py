@@ -261,7 +261,6 @@ def logout_view(request):
 #     finally:
 #         ftp.disconnect()
 
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def upload_json_file(request):
@@ -283,8 +282,8 @@ def upload_json_file(request):
         )
 
     username = request.user.username
-    today_date = datetime.now().strftime('%Y%m%d')
-    ftp_base_path = f'/Reports/ELON_data/Upload_test/{username}_{today_date}/'
+    today_date = datetime.now().strftime('%Y_%m_%d')  # Use underscores
+    ftp_base_path = f'/Reports/ELON_data/Upload_test/{username}_{today_date}'
 
     ftp = FTPConnection(authenticated_username=username)
     ftp_connect_result = ftp.connect()
@@ -301,7 +300,27 @@ def upload_json_file(request):
         for directory in ftp_dirs:
             if directory:  # Skip empty strings
                 current_path = os.path.join(current_path, directory).replace('\\', '/')
-                ftp.mkdir(current_path)
+                mkdir_result = ftp.mkdir(current_path)
+                logger.info(f"mkdir result for {current_path}: {mkdir_result}")
+                if mkdir_result['status'] != 'success':
+                    raise Exception(f"Failed to create directory {current_path}: {mkdir_result['message']}")
+
+        # Navigate to the directory to ensure it exists
+        ftp_result = ftp.ensure_connected()
+        if not ftp_result:
+            return Response(
+                {'error': 'Failed to reconnect to FTPS server'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        try:
+            ftp.ftp.cwd(ftp_base_path)
+            logger.info(f"Successfully navigated to {ftp_base_path}")
+        except ftplib.error_perm as e:
+            logger.error(f"Failed to navigate to {ftp_base_path}: {e}")
+            return Response(
+                {'error': f'Failed to navigate to directory {ftp_base_path}: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
         results = []
         all_successful = True
@@ -353,7 +372,7 @@ def upload_json_file(request):
                 continue
 
             # Attempt FTP upload
-            ftp_result = ftp.upload_stream(file_buffer, os.path.join(ftp_base_path, uploaded_file.name))
+            ftp_result = ftp.upload_stream(file_buffer, uploaded_file.name)  # Pass only the file name
             if ftp_result['status'] == 'success':
                 result = {
                     'filename': uploaded_file.name,
