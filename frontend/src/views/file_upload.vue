@@ -44,6 +44,7 @@
         Upload
       </button>
       <p v-if="uploadComplete && !error" class="mt-2 text-green-600">Upload to FTP complete!</p>
+      <p v-if="uploadComplete && fileLocation" class="mt-2 text-gray-600">Location: "{{ fileLocation }}"</p>
     </div>
 
     <!-- Error Message -->
@@ -72,11 +73,12 @@ const loading = ref(false)
 const uploadProgress = ref(0)
 const uploadComplete = ref(false)
 const error = ref(null)
+const fileLocation = ref(null) // Stores the FTP path
 
 // Handle file selection
 const handleFileChange = (event) => {
   const files = Array.from(event.target.files || [])
-  console.log('Selected files:', files) // Debug log
+  console.log('Selected files:', files)
   if (files.length === 0) {
     error.value = { message: 'No files selected' }
     return
@@ -84,6 +86,7 @@ const handleFileChange = (event) => {
   selectedFiles.value = files
   uploadComplete.value = false
   error.value = null
+  fileLocation.value = null // Reset location on new file selection
 }
 
 // Handle file upload
@@ -103,20 +106,20 @@ const uploadFiles = async () => {
       loading.value = false
       return
     }
-    if (file) formData.append('files', file) // Append only if file is valid
+    if (file) formData.append('files', file)
   })
 
   if (error.value) return
 
   try {
-    console.log('Sending request to:', `${import.meta.env.VITE_API_URL}/api/upload/`) // Debug URL
+    console.log('Sending request to:', `${import.meta.env.VITE_API_URL}/api/upload/`)
     const response = await api.post('/api/upload/', formData, {
       timeout: 30000,
       onUploadProgress: (progressEvent) => {
         if (progressEvent.total) {
           const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)
           uploadProgress.value = percentCompleted
-          console.log(`Upload progress: ${percentCompleted}%`) // Debug progress
+          console.log(`Upload progress: ${percentCompleted}%`)
         }
       },
       headers: {
@@ -131,6 +134,8 @@ const uploadFiles = async () => {
           error.value = response.data
         } else {
           uploadComplete.value = true
+          // Extract the ftp_path from the response
+          fileLocation.value = response.data.results[0]?.ftp_path || 'Location not provided'
         }
       } else {
         throw new Error('Unexpected response format')
