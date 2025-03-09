@@ -16,6 +16,9 @@ from django.http import JsonResponse
 from django.urls import reverse, reverse_lazy
 from django.contrib.auth.views import LoginView
 from .ftp_fetch import FTPConnection
+from datetime import datetime
+
+
 
 logger = logging.getLogger(__name__)
 
