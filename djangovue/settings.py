@@ -52,7 +52,29 @@ AUTHENTICATION_BACKENDS = [
     'APIServer.authentication.APIKeyAuthentication',  # Our custom backend
 ]
 
-# Logging configuration for local debugging
+# # Logging configuration for local debugging
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'handlers': {
+#         'console': {
+#             'class': 'logging.StreamHandler',
+#         },
+#     },
+#     'loggers': {
+#         'APIServer.authentication': {
+#             'handlers': ['console'],
+#             'level': 'INFO',
+#             'propagate': True,
+#         },
+#         '': {  # Root logger to catch all logs
+#             'handlers': ['console'],
+#             'level': 'INFO',
+#             'propagate': True,
+#         },
+#     },
+# }
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -60,20 +82,26 @@ LOGGING = {
         'console': {
             'class': 'logging.StreamHandler',
         },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/www/html/gsgroup/django.log',  # New log file
+        },
     },
     'loggers': {
         'APIServer.authentication': {
-            'handlers': ['console'],
-            'level': 'INFO',
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
             'propagate': True,
         },
-        '': {  # Root logger to catch all logs
-            'handlers': ['console'],
-            'level': 'INFO',
+        '': {  # Root logger
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
             'propagate': True,
         },
     },
 }
+
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
