@@ -62,7 +62,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import api from '@/api/index'
+import api from '../api/index'
 
 const fileInput = ref(null)
 const selectedFiles = ref([])
