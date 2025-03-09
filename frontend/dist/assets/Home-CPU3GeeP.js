@@ -1,0 +1,2 @@
+import o from"./Login-BvNNW5oE.js";import{_ as r}from"./_plugin-vue_export-helper-BCo6x5W8.js";import{c as e,a as n,r as s,o as t}from"./index-Buwjy1AB.js";const a={class:"min-h-screen dark:bg-gray-800 dark:text-slate-50"};const i=r({name:"Home",components:{Login:o}},[["render",function(o,r,i,m,c,p){const d=s("Login");return t(),e("div",a,[n(d)])}]]);export{i as default};
+//# sourceMappingURL=Home-CPU3GeeP.js.map
