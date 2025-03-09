@@ -29,10 +29,34 @@ export default defineConfig({
         // 'all',  //This allows all hosts
     ],
   },
+  // build: {
+  //   minify: 'terser',
+  //   outDir: 'dist',        // Output directory for production builds
+  //   assetsDir: 'assets',   // Subdirectory for assets within dist
+  //   sourcemap: true,      // Generate sourcemaps for debugging
+  //   emptyOutDir: true, // This will clear the dist directory before building
+  // },
+
   build: {
     minify: 'terser',
-    outDir: 'dist',        // Output directory for production builds
-    assetsDir: 'assets',   // Subdirectory for assets within dist
-    sourcemap: true,      // Generate sourcemaps for debugging
-  },
+    outDir: 'dist',
+    assetsDir: 'assets',
+    sourcemap: false, // Disable source maps
+    emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            const packageName = id.split('node_modules/')[1].split('/')[0];
+            return `vendor-${packageName}`;
+          }
+          if (id.includes('src/')) {
+            const parts = id.split('src/')[1].split('/');
+            return `app-${parts[0]}`;
+          }
+        },
+        chunkSizeWarningLimit: 30,
+      },
+    },
+  }
 })

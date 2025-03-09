@@ -20,10 +20,10 @@
         <!-- Desktop Navigation -->
         <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
           <!-- Logo -->
-          <div class="flex shrink-0 items-center">
+          <!-- <div class="flex shrink-0 items-center">
             <img class="h-8 w-auto" src="https://tailwindui.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
               alt="BHS logistics" />
-          </div>
+          </div> -->
 
           <!-- Desktop Menu Items -->
           <div class="hidden sm:ml-6 sm:block">
