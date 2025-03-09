@@ -227,7 +227,8 @@ class FTPConnection:
                 try:
                     self.ftp.cwd(current_path)
                     logger.info(f"Directory {current_path} already exists")
-                except ftplib.error_perm:
+                except ftplib.error_perm as e:
+                    logger.info(f"Directory {current_path} does not exist, attempting to create: {e}")
                     try:
                         self.ftp.mkd(current_path)
                         logger.info(f"Successfully created directory {current_path}")
@@ -239,7 +240,6 @@ class FTPConnection:
                         return {"status": "error", "message": f"Error creating directory {current_path}: {e}"}
 
         return {"status": "success", "message": f"Directory {original_path} ensured"}
-
     def upload_stream(self, file_buffer, original_filename):
         """Upload a file stream to the FTPS server with the specified naming convention."""
         if not self.ensure_connected():
