@@ -33,7 +33,6 @@ class FTPConnection:
         if self.connected:
             return {"status": "success", "message": "Already connected"}
         try:
-            # Use a modern SSL context with TLSv1.2 as seen in the working code
             context = ssl.create_default_context()
             context.minimum_version = ssl.TLSVersion.TLSv1_2
             context.maximum_version = ssl.TLSVersion.TLSv1_2
@@ -45,9 +44,9 @@ class FTPConnection:
             logger.info("Connection established, attempting login")
             self.ftp.login(self.username, self.password)
             logger.info("Login successful, enabling protection")
-            self.ftp.prot_p()  # Use protected data channel (secure)
+            self.ftp.prot_p()
             logger.info("Set data channel to protected (PROT P)")
-            self.ftp.set_pasv(True)  # Enable passive mode
+            self.ftp.set_pasv(True)
             logger.info(f"Passive mode response: {self.ftp.voidcmd('PASV')}")
             self.connected = True
             logger.info(f"Successfully connected to FTPS server at {self.host}:{self.port}")
@@ -185,34 +184,48 @@ class FTPConnection:
     def mkdir(self, path):
         """
         Recursively create a directory on the FTPS server if it doesn't exist.
+        Mimics the step-by-step approach in ftp_test.py for better control.
         """
         if not self.ensure_connected():
             logger.warning("Attempted to create directory without active connection")
             return {"status": "error", "message": "Not connected to FTPS server"}
 
-        original_path = path
-        path_parts = path.split('/')
-        current_path = ''
+        # Normalize path
+        normalized_path = path.replace('\\', '/')
+        if not normalized_path.startswith('/'):
+            normalized_path = '/' + normalized_path
 
-        for part in path_parts:
-            if part:  # Skip empty strings
-                current_path = os.path.join(current_path, part).replace('\\', '/')
-                try:
-                    self.ftp.cwd(current_path)
-                    logger.info(f"Directory {current_path} already exists")
-                except ftplib.error_perm as e:
-                    logger.info(f"Directory {current_path} does not exist, attempting to create: {e}")
-                    try:
-                        self.ftp.mkd(current_path)
-                        logger.info(f"Successfully created directory {current_path}")
-                    except ftplib.error_perm as e:
-                        logger.error(f"Permission error creating directory {current_path}: {e}")
-                        return {"status": "error", "message": f"Permission error creating directory {current_path}: {e}"}
-                    except Exception as e:
-                        logger.error(f"Error creating directory {current_path}: {e}")
-                        return {"status": "error", "message": f"Error creating directory {current_path}: {e}"}
+        # Step 1: Ensure the base directory /Reports/ELON_data/Upload_test exists
+        base_path = '/Reports/ELON_data/Upload_test'
+        try:
+            self.ftp.cwd(base_path)
+            logger.info(f"Base directory {base_path} exists")
+        except ftplib.error_perm:
+            logger.info(f"Base directory {base_path} does not exist, attempting to create")
+            try:
+                self.ftp.mkd(base_path)
+                logger.info(f"Base directory {base_path} created")
+            except ftplib.error_perm as e:
+                logger.error(f"Failed to create base directory {base_path}: {e}")
+                return {"status": "error", "message": f"Failed to create base directory {base_path}: {e}"}
 
-        return {"status": "success", "message": f"Directory {original_path} ensured"}
+        # Step 2: Create the target directory
+        try:
+            self.ftp.cwd(normalized_path)
+            logger.info(f"Target directory {normalized_path} exists")
+        except ftplib.error_perm:
+            logger.info(f"Target directory {normalized_path} does not exist, attempting to create")
+            try:
+                self.ftp.mkd(normalized_path)
+                logger.info(f"Target directory {normalized_path} created")
+            except ftplib.error_perm as e:
+                logger.error(f"Failed to create target directory {normalized_path}: {e}")
+                return {"status": "error", "message": f"Failed to create target directory {normalized_path}: {e}"}
+            except Exception as e:
+                logger.error(f"Error creating target directory {normalized_path}: {e}")
+                return {"status": "error", "message": f"Error creating target directory {normalized_path}: {e}"}
+
+        return {"status": "success", "message": f"Directory {normalized_path} ensured"}
 
     def upload_stream(self, file_buffer, original_filename):
         """Upload a file stream to the FTPS server with the specified naming convention."""
@@ -225,12 +238,12 @@ class FTPConnection:
                 return {"status": "error", "message": "Only JSON files are allowed"}
 
             file_buffer.seek(0)
-            json_data = file_buffer.read().decode('utf-8-sig')  # Use utf-8-sig to handle BOM
+            json_data = file_buffer.read().decode('utf-8-sig')
             json.loads(json_data)
             file_buffer.seek(0)
 
             base_path = '/Reports/ELON_data/Upload_test'
-            today = time.strftime('%Y-%m-%d')  # Match the working code's date format
+            today = time.strftime('%Y_%m_%d')  # Use underscores as requested
             username = self.authenticated_username if self.authenticated_username else self.username.split('\\')[-1]
             folder_name = f"{username}_{today}"
             upload_dir = f"{base_path}/{folder_name}"
@@ -252,7 +265,7 @@ class FTPConnection:
             self.ftp.voidcmd("TYPE I")
             logger.info("Set binary mode")
             file_buffer.seek(0)
-            new_filename = original_filename  # Use the original filename as in the working code
+            new_filename = original_filename
             logger.info(f"Attempting to upload file {original_filename} as {new_filename}...")
             self.ftp.storbinary(f"STOR {new_filename}", file_buffer)
             logger.info(f"Successfully uploaded {original_filename} as {new_filename} to {upload_dir}")

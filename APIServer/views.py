@@ -183,7 +183,7 @@ def upload_json_file(request):
         )
 
     username = request.user.username
-    today_date = datetime.now().strftime('%Y-%m-%d')  # Match the working code's date format
+    today_date = datetime.now().strftime('%Y_%m_%d')  # Use underscores
     ftp_base_path = f'/Reports/ELON_data/Upload_test/{username}_{today_date}'
 
     ftp = FTPConnection(authenticated_username=username)
@@ -198,7 +198,10 @@ def upload_json_file(request):
         # Ensure the directory exists
         mkdir_result = ftp.mkdir(ftp_base_path)
         if mkdir_result['status'] != 'success':
-            raise Exception(f"Failed to create directory {ftp_base_path}: {mkdir_result['message']}")
+            return Response(
+                {'error': f"Failed to create directory {ftp_base_path}", 'details': mkdir_result['message']},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
         # Navigate to the directory
         try:
@@ -226,8 +229,8 @@ def upload_json_file(request):
 
             try:
                 file_content = uploaded_file.read()
-                json_data = file_content.decode('utf-8-sig')  # Handle BOM
-                json.loads(json_data)  # Validate JSON
+                json_data = file_content.decode('utf-8-sig')
+                json.loads(json_data)
                 file_buffer = io.BytesIO(file_content)
             except json.JSONDecodeError as e:
                 logger.error(f"Invalid JSON in {uploaded_file.name}: {str(e)}")
