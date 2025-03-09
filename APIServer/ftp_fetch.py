@@ -44,7 +44,7 @@ class FTPConnection:
             logger.info("Connection established, attempting login")
             self.ftp.login(self.username, self.password)
             logger.info("Login successful, enabling protection")
-            self.ftp.prot_c()  # Changed to PROT C to match working ftp_test.py
+            self.ftp.prot_c()  # Set data channel to clear (PROT C) for compatibility
             logger.info("Set data channel to clear (PROT C) for compatibility")
             self.ftp.set_pasv(True)
             logger.info(f"Passive mode response: {self.ftp.voidcmd('PASV')}")
@@ -237,10 +237,24 @@ class FTPConnection:
             if not original_filename.lower().endswith('.json'):
                 return {"status": "error", "message": "Only JSON files are allowed"}
 
-            file_buffer.seek(0)
-            json_data = file_buffer.read().decode('utf-8-sig')
-            json.loads(json_data)
-            file_buffer.seek(0)
+            # Removed JSON validation for now
+            # file_buffer.seek(0)
+            # json_data = file_buffer.read().decode('utf-8-sig')
+            # json.loads(json_data)  # Validate JSON
+            # file_buffer.seek(0)
+
+            # Commented code for future JSON validation
+            # try:
+            #     file_buffer.seek(0)
+            #     json_data = file_buffer.read().decode('utf-8-sig')
+            #     json.loads(json_data)  # Re-enable this to validate JSON in the future
+            #     file_buffer.seek(0)
+            # except json.JSONDecodeError as e:
+            #     logger.error(f"Invalid JSON file: {e}")
+            #     return {"status": "error", "message": f"Invalid JSON file: {e}"}
+            # except UnicodeDecodeError as e:
+            #     logger.error(f"Encoding error in {original_filename}: {e}")
+            #     return {"status": "error", "message": f"Encoding error: {e}"}
 
             base_path = '/Reports/ELON_data/Upload_test'
             today = time.strftime('%Y_%m_%d')
@@ -276,9 +290,6 @@ class FTPConnection:
                 "file_path": f"{upload_dir}/{new_filename}"
             }
 
-        except json.JSONDecodeError as e:
-            logger.error(f"Invalid JSON file: {e}")
-            return {"status": "error", "message": f"Invalid JSON file: {e}"}
         except ftplib.error_perm as e:
             logger.error(f"Permission error during upload: {e}")
             return {"status": "error", "message": f"Permission error during upload: {e}"}
