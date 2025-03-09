@@ -25,6 +25,7 @@ APIServer\__init__.py
 APIServer\ftp_test.py
 djangovue\__init__.py
 djangovue\settings_copy.py
+djangovue\settings.pyP
 .editorconfig
 uwsgi_copy.ini
 uwsgi-emperor.log

@@ -52,7 +52,29 @@ AUTHENTICATION_BACKENDS = [
     'APIServer.authentication.APIKeyAuthentication',  # Our custom backend
 ]
 
-# Logging configuration for local debugging
+# # Logging configuration for local debugging
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'handlers': {
+#         'console': {
+#             'class': 'logging.StreamHandler',
+#         },
+#     },
+#     'loggers': {
+#         'APIServer.authentication': {
+#             'handlers': ['console'],
+#             'level': 'INFO',
+#             'propagate': True,
+#         },
+#         '': {  # Root logger to catch all logs
+#             'handlers': ['console'],
+#             'level': 'INFO',
+#             'propagate': True,
+#         },
+#     },
+# }
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -60,20 +82,26 @@ LOGGING = {
         'console': {
             'class': 'logging.StreamHandler',
         },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/www/html/gsgroup/django.log',  # New log file
+        },
     },
     'loggers': {
         'APIServer.authentication': {
-            'handlers': ['console'],
-            'level': 'INFO',
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
             'propagate': True,
         },
-        '': {  # Root logger to catch all logs
-            'handlers': ['console'],
-            'level': 'INFO',
+        '': {  # Root logger
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
             'propagate': True,
         },
     },
 }
+
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -144,7 +172,7 @@ CSRF_TRUSTED_ORIGINS = [
 
 # Session settings for production
 
-# SESSION_COOKIE_SECURE = True  # Require HTTPS
+SESSION_COOKIE_SECURE = True  # Require HTTPS
 SESSION_COOKIE_SAMESITE = 'Strict'  # Protect against CSRF
 SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access
 
@@ -206,7 +234,7 @@ USE_TZ = True
 # Static files (configured for production with collectstatic)
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'  # Collectstatic will populate this
-
+STATICFILES_DIRS = [BASE_DIR / 'static']  # Optional: for development static files
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -220,13 +248,8 @@ MEDIA_ROOT = BASE_DIR / 'media'
 SECURE_HSTS_SECONDS = 31536000  # Enable HSTS for 1 year
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
-
-
-# SECURE_SSL_REDIRECT = True  # Redirect HTTP to HTTPS
-# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')  # For reverse proxies
-
-
-
+SECURE_SSL_REDIRECT = True  # Redirect HTTP to HTTPS
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')  # For reverse proxies
 X_FRAME_OPTIONS = 'DENY'  # Prevent clickjacking
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
