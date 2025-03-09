@@ -15,6 +15,7 @@ frontend\node_modules
 frontend\public
 frontend\src\assets
 frontend\src\components
+frontend\dist
 
 [files]
 
@@ -22,13 +23,13 @@ frontend\builder.config.js
 frontend\package-lock.json
 frontend\README.md
 frontend\vueform.config.js
+frontend\src\main_copy.js
+frontend\src\router\index_copy.js
+frontend\src\stores\auth_copy.js
+frontend\src\views\Home_copy.vue
 frontend\src\views\Login_copy.vue
 frontend\src\views\Navbar_.vue
 frontend\src\views\Navbar_clone.vue
-frontend\src\main_copy.js
-frontend\src\views\Home_copy.vue
-frontend\src\stores\auth_copy.js
-frontend\src\router\index_copy.js
 
 .editorconfig
 backend_dir_list.py

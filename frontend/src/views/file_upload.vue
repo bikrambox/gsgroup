@@ -1,3 +1,5 @@
+<!-- FileName: frontend\src\views\file_upload.vue -->
+
 <template>
   <div class="max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg">
     <h2 class="text-2xl font-semibold text-gray-900 mb-4">File Upload</h2>
@@ -61,7 +63,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import api from '../api/index'
 
 const fileInput = ref(null)
@@ -71,12 +73,14 @@ const uploadProgress = ref(0)
 const uploadComplete = ref(false)
 const error = ref(null)
 
+// Handle file selection
 const handleFileChange = (event) => {
   selectedFiles.value = Array.from(event.target.files)
   uploadComplete.value = false
   error.value = null
 }
 
+// Handle file upload
 const uploadFiles = async () => {
   if (selectedFiles.value.length === 0) {
     error.value = { message: 'Please select at least one file' }
@@ -86,13 +90,15 @@ const uploadFiles = async () => {
   loading.value = true
   uploadProgress.value = 0
   const formData = new FormData()
-  selectedFiles.value.forEach((file, index) => {
-    if (!file.name.toLowerCase().endsWith('.json')) {
+
+  // Append each file with the key 'files' as expected by the backend
+  selectedFiles.value.forEach(file => {
+    if (!file.name.toLowerCase().endswith('.json')) {
       error.value = { message: `File ${file.name} is not a JSON file` }
       loading.value = false
       return
     }
-    formData.append('files', file) // Append each file with the key 'files'
+    formData.append('files', file) // Key 'files' matches backend expectation
   })
 
   if (error.value) return
@@ -101,12 +107,17 @@ const uploadFiles = async () => {
     const response = await api.post('/api/upload/', formData, {
       timeout: 30000,
       onUploadProgress: (progressEvent) => {
-        const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)
-        uploadProgress.value = percentCompleted
-      }
+        if (progressEvent.total) {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+          uploadProgress.value = percentCompleted
+        }
+      },
+      headers: {
+        'Content-Type': 'multipart/form-data', // Ensure correct content type
+      },
     })
 
-    // Handle the response based on status
+    // Handle the response
     if (response.status === 200) {
       if (response.data.message === 'File upload processing completed' && response.data.results) {
         const hasError = response.data.results.some(result => result.status === 'error')
@@ -131,8 +142,15 @@ const uploadFiles = async () => {
     }
   } finally {
     loading.value = false
+    // Reset file input to allow re-uploading the same file
+    fileInput.value.value = null
   }
 }
+
+// Ensure the API URL is correctly set based on the environment
+onMounted(() => {
+  console.log('API URL:', import.meta.env.VITE_API_URL)
+})
 </script>
 
 <style scoped>

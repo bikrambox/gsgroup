@@ -6,13 +6,7 @@ import Login from '../views/Login.vue'
 import SignUp from '../views/Sign_up.vue'
 import FileUpload from '../views/file_upload.vue'
 
-// const routes = [
-//   { path: '/', component: Home },
-//   { path: '/dashboard', component: Dashboard },
-//   { path: '/login', component: Login },
-//   { path: '/signup', component: SignUp },
-//   { path: '/file-upload', component: FileUpload },
-// ]
+// Define routes
 const routes = [
   {
     path: '/',
@@ -31,14 +25,12 @@ const routes = [
     component: () => import('../views/Sign_up.vue'),
   },
   {
-    path: '/file-upload',
+    path: '/fileupload', // Changed from '/file-upload' to '/fileupload'
     component: () => import('../views/file_upload.vue'),
   },
 ];
 
-
 const router = createRouter({
-  // history: createWebHistory(),
   history: createWebHistory(import.meta.env.BASE_URL),
   routes
 })
