@@ -163,7 +163,7 @@ def logout_view(request):
 def upload_json_file(request):
     """
     API endpoint to upload multiple JSON files to an FTPS server.
-    Files are validated in RAM, necessary folders are verified/created, then uploaded.
+    Files are checked for .json extension, necessary folders are verified/created, then uploaded.
     """
     logger.debug(f"Received request.FILES: {dict(request.FILES)}")
     logger.debug(f"Request headers: {dict(request.headers)}")
@@ -183,7 +183,7 @@ def upload_json_file(request):
         )
 
     username = request.user.username
-    today_date = datetime.now().strftime('%Y_%m_%d')  # Use underscores
+    today_date = datetime.now().strftime('%Y_%m_%d')
     ftp_base_path = f'/Reports/ELON_data/Upload_test/{username}_{today_date}'
 
     ftp = FTPConnection(authenticated_username=username)
@@ -227,41 +227,45 @@ def upload_json_file(request):
                 all_successful = False
                 continue
 
-            try:
-                file_content = uploaded_file.read()
-                json_data = file_content.decode('utf-8-sig')
-                json.loads(json_data)
-                file_buffer = io.BytesIO(file_content)
-            except json.JSONDecodeError as e:
-                logger.error(f"Invalid JSON in {uploaded_file.name}: {str(e)}")
-                result = {
-                    'filename': uploaded_file.name,
-                    'status': 'error',
-                    'message': f'Invalid JSON file: {str(e)}'
-                }
-                results.append(result)
-                all_successful = False
-                continue
-            except UnicodeDecodeError as e:
-                logger.error(f"Encoding error in {uploaded_file.name}: {str(e)}")
-                result = {
-                    'filename': uploaded_file.name,
-                    'status': 'error',
-                    'message': f'Encoding error: {str(e)}'
-                }
-                results.append(result)
-                all_successful = False
-                continue
-            except Exception as e:
-                logger.error(f"Error processing {uploaded_file.name}: {str(e)}")
-                result = {
-                    'filename': uploaded_file.name,
-                    'status': 'error',
-                    'message': f'Error processing file: {str(e)}'
-                }
-                results.append(result)
-                all_successful = False
-                continue
+            # Removed JSON validation
+            # try:
+            #     file_content = uploaded_file.read()
+            #     json_data = file_content.decode('utf-8-sig')
+            #     json.loads(json_data)
+            #     file_buffer = io.BytesIO(file_content)
+            # except json.JSONDecodeError as e:
+            #     logger.error(f"Invalid JSON in {uploaded_file.name}: {str(e)}")
+            #     result = {
+            #         'filename': uploaded_file.name,
+            #         'status': 'error',
+            #         'message': f'Invalid JSON file: {str(e)}'
+            #     }
+            #     results.append(result)
+            #     all_successful = False
+            #     continue
+            # except UnicodeDecodeError as e:
+            #     logger.error(f"Encoding error in {uploaded_file.name}: {str(e)}")
+            #     result = {
+            #         'filename': uploaded_file.name,
+            #         'status': 'error',
+            #         'message': f'Encoding error: {str(e)}'
+            #     }
+            #     results.append(result)
+            #     all_successful = False
+            #     continue
+            # except Exception as e:
+            #     logger.error(f"Error processing {uploaded_file.name}: {str(e)}")
+            #     result = {
+            #         'filename': uploaded_file.name,
+            #         'status': 'error',
+            #         'message': f'Error processing file: {str(e)}'
+            #     }
+            #     results.append(result)
+            #     all_successful = False
+            #     continue
+
+            # Create file buffer without validation
+            file_buffer = io.BytesIO(uploaded_file.read())
 
             # Attempt FTP upload
             ftp_result = ftp.upload_stream(file_buffer, uploaded_file.name)
