@@ -1,4 +1,5 @@
 # APIServer/ftp_fetch.py
+# APIServer/ftp_fetch.py
 import ftplib
 import os
 import threading
@@ -33,17 +34,21 @@ class FTPConnection:
         if self.connected:
             return {"status": "success", "message": "Already connected"}
         try:
-            context = ssl.SSLContext()
-            context.minimum_version = ssl.TLSVersion.TLSv1_2  # Align with ftp_test.py
-            context.maximum_version = ssl.TLSVersion.TLSv1_2  # Align with ftp_test.py
+            # Use a modern SSL context with secure defaults
+            context = ssl.create_default_context()
+            # Restrict to TLSv1.2 for compatibility with the server
+            context.minimum_version = ssl.TLSVersion.TLSv1_2
+            context.maximum_version = ssl.TLSVersion.TLSv1_2
             context.check_hostname = False
             context.verify_mode = ssl.CERT_NONE
+            # Set ciphers to match server compatibility (from previous troubleshooting)
+            context.set_ciphers('ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384')
             self.ftp = ftplib.FTP_TLS(context=context, timeout=1200)
             logger.info(f"Attempting FTPS connection to {self.host}:{self.port} with TLSv1.2")
             self.ftp.connect(self.host, self.port)
             self.ftp.login(self.username, self.password)
             logger.info("Login successful, enabling protection")
-            self.ftp.prot_p()  # Use protected data channel (PROT P)
+            self.ftp.prot_p()  # Use protected data channel (secure)
             logger.info("Set data channel to protected (PROT P)")
             self.ftp.set_pasv(True)
             logger.info(f"Passive mode response: {self.ftp.voidcmd('PASV')}")
@@ -67,6 +72,7 @@ class FTPConnection:
             self.connected = False
             logger.error(f"FTPS connection failed: {e}")
             return {"status": "error", "message": f"FTPS connection failed: {e}"}
+
 
     def start_keep_alive(self):
         if self.keep_alive_thread and self.keep_alive_thread.is_alive():
