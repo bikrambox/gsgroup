@@ -1,5 +1,4 @@
 # APIServer/ftp_fetch.py
-# APIServer/ftp_fetch.py
 import ftplib
 import os
 import threading
@@ -34,23 +33,21 @@ class FTPConnection:
         if self.connected:
             return {"status": "success", "message": "Already connected"}
         try:
-            # Use a modern SSL context with secure defaults
+            # Use a modern SSL context with TLSv1.2 as seen in the working code
             context = ssl.create_default_context()
-            # Restrict to TLSv1.2 for compatibility with the server
             context.minimum_version = ssl.TLSVersion.TLSv1_2
             context.maximum_version = ssl.TLSVersion.TLSv1_2
             context.check_hostname = False
             context.verify_mode = ssl.CERT_NONE
-            # Set ciphers to match server compatibility (from previous troubleshooting)
-            context.set_ciphers('ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384')
             self.ftp = ftplib.FTP_TLS(context=context, timeout=1200)
             logger.info(f"Attempting FTPS connection to {self.host}:{self.port} with TLSv1.2")
             self.ftp.connect(self.host, self.port)
+            logger.info("Connection established, attempting login")
             self.ftp.login(self.username, self.password)
             logger.info("Login successful, enabling protection")
             self.ftp.prot_p()  # Use protected data channel (secure)
             logger.info("Set data channel to protected (PROT P)")
-            self.ftp.set_pasv(True)
+            self.ftp.set_pasv(True)  # Enable passive mode
             logger.info(f"Passive mode response: {self.ftp.voidcmd('PASV')}")
             self.connected = True
             logger.info(f"Successfully connected to FTPS server at {self.host}:{self.port}")
@@ -72,7 +69,6 @@ class FTPConnection:
             self.connected = False
             logger.error(f"FTPS connection failed: {e}")
             return {"status": "error", "message": f"FTPS connection failed: {e}"}
-
 
     def start_keep_alive(self):
         if self.keep_alive_thread and self.keep_alive_thread.is_alive():
@@ -186,35 +182,6 @@ class FTPConnection:
             logger.error(f"Error retrieving file via FTP: {e}")
             return {"status": "error", "message": f"Error retrieving file via FTP: {e}"}
 
-    # def mkdir(self, path):
-    #     """
-    #     Create a directory on the FTPS server if it doesn't exist.
-    #     """
-    #     if not self.ensure_connected():
-    #         logger.warning("Attempted to create directory without active connection")
-    #         return {"status": "error", "message": "Not connected to FTPS server"}
-
-    #     try:
-    #         # Try to change to the directory to see if it exists
-    #         self.ftp.cwd(path)
-    #         logger.info(f"Directory {path} already exists")
-    #         return {"status": "success", "message": f"Directory {path} already exists"}
-    #     except ftplib.error_perm:
-    #         try:
-    #             # If the directory doesn't exist, create it
-    #             self.ftp.mkd(path)
-    #             logger.info(f"Successfully created directory {path}")
-    #             return {"status": "success", "message": f"Successfully created directory {path}"}
-    #         except ftplib.error_perm as e:
-    #             logger.error(f"Permission error creating directory {path}: {e}")
-    #             return {"status": "error", "message": f"Permission error creating directory: {e}"}
-    #         except Exception as e:
-    #             logger.error(f"Error creating directory {path}: {e}")
-    #             return {"status": "error", "message": f"Error creating directory: {e}"}
-    #     except Exception as e:
-    #         logger.error(f"Error accessing directory {path}: {e}")
-    #         return {"status": "error", "message": f"Error accessing directory: {e}"}
-
     def mkdir(self, path):
         """
         Recursively create a directory on the FTPS server if it doesn't exist.
@@ -246,6 +213,7 @@ class FTPConnection:
                         return {"status": "error", "message": f"Error creating directory {current_path}: {e}"}
 
         return {"status": "success", "message": f"Directory {original_path} ensured"}
+
     def upload_stream(self, file_buffer, original_filename):
         """Upload a file stream to the FTPS server with the specified naming convention."""
         if not self.ensure_connected():
@@ -262,7 +230,7 @@ class FTPConnection:
             file_buffer.seek(0)
 
             base_path = '/Reports/ELON_data/Upload_test'
-            today = time.strftime('%Y_%m_%d')  # Use underscores
+            today = time.strftime('%Y-%m-%d')  # Match the working code's date format
             username = self.authenticated_username if self.authenticated_username else self.username.split('\\')[-1]
             folder_name = f"{username}_{today}"
             upload_dir = f"{base_path}/{folder_name}"
@@ -280,28 +248,12 @@ class FTPConnection:
                 logger.error(f"Failed to navigate to {upload_dir}: {e}")
                 return {"status": "error", "message": f"Failed to navigate to directory {upload_dir}: {str(e)}"}
 
-            # List existing files to determine the sequence number
-            try:
-                files = []
-                self.ftp.retrlines('NLST', files.append)
-                logger.info(f"Files in {upload_dir}: {files}")
-                file_count = len([f for f in files if f.startswith(f"{folder_name}_")])
-                logger.info(f"Found {file_count} existing files in {upload_dir}")
-            except Exception as e:
-                logger.error(f"Failed to list files in {upload_dir}: {e}")
-                file_count = 0
-
-            base_name = original_filename.rsplit('.', 1)[0]
-            extension = '.json'
-            new_filename = f"{folder_name}_{base_name}"
-            if file_count > 0:
-                new_filename += f"_{file_count:02d}"
-            new_filename += extension
-            logger.info(f"Uploading file as {new_filename} to {upload_dir}")
-
-            file_buffer.seek(0)
+            # Set binary mode and upload
             self.ftp.voidcmd("TYPE I")
-            logger.info("Starting file upload with STOR command...")
+            logger.info("Set binary mode")
+            file_buffer.seek(0)
+            new_filename = original_filename  # Use the original filename as in the working code
+            logger.info(f"Attempting to upload file {original_filename} as {new_filename}...")
             self.ftp.storbinary(f"STOR {new_filename}", file_buffer)
             logger.info(f"Successfully uploaded {original_filename} as {new_filename} to {upload_dir}")
 
