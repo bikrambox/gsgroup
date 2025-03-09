@@ -30,6 +30,7 @@ export default defineConfig({
     ],
   },
   build: {
+    minify: 'terser',
     outDir: 'dist',        // Output directory for production builds
     assetsDir: 'assets',   // Subdirectory for assets within dist
     sourcemap: true,      // Generate sourcemaps for debugging
