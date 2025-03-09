@@ -2,17 +2,17 @@
 
 <template>
   <div class="min-h-screen dark:bg-gray-800 dark:text-slate-50">
-    <Login />
+    <Intro />
   </div>
 </template>
 
 <script>
-import Login from './Login.vue'
+import Intro from './Intro.vue'
 
 export default {
   name: 'Home',
   components: {
-    Login
+    Intro
   }
 }
 </script>
