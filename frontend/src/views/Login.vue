@@ -109,7 +109,7 @@ const handleLogin = async () => {
   const success = await authStore.login(username.value, password.value)
   if (success) {
     console.log('Login successful! Redirecting to file-upload page.')
-    router.push('/file-upload')
+    router.push('/fileupload')
   } else {
     console.error('Login failed: Invalid credentials or server error.')
   }
