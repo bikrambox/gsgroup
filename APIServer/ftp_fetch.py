@@ -44,8 +44,8 @@ class FTPConnection:
             logger.info("Connection established, attempting login")
             self.ftp.login(self.username, self.password)
             logger.info("Login successful, enabling protection")
-            self.ftp.prot_p()
-            logger.info("Set data channel to protected (PROT P)")
+            self.ftp.prot_c()  # Changed to PROT C to match working ftp_test.py
+            logger.info("Set data channel to clear (PROT C) for compatibility")
             self.ftp.set_pasv(True)
             logger.info(f"Passive mode response: {self.ftp.voidcmd('PASV')}")
             self.connected = True
@@ -243,7 +243,7 @@ class FTPConnection:
             file_buffer.seek(0)
 
             base_path = '/Reports/ELON_data/Upload_test'
-            today = time.strftime('%Y_%m_%d')  # Use underscores as requested
+            today = time.strftime('%Y_%m_%d')
             username = self.authenticated_username if self.authenticated_username else self.username.split('\\')[-1]
             folder_name = f"{username}_{today}"
             upload_dir = f"{base_path}/{folder_name}"
