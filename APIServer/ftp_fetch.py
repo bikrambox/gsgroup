@@ -180,34 +180,65 @@ class FTPConnection:
             logger.error(f"Error retrieving file via FTP: {e}")
             return {"status": "error", "message": f"Error retrieving file via FTP: {e}"}
 
+    # def mkdir(self, path):
+    #     """
+    #     Create a directory on the FTPS server if it doesn't exist.
+    #     """
+    #     if not self.ensure_connected():
+    #         logger.warning("Attempted to create directory without active connection")
+    #         return {"status": "error", "message": "Not connected to FTPS server"}
+
+    #     try:
+    #         # Try to change to the directory to see if it exists
+    #         self.ftp.cwd(path)
+    #         logger.info(f"Directory {path} already exists")
+    #         return {"status": "success", "message": f"Directory {path} already exists"}
+    #     except ftplib.error_perm:
+    #         try:
+    #             # If the directory doesn't exist, create it
+    #             self.ftp.mkd(path)
+    #             logger.info(f"Successfully created directory {path}")
+    #             return {"status": "success", "message": f"Successfully created directory {path}"}
+    #         except ftplib.error_perm as e:
+    #             logger.error(f"Permission error creating directory {path}: {e}")
+    #             return {"status": "error", "message": f"Permission error creating directory: {e}"}
+    #         except Exception as e:
+    #             logger.error(f"Error creating directory {path}: {e}")
+    #             return {"status": "error", "message": f"Error creating directory: {e}"}
+    #     except Exception as e:
+    #         logger.error(f"Error accessing directory {path}: {e}")
+    #         return {"status": "error", "message": f"Error accessing directory: {e}"}
+
     def mkdir(self, path):
         """
-        Create a directory on the FTPS server if it doesn't exist.
+        Recursively create a directory on the FTPS server if it doesn't exist.
         """
         if not self.ensure_connected():
             logger.warning("Attempted to create directory without active connection")
             return {"status": "error", "message": "Not connected to FTPS server"}
 
-        try:
-            # Try to change to the directory to see if it exists
-            self.ftp.cwd(path)
-            logger.info(f"Directory {path} already exists")
-            return {"status": "success", "message": f"Directory {path} already exists"}
-        except ftplib.error_perm:
-            try:
-                # If the directory doesn't exist, create it
-                self.ftp.mkd(path)
-                logger.info(f"Successfully created directory {path}")
-                return {"status": "success", "message": f"Successfully created directory {path}"}
-            except ftplib.error_perm as e:
-                logger.error(f"Permission error creating directory {path}: {e}")
-                return {"status": "error", "message": f"Permission error creating directory: {e}"}
-            except Exception as e:
-                logger.error(f"Error creating directory {path}: {e}")
-                return {"status": "error", "message": f"Error creating directory: {e}"}
-        except Exception as e:
-            logger.error(f"Error accessing directory {path}: {e}")
-            return {"status": "error", "message": f"Error accessing directory: {e}"}
+        original_path = path
+        path_parts = path.split('/')
+        current_path = ''
+
+        for part in path_parts:
+            if part:  # Skip empty strings
+                current_path = os.path.join(current_path, part).replace('\\', '/')
+                try:
+                    self.ftp.cwd(current_path)
+                    logger.info(f"Directory {current_path} already exists")
+                except ftplib.error_perm:
+                    try:
+                        self.ftp.mkd(current_path)
+                        logger.info(f"Successfully created directory {current_path}")
+                    except ftplib.error_perm as e:
+                        logger.error(f"Permission error creating directory {current_path}: {e}")
+                        return {"status": "error", "message": f"Permission error creating directory {current_path}: {e}"}
+                    except Exception as e:
+                        logger.error(f"Error creating directory {current_path}: {e}")
+                        return {"status": "error", "message": f"Error creating directory {current_path}: {e}"}
+
+        return {"status": "success", "message": f"Directory {original_path} ensured"}
 
     def upload_stream(self, file_buffer, original_filename):
         """Upload a file stream to the FTPS server with the specified naming convention."""
