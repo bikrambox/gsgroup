@@ -70,8 +70,7 @@
         <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
         </svg>
-        <p>Upload Success! {{ selectedFiles.length }} {{ selectedFiles.length === 1 ? 'file' : 'files' }} successfully
-          uploaded!</p>
+        <p>Upload Success! {{ uploadedFileCount }} {{ uploadedFileCount === 1 ? 'file' : 'files' }} successfully uploaded!</p>
       </div>
       <div v-if="uploadComplete && !error && fileLocations.length > 0" class="mt-2 text-gray-600 location-container">
         <p v-for="(location, index) in fileLocations" :key="index" class="location-text break-all">
@@ -110,6 +109,7 @@ const error = ref(null)
 const fileLocation = ref(null)
 const fileLocations = ref([]) // Array to store multiple FTP paths
 const isDragging = ref(false)
+const uploadedFileCount = ref(0) // New ref to store the number of uploaded files
 
 const handleDragOver = () => {
   isDragging.value = true
@@ -220,15 +220,18 @@ const uploadFiles = async () => {
           error.value = response.data
         } else {
           uploadComplete.value = true
+          // Store the number of successfully uploaded files
+          uploadedFileCount.value = response.data.results.length
           // Extract FTP paths for all successful uploads
           fileLocations.value = response.data.results.map(result => result.ftp_path)
           // Clear the selected files list
           selectedFiles.value = []
           fileProgress.value = []
-          // Revert to upload button after 3 seconds
+          // Revert to upload button after 5 seconds
           setTimeout(() => {
             uploadComplete.value = false
             fileLocations.value = []
+            uploadedFileCount.value = 0 // Reset the count after the message disappears
           }, 5000)
         }
       } else {
