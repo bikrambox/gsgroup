@@ -1,12 +1,11 @@
 <!-- FileName: frontend\src\views\file_upload.vue -->
 <template>
-  <div class="max-w-md mx-auto p-6 bg-white">
-    <!-- <h2 class="text-2xl font-semibold text-gray-900 mb-1">JSON File Upload:</h2> -->
-
+  <!-- <div class="max-w-lg mx-auto p-6 bg-black"> -->
+    <div class="max-w-3xl mx-auto p-6 bg-white">
 
     <!-- File Input with Drag-and-Drop -->
     <div
-      class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center relative"
+      class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center relative mt-4"
       @dragover.prevent="handleDragOver"
       @dragleave.prevent="handleDragLeave"
       @drop.prevent="handleDrop"
@@ -31,7 +30,7 @@
 
     <!-- Selected Files List -->
     <div v-if="selectedFiles.length > 0" class="mt-4">
-      <h3 class="text-lg font-medium text-gray-900 mb-2">Number of files • {{ selectedFiles.length }}</h3>
+      <p class="text-sm text-gray-600">Number of files: {{ selectedFiles.length }}</p>
       <div v-for="(file, index) in selectedFiles" :key="index" class="flex items-center justify-between p-2 bg-gray-50 rounded-lg mb-2">
         <div class="flex items-center">
           <svg class="h-6 w-6 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -71,7 +70,7 @@
         <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
         </svg>
-        <p>Upload Success! {{ selectedFiles.length }} {{ selectedFiles.length === 1 ? 'file' : 'files'}} successfully uploaded!</p>
+        <p>Upload Success! {{ selectedFiles.length }} {{ selectedFiles.length === 1 ? 'file' : 'files' }} successfully uploaded!</p>
       </div>
       <p v-if="uploadComplete && fileLocation" class="mt-2 text-gray-600 location-text">
         Location: "{{ fileLocation }}"
@@ -178,7 +177,7 @@ const uploadFiles = async () => {
         if (progressEvent.total) {
           const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)
           uploadProgress.value = percentCompleted
-          // Simulate per-file progress (in a real scenario, you'd need per-file progress from the server)
+          // Simulate per-file progress
           fileProgress.value = fileProgress.value.map(() => percentCompleted)
           console.log(`Upload progress: ${percentCompleted}%`)
         }
@@ -241,5 +240,10 @@ onMounted(() => {
 
 .bg-blue-50 {
   background-color: #f0f9ff;
+}
+
+/* Ensure file list items stack properly */
+.mb-2 {
+  margin-bottom: 0.5rem;
 }
 </style>
