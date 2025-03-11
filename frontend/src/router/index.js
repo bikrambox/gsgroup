@@ -3,13 +3,13 @@ import { useAuthStore } from '../stores/auth' // Assuming an auth store exists
 
 // Define routes
 const routes = [
+  // {
+  //   path: '/',
+  //   component: () => import('../views/Home.vue'),
+  //   meta: { requiresAuth: false },
+  // },
   {
     path: '/',
-    component: () => import('../views/Home.vue'),
-    meta: { requiresAuth: false },
-  },
-  {
-    path: '/login',
     component: () => import('../views/Login.vue'),
     meta: { requiresAuth: false },
   },
@@ -42,12 +42,9 @@ router.beforeEach((to, from, next) => {
 
   if (to.meta.requiresAuth && !isAuthenticated) {
     // If route requires auth and user is not authenticated, redirect to login
-    next('/login');
-  } else if (to.path === '/login' && isAuthenticated) {
-    // If already authenticated and trying to access login, redirect to fileupload
-    next('/fileupload');
+    next('/');
   } else if (to.path === '/' && isAuthenticated) {
-    // If on root and authenticated, redirect to fileupload
+    // If already authenticated and trying to access login, redirect to fileupload
     next('/fileupload');
   } else {
     next();

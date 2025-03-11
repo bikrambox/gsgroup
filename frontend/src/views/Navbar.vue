@@ -35,30 +35,7 @@
                   {{ item.name }}
                 </button>
 
-                <!-- Dropdown menu -->
-                <div v-else class="relative inline-block text-left" @mouseenter="hoveredDropdown = item.name"
-                  @mouseleave="hoveredDropdown = null">
-                  <button
-                    class="inline-flex items-center rounded-md px-3 py-2 text-sm font-medium text-gray-900 dark:text-gray-50 hover:bg-gray-300 dark:hover:bg-gray-700">
-                    {{ item.name }}
-                    <svg class="ml-2 -mr-1 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd"
-                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                        clip-rule="evenodd" />
-                    </svg>
-                  </button>
-
-                  <div v-show="hoveredDropdown === item.name"
-                    class="absolute left-0 z-10 w-48 origin-top-right bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-50 rounded-md shadow-lg">
-                    <div class="">
-                      <button v-for="subItem in item.subItems" :key="subItem.name"
-                        @click="handleItemClick(subItem.name)"
-                        class="block w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-700">
-                        {{ subItem.name }}
-                      </button>
-                    </div>
-                  </div>
-                </div>
+    
               </template>
             </div>
           </div>
@@ -67,33 +44,11 @@
         <!-- User menu -->
         <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
           <!-- Dark Mode Toggle -->
-          <button @click="toggleDarkMode"
-            class="group relative rounded-full p-1 text-gray-900 dark:text-gray-50 hover:bg-gray-300 dark:hover:bg-gray-700 mr-2">
-            <!-- Sun icon for dark mode -->
-            <svg v-if="isDarkMode" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
-            <!-- Moon icon for light mode -->
-            <svg v-else class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-            </svg>
-          </button>
+
 
           <!-- Bell Icon -->
           <div class="relative">
-            <button type="button"
-              class="group relative rounded-full  dark:bg-gray-800 p-1 text-gray-900 dark:text-gray-50 hover:bg-gray-300 dark:hover:bg-gray-700"
-              @mouseenter="hoveredDropdown = 'bell'" @mouseleave="hoveredDropdown = null">
-              <span class="sr-only">View notifications</span>
-              <svg
-                class="h-6 w-6 stroke-gray-900 dark:stroke-gray-50 group-hover:stroke-gray-700 dark:group-hover:stroke-gray-300"
-                fill="none" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-              </svg>
-            </button>
+
 
             <div v-show="hoveredDropdown === 'bell'" role="tooltip" :class="[
               'absolute z-10 inline-block px-3 py-2 text-sm font-medium bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-50 rounded-lg shadow-lg',
@@ -111,7 +66,8 @@
           <div class="relative ml-3" @mouseenter="hoveredDropdown = 'profile'" @mouseleave="hoveredDropdown = null">
             <button class="relative flex rounded-full bg-gray-50 dark:bg-gray-800 text-sm">
               <img class="h-8 w-8 rounded-full"
-                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                
+                src="https://w7.pngwing.com/pngs/859/761/png-transparent-user-heroicons-solid-icon.png"
                 alt="" />
             </button>
 
@@ -132,7 +88,7 @@
                 </button> -->
 
                 <div v-show="hoveredDropdown === 'profile'"
-                  class="absolute right-0 z-10 w-48 origin-top-right py-2 bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-50 rounded-lg shadow-lg">
+                  class="absolute right-0 z-10 w-48 origin-top-right py-1 bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-50 rounded-lg shadow-lg">
                   <div class="">
                     <button v-for="item in profileDropdownItems" :key="item.name" @click="item.action"
                       class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-300 dark:hover:bg-gray-700">
@@ -339,7 +295,7 @@ const handleItemClick = (itemName) => {
   if (itemName === 'Sign out') {
     handleLogout()
   } else if (itemName === 'Log In') {
-    router.push('/login')
+    router.push('/')
   } else {
     // Handle other clicks (e.g., Profile, Settings)
     console.log(`Navigating to ${itemName}`)
@@ -384,8 +340,8 @@ const handleLogout = () => {
 
 // Dynamically compute the navigation items based on auth status
 const navigation = ref([
-  { name: 'Dashboard', href: '#', current: true },
-  { name: 'Team', href: '#', current: false },
+  { name: 'Home', href: '/', current: true },
+  // { name: 'Team', href: '#', current: false },
   {
     name: 'Projects',
     href: '#',
@@ -408,13 +364,13 @@ const navigation = ref([
       { name: 'TXT', href: '#' }
     ]
   },
-  { name: 'Calendar', href: '#', current: false }
+  // { name: 'Calendar', href: '#', current: false }
 ])
 
 // Computed property to dynamically adjust the profile dropdown
 const profileDropdownItems = computed(() => [
-  { name: 'Your Profile', action: () => handleItemClick('Profile') },
-  { name: 'Settings', action: () => handleItemClick('Settings') },
+  // { name: 'Your Profile', action: () => handleItemClick('Profile') },
+  // { name: 'Settings', action: () => handleItemClick('Settings') },
   {
     name: authStore.isAuthenticated ? 'Sign out' : 'Log In',
     action: () => handleItemClick(authStore.isAuthenticated ? 'Sign out' : 'Log In')
