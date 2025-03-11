@@ -131,12 +131,14 @@ const handleDrop = (event) => {
 
 const handleFileChange = (event) => {
   const files = Array.from(event.target.files || [])
-  console.log('Selected files:', files)
-  if (files.length === 0) {
-    error.value = { message: 'No files selected' }
-    return
+  console.log('Selected files from input:', files)
+  // Only process if files are selected, otherwise do nothing
+  if (files.length > 0) {
+    appendFiles(files)
+  } else {
+    console.log('No files selected from input, ignoring...')
+    // Do not set error here to avoid crashing the process
   }
-  appendFiles(files)
 }
 
 const appendFiles = (files) => {
@@ -175,7 +177,7 @@ const formatFileSize = (bytes) => {
 
 const uploadFiles = async () => {
   if (selectedFiles.value.length === 0) {
-    error.value = { message: 'Please select at least one file' }
+    error.value = { message: 'No files selected' }
     return
   }
 
