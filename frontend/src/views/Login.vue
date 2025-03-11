@@ -81,10 +81,10 @@
           </button>
         </div>
       </form>
-      <p class="mt-10 text-center text-sm/6 text-gray-500">
+      <!-- <p class="mt-10 text-center text-sm/6 text-gray-500">
         Not a member? {{ ' ' }}
         <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500">Register</a>
-      </p>
+      </p> -->
     </div>
   </div>
 </template>
