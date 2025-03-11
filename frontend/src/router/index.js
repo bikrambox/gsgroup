@@ -25,7 +25,7 @@ const routes = [
   },
   {
     path: '/fileupload',
-    component: () => import('../views/file_upload_B.vue'),
+    component: () => import('../views/file_upload.vue'),
     meta: { requiresAuth: false },
     // meta: { requiresAuth: true },
   },
