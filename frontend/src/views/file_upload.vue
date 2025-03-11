@@ -1,11 +1,9 @@
 <!-- FileName: frontend\src\views\file_upload.vue -->
-
 <template>
   <div class="max-w-md mx-auto p-6 bg-white">
     <h2 class="text-2xl font-semibold text-gray-900 mb-4">File Upload</h2>
     
     <!-- File Input -->
-    <!-- <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center"> -->
     <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
       <input
         type="file"
@@ -45,7 +43,9 @@
         Upload
       </button>
       <p v-if="uploadComplete && !error" class="mt-2 text-green-600">Upload to FTP complete!</p>
-      <p v-if="uploadComplete && fileLocation" class="mt-2 text-gray-600">Location: "{{ fileLocation }}"</p>
+      <p v-if="uploadComplete && fileLocation" class="mt-2 text-gray-600 location-text">
+        Location: "{{ fileLocation }}"
+      </p>
     </div>
 
     <!-- Error Message -->
@@ -63,7 +63,6 @@
     </div>
   </div>
 </template>
-
 <script setup>
 import { ref, onMounted } from 'vue'
 import api from '../api/index'
@@ -74,9 +73,8 @@ const loading = ref(false)
 const uploadProgress = ref(0)
 const uploadComplete = ref(false)
 const error = ref(null)
-const fileLocation = ref(null) // Stores the FTP path
+const fileLocation = ref(null)
 
-// Handle file selection
 const handleFileChange = (event) => {
   const files = Array.from(event.target.files || [])
   console.log('Selected files:', files)
@@ -87,10 +85,9 @@ const handleFileChange = (event) => {
   selectedFiles.value = files
   uploadComplete.value = false
   error.value = null
-  fileLocation.value = null // Reset location on new file selection
+  fileLocation.value = null
 }
 
-// Handle file upload
 const uploadFiles = async () => {
   if (selectedFiles.value.length === 0) {
     error.value = { message: 'Please select at least one file' }
@@ -135,7 +132,6 @@ const uploadFiles = async () => {
           error.value = response.data
         } else {
           uploadComplete.value = true
-          // Extract the ftp_path from the response
           fileLocation.value = response.data.results[0]?.ftp_path || 'Location not provided'
         }
       } else {
@@ -154,16 +150,29 @@ const uploadFiles = async () => {
     }
   } finally {
     loading.value = false
-    fileInput.value.value = null // Reset file input
+    fileInput.value.value = null
   }
 }
 
-// Debug API URL on mount
 onMounted(() => {
   console.log('API URL:', import.meta.env.VITE_API_URL)
 })
 </script>
-
 <style scoped>
-/* Add any custom styles if needed */
+/* Ensure the location text is centered and has proper spacing */
+.location-text {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 100%;
+  word-break: break-all; /* Prevent long paths from overflowing */
+  padding: 0 10px; /* Add some padding for better readability */
+}
+
+/* Optional: Adjust the container if needed */
+/* .max-w-md {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+} */
 </style>
