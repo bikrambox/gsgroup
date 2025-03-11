@@ -1,6 +1,5 @@
 <!-- FileName: frontend\src\views\file_upload.vue -->
 <template>
-
   <div class="max-w-2xl mx-auto p-6 bg-white">
     <!-- File Input with Drag-and-Drop -->
     <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center relative mt-4"
@@ -32,11 +31,23 @@
             <p class="text-xs text-gray-500">{{ formatFileSize(file.size) }}</p>
           </div>
         </div>
-        <div v-if="loading && fileProgress[index] !== undefined" class="w-1/3">
-          <div class="bg-gray-200 rounded-full h-2">
-            <div class="bg-blue-600 h-2 rounded-full" :style="{ width: `${fileProgress[index]}%` }"></div>
+        <div class="flex items-center">
+          <div v-if="loading && fileProgress[index] !== undefined" class="w-1/3 mr-4">
+            <div class="bg-gray-200 rounded-full h-2">
+              <div class="bg-blue-600 h-2 rounded-full" :style="{ width: `${fileProgress[index]}%` }"></div>
+            </div>
+            <p class="text-xs text-gray-500 text-right mt-1">{{ fileProgress[index] }}%</p>
           </div>
-          <p class="text-xs text-gray-500 text-right mt-1">{{ fileProgress[index] }}%</p>
+          <button
+            @click="removeFile(index)"
+            class="text-red-600 hover:text-red-800 focus:outline-none"
+            title="Remove file"
+            :disabled="loading"
+          >
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
       </div>
     </div>
@@ -83,7 +94,6 @@
       <p v-if="error.user" class="mt-2"><strong>User:</strong> {{ error.user }}</p>
     </div>
   </div>
-
 </template>
 
 <script setup>
@@ -144,6 +154,15 @@ const appendFiles = (files) => {
   uploadComplete.value = false
   error.value = null
   fileLocation.value = null
+}
+
+// Function to remove a file from the list
+const removeFile = (index) => {
+  selectedFiles.value.splice(index, 1) // Remove the file at the given index
+  fileProgress.value.splice(index, 1) // Update the progress array
+  if (selectedFiles.value.length === 0) {
+    error.value = null // Clear any error messages if no files remain
+  }
 }
 
 const formatFileSize = (bytes) => {
@@ -285,5 +304,10 @@ onMounted(() => {
 /* Ensure file list items stack properly */
 .mb-2 {
   margin-bottom: 0.5rem;
+}
+
+/* Styling for delete button */
+button:disabled svg {
+  stroke: #d1d5db; /* Gray out the icon when disabled */
 }
 </style>
