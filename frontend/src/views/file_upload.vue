@@ -1,10 +1,11 @@
 <!-- FileName: frontend\src\views\file_upload.vue -->
 
 <template>
-  <div class="max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg">
+  <div class="max-w-md mx-auto p-6 bg-white">
     <h2 class="text-2xl font-semibold text-gray-900 mb-4">File Upload</h2>
     
     <!-- File Input -->
+    <!-- <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center"> -->
     <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
       <input
         type="file"
