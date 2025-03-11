@@ -335,7 +335,7 @@ const toggleDarkMode = () => {
 
 const handleLogout = () => {
   authStore.logout() // Clear auth state
-  router.push('/login') // Redirect to login after logout
+  router.push('/') // Redirect to login after logout
 }
 
 // Dynamically compute the navigation items based on auth status
