@@ -135,7 +135,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import api from '../api/index'
 
 const fileInput = ref(null)
@@ -193,7 +193,7 @@ const appendFiles = (files) => {
       message: `Duplicate Files: ${duplicateNames}`,
       isDuplicateError: true // Flag to identify this as a duplicate error
     }
-    // Start a timer to auto-dismiss the duplicate error after 5 seconds
+    // Reset and start a new timer to auto-dismiss the duplicate error after 5 seconds
     errorDismissTimer.value = 5
     if (errorDismissInterval) clearInterval(errorDismissInterval) // Clear any existing interval
     errorDismissInterval = setInterval(() => {
@@ -207,18 +207,20 @@ const appendFiles = (files) => {
     }, 1000)
   }
 
-  if (newFiles.length === 0) {
-    return // No new files to add
+  if (newFiles.length === 0 && duplicateFiles.length > 0) {
+    return // No new files to add, and duplicates are handled with error
   }
 
   // Append new files to the existing list
-  selectedFiles.value = [...selectedFiles.value, ...newFiles]
-  fileProgress.value = selectedFiles.value.map(() => 0) // Update progress array
-  uploadComplete.value = false
-  if (!error.value || !error.value.isDuplicateError) {
-    error.value = null // Clear non-duplicate errors
+  if (newFiles.length > 0) {
+    selectedFiles.value = [...selectedFiles.value, ...newFiles]
+    fileProgress.value = selectedFiles.value.map(() => 0) // Update progress array
+    uploadComplete.value = false
+    if (!error.value || !error.value.isDuplicateError) {
+      error.value = null // Clear non-duplicate errors
+    }
+    fileLocation.value = null
   }
-  fileLocation.value = null
 }
 
 // Function to remove a file from the list
