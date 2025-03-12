@@ -3,9 +3,9 @@
   <div class="max-w-2xl mx-auto p-6">
     <h2 class="text-5xl font-bold tracking-tight text-gray-600 dark:text-white sm:text-7xl text-center" style="font-family: Helvetica, sans-serif;">BHS logistics</h2>
     <!-- File Input with Drag-and-Drop -->
-    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center relative mt-4 bg-gray-50 dark:bg-gray-800 "
+    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center relative mt-4  "
       @dragover.prevent="handleDragOver" @dragleave.prevent="handleDragLeave" @drop.prevent="handleDrop"
-      :class="{ 'bg-blue-50 dark:bg-blue-800': isDragging }">
+      :class="{ 'bg-red-700 dark:bg-red-700': isDragging }">
       <input type="file" ref="fileInput" @change="handleFileChange" class="hidden" accept=".json" multiple />
       <div class="flex flex-col items-center">
         <svg class="h-12 w-12 text-gray-400 dark:text-gray-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
