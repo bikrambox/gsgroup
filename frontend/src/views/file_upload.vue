@@ -3,18 +3,18 @@
   <div class="max-w-2xl mx-auto p-6 bg-white">
     <h2 class="text-5xl font-bold tracking-tight text-gray-600 dark:text-white sm:text-7xl text-center" style="font-family: Helvetica, sans-serif;">BHS logistics</h2>
     <!-- File Input with Drag-and-Drop -->
-    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center relative mt-4 dark:bg-gray-800"
+    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center relative mt-4 bg-gray-50 dark:bg-gray-800 "
       @dragover.prevent="handleDragOver" @dragleave.prevent="handleDragLeave" @drop.prevent="handleDrop"
       :class="{ 'bg-blue-50': isDragging }">
       <input type="file" ref="fileInput" @change="handleFileChange" class="hidden" accept=".json" multiple />
       <div class="flex flex-col items-center">
-        <svg class="h-12 w-12 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg class="h-12 w-12 text-gray-400 dark:text-gray-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M7 16V4m0 0L3 8m4-4l4-4m10 12h-6m6 0l-4 4m0-8l-4-4m-2 12V8m0 0l-4 4m4-4l4 4" />
         </svg>
-        <p class="text-gray-600">Drag & Drop file here or <span @click="$refs.fileInput.click()"
+        <p class="text-gray-600 dark:text-gray-300 ">Drag & Drop file here or <span @click="$refs.fileInput.click()"
             class="text-blue-600 cursor-pointer hover:underline">Choose file</span></p>
-        <p class="text-sm text-gray-500 mt-2">Supported formats: .json • Maximum size: 10MB</p>
+        <p class="text-sm text-gray-500 dark:text-gray-300 mt-2">Supported formats: .json • Maximum size: 10MB</p>
       </div>
     </div>
 
