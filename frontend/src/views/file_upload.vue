@@ -3,7 +3,7 @@
   <div class="max-w-2xl mx-auto p-6">
     <h2 class="text-5xl font-bold tracking-tight text-gray-600 dark:text-white sm:text-7xl text-center" style="font-family: Helvetica, sans-serif;">BHS logistics</h2>
     <!-- File Input with Drag-and-Drop -->
-    <div class="border-2 border-dashed border-gray-300 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 bg-gray-50 dark:bg-gray-900 rounded-lg p-6 text-center relative mt-4"
+    <div class="border-2 border-dashed border-gray-300 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-800 bg-gray-50 dark:bg-black rounded-lg p-6 text-center relative mt-4"
       @dragover.prevent="handleDragOver" @dragleave.prevent="handleDragLeave" @drop.prevent="handleDrop"
       :class="{ 'hover:bg-green-50 dark:hover:bg-green-700': isDragging }">
       <input type="file" ref="fileInput" @change="handleFileChange" class="hidden" accept=".json" multiple />
