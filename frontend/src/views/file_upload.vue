@@ -1,6 +1,6 @@
 <!-- FileName: frontend\src\views\file_upload.vue -->
 <template>
-  <div class="max-w-2xl mx-auto p-6 bg-gray-50 dark:bg-gray-800">
+  <div class="max-w-2xl mx-auto p-6">
     <h2 class="text-5xl font-bold tracking-tight text-gray-600 dark:text-white sm:text-7xl text-center" style="font-family: Helvetica, sans-serif;">BHS logistics</h2>
     <!-- File Input with Drag-and-Drop -->
     <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center relative mt-4 bg-gray-50 dark:bg-gray-800 "
