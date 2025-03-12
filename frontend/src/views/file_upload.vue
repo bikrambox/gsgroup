@@ -28,9 +28,9 @@
 
     <!-- Selected Files List -->
     <div v-if="selectedFiles.length > 0" class="mt-4">
-      <p class="text-sm text-gray-600">Number of files: {{ selectedFiles.length }}</p>
+      <p class="text-sm text-gray-600 dark:text-white ">Number of files: {{ selectedFiles.length }}</p>
       <div v-for="(file, index) in selectedFiles" :key="index"
-        class="flex items-center justify-between p-2 bg-gray-50 rounded-lg mb-2">
+        class="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded-lg mb-2">
         <div class="flex items-center">
           <svg class="h-6 w-6 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path style="fill:#FBA026;" d="M442.879,325.778c3.298,97.524-89.057,175.55-186.879,175.514
@@ -71,8 +71,8 @@
             </g>
           </svg>
           <div>
-            <p class="text-sm font-medium text-gray-900">{{ file.name }}</p>
-            <p class="text-xs text-gray-500">{{ formatFileSize(file.size) }}</p>
+            <p class="text-sm font-medium text-gray-600 dark:text-white">{{ file.name }}</p>
+            <p class="text-xs text-gray-500 dark:text-gray-100">{{ formatFileSize(file.size) }}</p>
           </div>
         </div>
         <div class="flex items-center">
@@ -84,7 +84,7 @@
           </div>
           <button
             @click="removeFile(index)"
-            class="text-red-600 hover:text-red-800 focus:outline-none"
+            class="text-red-400 dark:text-gray-50 hover:text-red-700 dark:hover:text-red-500 focus:outline-none"
             title="Remove file"
             :disabled="loading"
           >
