@@ -3,25 +3,27 @@
   <div class="max-w-2xl mx-auto p-6">
     <h2 class="text-5xl font-bold tracking-tight text-gray-600 dark:text-white sm:text-7xl text-center" style="font-family: Helvetica, sans-serif;">BHS logistics</h2>
     <!-- File Input with Drag-and-Drop -->
-    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center relative mt-4"
+    <div class="border-2 border-dashed border-gray-300 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 bg-gray-50 dark:bg-gray-900 rounded-lg p-6 text-center relative mt-4"
       @dragover.prevent="handleDragOver" @dragleave.prevent="handleDragLeave" @drop.prevent="handleDrop"
       :class="{ 'hover:bg-green-50 dark:hover:bg-green-700': isDragging }">
       <input type="file" ref="fileInput" @change="handleFileChange" class="hidden" accept=".json" multiple />
-      <div class="flex flex-col items-center">
-        <svg class="h-12 w-12 text-gray-400 dark:text-gray-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div class="flex flex-col items-center hover:text-red-700 dark:hover:text-red-50">
+        <svg class="h-12 w-12 text-gray-500 dark:text-gray-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M7 16V4m0 0L3 8m4-4l4-4m10 12h-6m6 0l-4 4m0-8l-4-4m-2 12V8m0 0l-4 4m4-4l4 4" />
         </svg>
-        <p class="text-gray-600 dark:text-gray-300">
+        
+        <label class="text-gray-600 dark:text-gray-100 ">
           Drag & Drop file here or 
           <span @click="$refs.fileInput.click()" class="text-blue-600 cursor-pointer hover:underline">
             Choose file
           </span>
-        </p>
-        <p class="text-sm text-gray-500 dark:text-gray-300 mt-2">
+        </label>
+        <p class="text-sm text-gray-500 dark:text-gray-100 mt-2">
           Supported formats: .json • Maximum size: 10MB
         </p>
       </div>
+      
     </div>
 
     <!-- Selected Files List -->
@@ -381,16 +383,7 @@ onMounted(() => {
   max-width: 100%;
 }
 
-/* Drag-and-drop styling */
-.border-dashed:hover {
-  background-color: #fcfcfc;
-  transition: background-color 0.3s;
-}
 
-.dark .border-dashed:hover {
-  background-color: #ededed; /* Tailwind bg-green-700 */
-  transition: background-color 0.3s;
-}
 
 .bg-blue-50 {
   background-color: #f0f9ff;
