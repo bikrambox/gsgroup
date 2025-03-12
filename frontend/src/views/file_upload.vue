@@ -30,7 +30,7 @@
     <div v-if="selectedFiles.length > 0" class="mt-4">
       <p class="text-sm text-gray-600 dark:text-white ">Number of files: {{ selectedFiles.length }}</p>
       <div v-for="(file, index) in selectedFiles" :key="index"
-        class="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded-lg mb-2">
+        class="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded-lg mb-2">
         <div class="flex items-center">
           <svg class="h-6 w-6 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path style="fill:#FBA026;" d="M442.879,325.778c3.298,97.524-89.057,175.55-186.879,175.514
@@ -77,7 +77,7 @@
         </div>
         <div class="flex items-center">
           <div v-if="loading && fileProgress[index] !== undefined" class="w-1/3 mr-4">
-            <div class="bg-gray-200 rounded-full h-2">
+            <div class="bg-gray-200  rounded-full h-2">
               <div class="bg-blue-600 h-2 rounded-full" :style="{ width: `${fileProgress[index]}%` }"></div>
             </div>
             <p class="text-xs text-gray-500 text-right mt-1">{{ fileProgress[index] }}%</p>
