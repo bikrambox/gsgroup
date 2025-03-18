@@ -31,6 +31,13 @@
               class="shadow-xs bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-xs-light" />
           </div>
         </div>
+        <div>
+          <label for="username" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Company Name</label>
+          <div class="mt-2">
+            <input type="text" placeholder="Company Name" name="username" id="username" autocomplete="username" required=""
+              class="shadow-xs bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-xs-light" />
+          </div>
+        </div>
 
         <!-- Password field -->
         <div class="mb-5">
@@ -136,7 +143,7 @@
       <p class="mt-10 text-center text-sm/6 text-gray-500">
         Already a member?
         {{ ' ' }}
-        <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500">Login</a>
+        <a href="/" class="font-semibold text-indigo-600 hover:text-indigo-500">Login</a>
       </p>
     </div>
   </div>

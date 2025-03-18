@@ -3,11 +3,6 @@ import { useAuthStore } from '../stores/auth' // Assuming an auth store exists
 
 // Define routes
 const routes = [
-  // {
-  //   path: '/',
-  //   component: () => import('../views/Home.vue'),
-  //   meta: { requiresAuth: false },
-  // },
   {
     path: '/',
     component: () => import('../views/Login.vue'),
@@ -26,8 +21,13 @@ const routes = [
   {
     path: '/fileupload',
     component: () => import('../views/file_upload.vue'),
+    // meta: { requiresAuth: false },
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/register',
+    component: () => import('../views/Sign_up.vue'),
     meta: { requiresAuth: false },
-    // meta: { requiresAuth: true },
   },
 ];
 
