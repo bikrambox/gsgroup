@@ -50,14 +50,14 @@
 
         <!-- User menu -->
         <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-          <button v-if="route.path !== '/'" type="button" @click="handleItemClick('Log In')" class="relative rounded-md text-gray-900 dark:text-gray-50 hover:bg-gray-300 dark:hover:bg-gray-700 px-3 mr-1 py-2 text-sm font-medium cursor-pointer">
+          <button v-if="route.path !== '/' && route.path !== '/fileupload'" type="button" @click="handleItemClick('Log In')" class="relative rounded-md text-gray-900 dark:text-gray-50 hover:bg-gray-300 dark:hover:bg-gray-700 px-3 mr-1 py-2 text-sm font-medium cursor-pointer">
             Login
           </button>
-          <button v-if="route.path !== '/register'" type="button" @click="handleItemClick('Register')" class="relative rounded-md text-gray-900 dark:text-gray-50 hover:bg-gray-300 dark:hover:bg-gray-700 px-3 ml-1 py-2 text-sm font-medium cursor-pointer">
+          <button v-if="route.path !== '/register' && route.path !== '/fileupload'" type="button" @click="handleItemClick('Register')" class="relative rounded-md text-gray-900 dark:text-gray-50 hover:bg-gray-300 dark:hover:bg-gray-700 px-3 ml-1 py-2 text-sm font-medium cursor-pointer">
             Register
           </button>
           <!-- Profile dropdown -->
-          <div class="relative ml-3" @mouseenter="hoveredDropdown = 'profile'" @mouseleave="hoveredDropdown = null">
+          <div v-if="route.path === '/fileupload' || authStore.isAuthenticated" class="relative ml-3" @mouseenter="hoveredDropdown = 'profile'" @mouseleave="hoveredDropdown = null">
             <button class="relative flex rounded-full bg-gray-50 dark:bg-gray-800 text-sm cursor-pointer">
               <img class="h-8 w-8 rounded-full" src="https://w7.pngwing.com/pngs/859/761/png-transparent-user-heroicons-solid-icon.png" alt="Profile" />
             </button>
