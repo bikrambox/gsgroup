@@ -50,10 +50,10 @@
 
         <!-- User menu -->
         <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-          <button v-if="route.path !== '/' && route.path !== '/register' && route.path !== '/fileupload'" type="button" @click="handleItemClick('Log In')" class="relative rounded-md text-gray-900 dark:text-gray-50 hover:bg-gray-300 dark:hover:bg-gray-700 px-3 mr-1 py-2 text-sm font-medium cursor-pointer">
+          <button v-if="route.path !== '/' && route.path !== '/fileupload'" type="button" @click="handleItemClick('Log In')" class="relative rounded-md text-gray-900 dark:text-gray-50 hover:bg-gray-300 dark:hover:bg-gray-700 px-3 mr-1 py-2 text-sm font-medium cursor-pointer">
             Login
           </button>
-          <button v-if="route.path !== '/' && route.path !== '/register' && route.path !== '/fileupload'" type="button" @click="handleItemClick('Register')" class="relative rounded-md text-gray-900 dark:text-gray-50 hover:bg-gray-300 dark:hover:bg-gray-700 px-3 ml-1 py-2 text-sm font-medium cursor-pointer">
+          <button v-if="route.path !== '/register' && route.path !== '/fileupload'" type="button" @click="handleItemClick('Register')" class="relative rounded-md text-gray-900 dark:text-gray-50 hover:bg-gray-300 dark:hover:bg-gray-700 px-3 ml-1 py-2 text-sm font-medium cursor-pointer">
             Register
           </button>
           <a v-if="(authStore.isAuthenticated || route.path === '/fileupload') && route.path !== '/' && route.path !== '/register'" href="#" @click.prevent="handleLogout" class="text-gray-900 dark:text-gray-50 text-sm font-medium ml-4">
