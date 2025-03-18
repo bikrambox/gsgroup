@@ -21,8 +21,8 @@ const routes = [
   {
     path: '/fileupload',
     component: () => import('../views/file_upload.vue'),
-    // meta: { requiresAuth: false },
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: false },
+    // meta: { requiresAuth: true },
   },
   {
     path: '/register',
