@@ -50,15 +50,15 @@
 
         <!-- User menu -->
         <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-          <button v-if="route.path !== '/' && route.path !== '/fileupload'" type="button" @click="handleItemClick('Log In')" class="relative rounded-md text-gray-900 dark:text-gray-50 hover:bg-gray-300 dark:hover:bg-gray-700 px-3 mr-1 py-2 text-sm font-medium cursor-pointer">
+          <button v-if="route.path !== '/' && route.path !== '/register' && route.path !== '/fileupload'" type="button" @click="handleItemClick('Log In')" class="relative rounded-md text-gray-900 dark:text-gray-50 hover:bg-gray-300 dark:hover:bg-gray-700 px-3 mr-1 py-2 text-sm font-medium cursor-pointer">
             Login
           </button>
-          <button v-if="route.path !== '/register' && route.path !== '/fileupload'" type="button" @click="handleItemClick('Register')" class="relative rounded-md text-gray-900 dark:text-gray-50 hover:bg-gray-300 dark:hover:bg-gray-700 px-3 ml-1 py-2 text-sm font-medium cursor-pointer">
+          <button v-if="route.path !== '/' && route.path !== '/register' && route.path !== '/fileupload'" type="button" @click="handleItemClick('Register')" class="relative rounded-md text-gray-900 dark:text-gray-50 hover:bg-gray-300 dark:hover:bg-gray-700 px-3 ml-1 py-2 text-sm font-medium cursor-pointer">
             Register
           </button>
-          <button v-if="route.path === '/fileupload' || authStore.isAuthenticated" type="button" @click="handleItemClick('Register')" class="relative rounded-md text-gray-900 dark:text-gray-50 hover:bg-gray-300 dark:hover:bg-gray-700 px-3 ml-1 py-2 text-sm font-medium cursor-pointer">
+          <a v-if="(authStore.isAuthenticated || route.path === '/fileupload') && route.path !== '/' && route.path !== '/register'" href="#" @click.prevent="handleLogout" class="text-gray-900 dark:text-gray-50 text-sm font-medium ml-4">
             Logout
-          </button>
+          </a>
         </div>
       </div>
     </div>
@@ -97,6 +97,7 @@
 import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import api from '../api' // Import your Axios instance
 
 const hoveredDropdown = ref(null)
 const isMobileMenuOpen = ref(false)
@@ -104,7 +105,7 @@ const navRef = ref(null)
 const tooltipPosition = ref('left')
 const isDarkMode = ref(true)
 const router = useRouter()
-const route = useRoute() // Added to track current route
+const route = useRoute()
 const authStore = useAuthStore()
 
 const updateTooltipPosition = () => {
@@ -135,14 +136,12 @@ onUnmounted(() => {
 
 const handleItemClick = (itemName) => {
   console.log(`${itemName} item clicked`)
-  if (itemName === 'Sign out') {
-    handleLogout()
-  } else if (itemName === 'Log In') {
+  if (itemName === 'Log In') {
     router.push('/')
   } else if (itemName === 'Register') {
     router.push('/register')
   } else if (itemName === 'Home') {
-    router.push('/') // Redirect to root path (/)
+    router.push('/')
   } else {
     console.log(`Navigating to ${itemName}`)
   }
@@ -180,9 +179,15 @@ const toggleDarkMode = () => {
   localStorage.setItem('darkMode', isDarkMode.value)
 }
 
-const handleLogout = () => {
-  authStore.logout()
-  router.push('/')
+const handleLogout = async () => {
+  try {
+    await api.post('/api/auth/logout/') // Call backend logout endpoint
+    authStore.logout() // Clear frontend auth state
+    router.push('/') // Redirect to login page
+  } catch (error) {
+    console.error('Logout failed:', error.response?.data || error.message)
+    alert('Logout failed: ' + (error.response?.data?.message || 'Server error'))
+  }
 }
 
 // Dynamically compute the navigation items based on auth status and current route
@@ -190,14 +195,6 @@ const navigation = computed(() => {
   const navItems = [
     // { name: 'Home', href: '/', current: route.path === '/' },
   ]
-
   return navItems
 })
-
-const profileDropdownItems = computed(() => [
-  {
-    name: authStore.isAuthenticated ? 'Sign out' : 'Log In',
-    action: () => handleItemClick(authStore.isAuthenticated ? 'Sign out' : 'Log In')
-  },
-])
 </script>
