@@ -13,16 +13,16 @@ const routes = [
     component: () => import('../views/Dashboard.vue'),
     meta: { requiresAuth: true },
   },
-  {
-    path: '/signup',
-    component: () => import('../views/Sign_up.vue'),
-    meta: { requiresAuth: false },
-  },
+  // {
+  //   path: '/signup',
+  //   component: () => import('../views/Sign_up.vue'),
+  //   meta: { requiresAuth: false },
+  // },
   {
     path: '/fileupload',
     component: () => import('../views/file_upload.vue'),
-    // meta: { requiresAuth: false },
     meta: { requiresAuth: true },
+    // meta: { requiresAuth: false },
   },
   {
     path: '/register',
@@ -36,18 +36,25 @@ const router = createRouter({
   routes,
 });
 
-// Navigation guard to handle authentication
+// Navigation guard to handle authentication and redirects
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
-  const isAuthenticated = authStore.isAuthenticated; // Assuming this method exists
+  const isAuthenticated = authStore.isAuthenticated;
 
+  // If route requires auth and user is not authenticated, redirect to login
   if (to.meta.requiresAuth && !isAuthenticated) {
-    // If route requires auth and user is not authenticated, redirect to login
     next('/');
-  } else if (to.path === '/' && isAuthenticated) {
-    // If already authenticated and trying to access login, redirect to fileupload
+  } 
+  // If already authenticated and trying to access login, redirect to fileupload
+  else if (to.path === '/' && isAuthenticated) {
     next('/fileupload');
-  } else {
+  } 
+  // If authenticated and trying to access /register or /signup, redirect to fileupload
+  else if ((to.path === '/register') && isAuthenticated) {
+    next('/fileupload');
+  } 
+  // Proceed to the requested route
+  else {
     next();
   }
 });
