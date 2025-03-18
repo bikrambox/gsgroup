@@ -30,6 +30,11 @@ frontend\src\views\Home_copy.vue
 frontend\src\views\Login_copy.vue
 frontend\src\views\Navbar_.vue
 frontend\src\views\Navbar_clone.vue
+frontend\src\views\Intro.vue
+frontend\src\views\file_upload_BAK.vue
+frontend\src\views\Footer.vue
+
+
 
 .editorconfig
 backend_dir_list.py
@@ -52,3 +57,11 @@ uwsgi.ini_Pr
 
 vassals\uwsgi.ini
 var\vassals\uwsgi.ini
+
+
+frontend\postcss.config.cjs
+frontend\postcss.config.js
+frontend\vite.config_copy.js
+frontend\vite.config.js
+frontend\src\style.css
+frontend\src\views\file_upload.vue

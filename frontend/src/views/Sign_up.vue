@@ -7,8 +7,7 @@
       <form class="space-y-6" @submit="handleSubmit" action="#" method="POST">
         <div class="flex items-center justify-between">
           <div class="flex-1">
-            <label for="firstname" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">First
-              name</label>
+            <label for="firstname" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">First name</label>
             <div class="mt-1">
               <input type="text" placeholder="First name" name="firstname" id="firstname" autocomplete="firstname"
                 required=""
@@ -151,6 +150,10 @@
 
 <script setup>
 import { ref, reactive, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import api from '../api' // Adjust the import path based on your project structure
+
+const router = useRouter()
 
 const password = ref('')
 const confirmPassword = ref('')
@@ -182,7 +185,7 @@ const checkPasswordStrength = () => {
   let strength = 0
 
   // Reset all requirements
-  requirements.forEach(req => req.met = false)
+  requirements.forEach(req => (req.met = false))
 
   // Check length
   if (pwd.length >= 8) {
@@ -235,11 +238,11 @@ const toggleConfirmPassword = () => {
 }
 
 const checkPasswordMatch = () => {
-  // This function will trigger the computed property
+  // This function triggers the computed property `passwordsMatch`
 }
 
-const handleSubmit = (event) => {
-  event.preventDefault() // Prevent default form submission
+const handleSubmit = async (event) => {
+  event.preventDefault()
 
   if (!allRequirementsMet.value) {
     alert('Please fulfill all password requirements before submitting')
@@ -251,8 +254,19 @@ const handleSubmit = (event) => {
     return
   }
 
-  // If all validations pass, continue with form submission
-  console.log('Form submitted successfully')
-  // Add your form submission logic here
+  try {
+    const response = await api.post('/api/auth/register/', {
+      username: document.getElementById('username').value,
+      email: document.getElementById('email').value,
+      password: password.value,
+      first_name: document.getElementById('firstname').value,
+      last_name: document.getElementById('lastname').value
+    })
+    console.log('Registration successful:', response.data)
+    router.push('/') // Redirect to login after signup
+  } catch (error) {
+    console.error('Registration failed:', error.response?.data || error.message)
+    alert('Registration failed: ' + (error.response?.data?.message || 'Server error'))
+  }
 }
 </script>
