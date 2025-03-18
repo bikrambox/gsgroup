@@ -8,10 +8,10 @@
       :class="{ 'hover:bg-green-50 dark:hover:bg-green-700': isDragging }">
       <input type="file" ref="fileInput" @change="handleFileChange" class="hidden" accept=".json" multiple />
       <div class="flex flex-col items-center hover:text-red-700 dark:hover:text-red-50">
-        <svg class="h-12 w-12 text-gray-500 dark:text-gray-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <!-- <svg class="h-12 w-12 text-gray-500 dark:text-gray-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M7 16V4m0 0L3 8m4-4l4-4m10 12h-6m6 0l-4 4m0-8l-4-4m-2 12V8m0 0l-4 4m4-4l4 4" />
-        </svg>
+        </svg> -->
         
         <label class="text-gray-600 dark:text-gray-100 ">
           Drag & Drop file here or 

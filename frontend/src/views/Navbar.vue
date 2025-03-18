@@ -197,7 +197,7 @@ const handleLogout = () => {
 // Dynamically compute the navigation items based on auth status and current route
 const navigation = computed(() => {
   const navItems = [
-    { name: 'Home', href: '/', current: route.path === '/' },
+    // { name: 'Home', href: '/', current: route.path === '/' },
   ]
 
   return navItems
