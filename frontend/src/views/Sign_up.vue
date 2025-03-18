@@ -1,9 +1,10 @@
 <template>
   <div class="flex min-h-full flex-1 flex-col justify-center px-6 py-6 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-      <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight">Sign up for your account</h2>
+      <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight">Sign up for your BHS account</h2>
+      <h2 class="text-center text-red-500 dark:text-red-500">* All fields are mandatory</h2>
     </div>
-    <div class="pt-12 sm:mx-auto sm:w-full sm:max-w-sm">
+    <div class="pt-6 sm:mx-auto sm:w-full sm:max-w-sm">
       <form class="space-y-6" @submit="handleSubmit" action="#" method="POST">
         <div class="flex items-center justify-between">
           <div class="flex-1">
@@ -135,7 +136,7 @@
 
         <button type="submit"
           class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-          Register new account
+          Submit
         </button>
       </form>
 
