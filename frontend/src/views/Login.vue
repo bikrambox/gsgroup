@@ -8,12 +8,12 @@
     <div class="pt-12 sm:mx-auto sm:w-full sm:max-w-sm">
       <form @submit.prevent="handleLogin" class="space-y-6">
         <div>
-          <label for="username" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Company Name</label>
+          <label for="username" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Username</label>
           <div class="mt-2">
             <input
               type="text"
               v-model="username"
-              placeholder="Company Name"
+              placeholder="Username"
               name="username"
               id="username"
               autocomplete="username"
