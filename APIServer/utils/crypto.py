@@ -1,8 +1,7 @@
 from django.conf import settings
-from django.utils.encoding import force_bytes, force_str
+from django.utils.encoding import force_bytes
 from base64 import b64encode, b64decode
-from django.utils.crypto import get_random_string, salted_hmac
-import hashlib
+from django.utils.crypto import salted_hmac
 
 class CryptoUtils:
     @staticmethod
@@ -22,7 +21,7 @@ class CryptoUtils:
             salt,
             data,
             secret=settings.SECRET_KEY,
-            algorithm=hashlib.sha256
+            algorithm='sha256'  # Change to string 'sha256'
         ).hexdigest()
         
         # Combine signature with data and encode
@@ -52,7 +51,7 @@ class CryptoUtils:
                 salt,
                 data,
                 secret=settings.SECRET_KEY,
-                algorithm=hashlib.sha256
+                algorithm='sha256'  # Use string 'sha256'
             ).hexdigest()
             
             if signature != expected_signature:
