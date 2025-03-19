@@ -24,7 +24,7 @@ class EncryptedCharField(serializers.CharField):
 
 class UserSerializer(serializers.ModelSerializer):
     password = EncryptedCharField(write_only=True)
-    email = EncryptedCharField(required=False)
+    email = EncryptedCharField(required=True)  # Change to required=True
     
     class Meta:
         model = User
@@ -33,9 +33,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         password = CryptoUtils.decrypt_data(validated_data.pop('password'))
-        email = validated_data.get('email', '')
-        if email:
-            email = CryptoUtils.decrypt_data(email)
+        email = CryptoUtils.decrypt_data(validated_data['email'])  # No need for .get() since it's required
         user = User.objects.create_user(
             username=validated_data['username'],
             email=email,

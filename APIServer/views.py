@@ -76,6 +76,34 @@ def api_root(request):
         }
     })
 
+# @api_view(['GET', 'POST'])
+# @permission_classes([AllowAny])
+# def register_user(request):
+#     if request.user.is_authenticated:
+#         return redirect('api-root')
+
+#     if request.method == 'GET':
+#         return Response({
+#             "message": "User Registration API",
+#             "method": "POST",
+#             "required_fields": {
+#                 "username": "(required) - Choose a unique username",
+#                 "email": "(required) - Provide a valid email address",
+#                 "password": "(required) - Choose a secure password"
+#             }
+#         }, status=status.HTTP_200_OK)
+    
+#     serializer = UserSerializer(data=request.data)
+#     if serializer.is_valid():
+#         serializer.save()
+#         return Response({
+#             "message": "User registered successfully"
+#         }, status=status.HTTP_201_CREATED)
+    
+#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 @api_view(['GET', 'POST'])
 @permission_classes([AllowAny])
 def register_user(request):
@@ -89,7 +117,9 @@ def register_user(request):
             "required_fields": {
                 "username": "(required) - Choose a unique username",
                 "email": "(required) - Provide a valid email address",
-                "password": "(required) - Choose a secure password"
+                "password": "(required) - Choose a secure password",
+                "first_name": "(optional) - Your first name",
+                "last_name": "(optional) - Your last name"
             }
         }, status=status.HTTP_200_OK)
     
@@ -101,7 +131,6 @@ def register_user(request):
         }, status=status.HTTP_201_CREATED)
     
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 class CustomLoginView(LoginView):
     template_name = 'rest_framework/login.html'
     success_url = reverse_lazy('api-root')
