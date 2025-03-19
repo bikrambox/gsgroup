@@ -8,15 +8,15 @@
     <div class="pt-12 sm:mx-auto sm:w-full sm:max-w-sm">
       <form @submit.prevent="handleLogin" class="space-y-6">
         <div>
-          <label for="username" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Username</label>
+          <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email address</label>
           <div class="mt-2">
             <input
-              type="text"
-              v-model="username"
-              placeholder="Username"
-              name="username"
-              id="username"
-              autocomplete="username"
+              type="email"
+              v-model="email"
+              placeholder="john.doe@example.com"
+              name="email"
+              id="email"
+              autocomplete="email"
               required
               class="shadow-xs bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-xs-light"
             />
@@ -97,7 +97,7 @@ import { useAuthStore } from '../stores/auth'
 const router = useRouter()
 const authStore = useAuthStore()
 
-const username = ref('')
+const email = ref('')
 const password = ref('')
 const showPassword = ref(false)
 
@@ -106,12 +106,13 @@ const togglePassword = () => {
 }
 
 const handleLogin = async () => {
-  const success = await authStore.login(username.value, password.value)
+  const success = await authStore.login(email.value, password.value)
   if (success) {
     console.log('Login successful! Redirecting to file-upload page.')
     router.push('/fileupload')
   } else {
     console.error('Login failed: Invalid credentials or server error.')
+    alert('Login failed: Invalid email or password.')
   }
 }
 </script>

@@ -1,31 +1,49 @@
+# APIServer/authentication.py
+import logging
 from django.contrib.auth.backends import BaseBackend
 from django.contrib.auth.models import User
 from rest_framework import authentication
 from rest_framework import exceptions
 from .models import APIKey
-import logging
 
 logger = logging.getLogger(__name__)
 
 class EmailAuthenticationBackend(BaseBackend):
     """
     Custom authentication backend to authenticate users using email instead of username.
+    Supports both `email` and `username` parameters to handle form-based logins (where the email
+    is passed as `username`) and API-based logins (where the email is passed as `email`).
     """
-    def authenticate(self, request, email=None, password=None, **kwargs):
+    def authenticate(self, request, email=None, password=None, username=None, **kwargs):
+        # If email is not provided, use the username parameter (which may contain the email)
+        if email is None:
+            email = username
+
+        logger.debug(f"Attempting to authenticate user with email: {email}")
         if email is None or password is None:
+            logger.warning("Email or password not provided")
             return None
 
         try:
             user = User.objects.get(email=email)
+            logger.debug(f"Found user: {user.username} with email: {user.email}")
         except User.DoesNotExist:
             logger.warning(f"Authentication failed: No user found with email {email}")
             return None
+        except User.MultipleObjectsReturned:
+            logger.error(f"Multiple users found with email {email}")
+            return None
 
         if user.check_password(password):
-            logger.info(f"User with email {email} authenticated successfully")
-            return user
-        logger.warning(f"Authentication failed: Incorrect password for email {email}")
-        return None
+            if user.is_active:
+                logger.info(f"User with email {email} authenticated successfully")
+                return user
+            else:
+                logger.warning(f"User {email} is inactive and cannot authenticate")
+                return None
+        else:
+            logger.warning(f"Authentication failed: Incorrect password for email {email}")
+            return None
 
     def get_user(self, user_id):
         try:
@@ -62,6 +80,7 @@ class APIKeyAuthentication(BaseBackend):
 class DRFAPIKeyAuthentication(authentication.BaseAuthentication):
     """
     DRF authentication class for API key authentication.
+    Supports API key in Authorization header, APIKey header, or query parameters.
     """
     def authenticate(self, request):
         api_key = None

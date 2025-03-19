@@ -1,56 +1,54 @@
 // FileName: frontend\src\stores\auth.js
 
 import { defineStore } from 'pinia'
-import api from '../api' // Use the axios instance from api/auth/index.js
+import api from '../api'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null,
-    token: localStorage.getItem('token')
+    isAuthenticated: false
   }),
 
   getters: {
-    isAuthenticated: (state) => !!state.token,
+    isAuthenticated: (state) => state.isAuthenticated,
   },
 
   actions: {
-    async login(username, password) {
+    async login(email, password) {
       try {
-        const response = await api.post('/api/auth/token/', {
-          username,
+        await api.post('/api/auth/login/', {
+          email,
           password
         })
-
-        this.token = response.data.access
-        localStorage.setItem('token', this.token)
-
-        // Fetch user profile after successful login
+        this.isAuthenticated = true
         await this.fetchUserProfile()
-
         return true
       } catch (error) {
         console.error('Login failed in auth store:', error.response?.data || error.message)
+        this.isAuthenticated = false
         return false
       }
     },
 
     async fetchUserProfile() {
       try {
-        const response = await api.get('/api/profile/', {
-          headers: {
-            Authorization: `Bearer ${this.token}`
-          }
-        })
+        const response = await api.get('/api/auth/profile/')
         this.user = response.data
       } catch (error) {
         console.error('Failed to fetch user profile:', error.response?.data || error.message)
+        this.isAuthenticated = false
+        this.user = null
       }
     },
 
-    logout() {
-      this.user = null
-      this.token = null
-      localStorage.removeItem('token')
+    async logout() {
+      try {
+        await api.post('/api/auth/logout/')
+        this.user = null
+        this.isAuthenticated = false
+      } catch (error) {
+        console.error('Logout failed:', error.response?.data || error.message)
+      }
     }
   }
 })

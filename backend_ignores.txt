@@ -26,6 +26,7 @@ APIServer\ftp_test.py
 djangovue\__init__.py
 djangovue\settings_copy.py
 djangovue\settings.pyP
+djangovue\settings.py_P
 djangovue\settings.py_D
 .editorconfig
 uwsgi_copy.ini

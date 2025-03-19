@@ -17,11 +17,22 @@ from django.urls import reverse, reverse_lazy
 from django.contrib.auth.views import LoginView
 from .ftp_fetch import FTPConnection
 from datetime import datetime
+from .forms import EmailAuthenticationForm
 
 logger = logging.getLogger(__name__)
 
 from .models import NomecoDelivery, NovonordisDelivery
 from .serializers import NomecoDeliverySerializer, NovonordisDeliverySerializer
+
+
+class CustomLoginView(LoginView):
+    template_name = 'rest_framework/login.html'
+    success_url = reverse_lazy('api-root')
+    authentication_form = EmailAuthenticationForm  # Use the custom form
+
+    def get_success_url(self):
+        return self.success_url
+
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
