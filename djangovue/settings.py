@@ -49,7 +49,8 @@ INSTALLED_APPS = [
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',  # Default backend
-    'APIServer.authentication.APIKeyAuthentication',  # Our custom backend
+    'APIServer.authentication.EmailAuthenticationBackend',  # Custom email backend
+    'APIServer.authentication.APIKeyAuthentication',  # Custom API key backend
 ]
 
 # Logging configuration for local debugging

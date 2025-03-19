@@ -12,15 +12,20 @@ class EncryptedCharField(serializers.CharField):
     """Custom field that encrypts data before saving and decrypts when reading"""
     
     def to_internal_value(self, data):
-        # Encrypt data before saving
-        return CryptoUtils.encrypt_data(data)
+        if not isinstance(data, str):
+            raise serializers.ValidationError("Data must be a string")
+        encrypted = CryptoUtils.encrypt_data(data)
+        if not isinstance(encrypted, str):
+            raise serializers.ValidationError("Encryption did not return a string")
+        return encrypted
 
     def to_representation(self, value):
-        # Decrypt data when reading
+        if not isinstance(value, str):
+            return str(value)
         try:
             return CryptoUtils.decrypt_data(value)
         except ValueError:
-            return value  # Return as is if decryption fails
+            return value
 
 class UserSerializer(serializers.ModelSerializer):
     password = EncryptedCharField(write_only=True)
@@ -31,11 +36,24 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('id', 'username', 'email', 'password', 'first_name', 'last_name')
         extra_kwargs = {'password': {'write_only': True}}
 
+    def validate_password(self, value):
+        decrypted_value = CryptoUtils.decrypt_data(value)
+        if len(decrypted_value) < 8:
+            raise serializers.ValidationError('Password must be at least 8 characters long')
+        if not any(char.isdigit() for char in decrypted_value):
+            raise serializers.ValidationError('Password must contain at least one number')
+        if not any(char.isupper() for char in decrypted_value):
+            raise serializers.ValidationError('Password must contain at least one uppercase letter')
+        if not any(char.islower() for char in decrypted_value):
+            raise serializers.ValidationError('Password must contain at least one lowercase letter')
+        if not any(char in '!@#$%^&*()' for char in decrypted_value):
+            raise serializers.ValidationError('Password must contain at least one special character (!@#$%^&*())')
+        return value
+
     def create(self, validated_data):
-        password = validated_data.pop('password')  # Already encrypted by EncryptedCharField
-        email = validated_data.pop('email')  # Already encrypted by EncryptedCharField
+        password = validated_data.pop('password')
+        email = validated_data.pop('email')
         
-        # Decrypt the values
         password = CryptoUtils.decrypt_data(password)
         email = CryptoUtils.decrypt_data(email)
         
@@ -47,7 +65,6 @@ class UserSerializer(serializers.ModelSerializer):
             last_name=validated_data.get('last_name', '')
         )
         return user
-
 
 class DeliveryBaseSerializer(serializers.ModelSerializer):
     class Meta:
@@ -85,7 +102,6 @@ class APIKeyProfileSerializer(serializers.ModelSerializer):
         return obj.created_at.strftime('%B %d, %Y at %I:%M %p')
 
     def get_expires_at(self, obj):
-        # Example: API keys expire after 1 year
         expires = obj.created_at + timezone.timedelta(days=365)
         days_left = (expires - timezone.now()).days
         return {
@@ -110,7 +126,6 @@ class ChangePasswordSerializer(serializers.Serializer):
     confirm_password = EncryptedCharField(required=True)
 
     def validate(self, data):
-        # Decrypt passwords for comparison
         new_pass = CryptoUtils.decrypt_data(data['new_password'])
         confirm_pass = CryptoUtils.decrypt_data(data['confirm_password'])
         
@@ -120,16 +135,16 @@ class ChangePasswordSerializer(serializers.Serializer):
         return data
 
     def validate_new_password(self, value):
-        # Add password validation rules
-        if len(value) < 8:
+        decrypted_value = CryptoUtils.decrypt_data(value)
+        if len(decrypted_value) < 8:
             raise serializers.ValidationError('Password must be at least 8 characters long')
-        if not any(char.isdigit() for char in value):
+        if not any(char.isdigit() for char in decrypted_value):
             raise serializers.ValidationError('Password must contain at least one number')
-        if not any(char.isupper() for char in value):
+        if not any(char.isupper() for char in decrypted_value):
             raise serializers.ValidationError('Password must contain at least one uppercase letter')
-        if not any(char.islower() for char in value):
+        if not any(char.islower() for char in decrypted_value):
             raise serializers.ValidationError('Password must contain at least one lowercase letter')
-        if not any(char in '!@#$%^&*()' for char in value):
+        if not any(char in '!@#$%^&*()' for char in decrypted_value):
             raise serializers.ValidationError('Password must contain at least one special character (!@#$%^&*())')
         return value
 

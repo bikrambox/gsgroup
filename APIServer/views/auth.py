@@ -9,42 +9,36 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 import json
 import logging
 
-# Get the logger for this module
 logger = logging.getLogger(__name__)
 
 @api_view(['GET', 'POST'])
 @permission_classes([AllowAny])
 @ensure_csrf_cookie
 def login_view(request):
-    # Handle GET request to set CSRF cookie
     if request.method == 'GET':
         return Response({'detail': 'CSRF cookie set'})
     
-    """
-    Custom login view that handles encrypted credentials
-    """
     try:
-        # Get encrypted credentials
-        encrypted_username = request.data.get('username', '')
+        encrypted_email = request.data.get('email', '')
         encrypted_password = request.data.get('password', '')
         
-        # Decrypt credentials
-        username = CryptoUtils.decrypt_data(encrypted_username)
+        email = CryptoUtils.decrypt_data(encrypted_email)
         password = CryptoUtils.decrypt_data(encrypted_password)
         
-        user = authenticate(request, username=username, password=password)
+        user = authenticate(request, email=email, password=password)
         
         if user is not None:
             login(request, user)
-            logger.info(f"User '{username}' successfully logged in from {request.META.get('REMOTE_ADDR')}")  # Log to terminal
+            logger.info(f"User '{user.email}' successfully logged in from {request.META.get('REMOTE_ADDR')}")
             return Response({
                 'detail': 'Successfully logged in',
                 'user': {
                     'id': user.id,
-                    'username': user.username,
-                    'email': user.email
+                    'email': user.email,
+                    'first_name': user.first_name,
+                    'last_name': user.last_name
                 },
-                'token': 'your-jwt-token-here'  # Adjust based on your JWT setup
+                'token': 'your-jwt-token-here'
             })
         else:
             return Response({
@@ -62,8 +56,5 @@ def login_view(request):
 
 @api_view(['POST'])
 def logout_view(request):
-    """
-    Logout view
-    """
     logout(request)
     return Response({'detail': 'Successfully logged out'})

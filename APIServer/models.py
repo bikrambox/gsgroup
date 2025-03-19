@@ -4,8 +4,6 @@ Models for handling deliveries and API key authentication.
 
 from django.db import models
 from django.utils import timezone
-
-
 from django.core.validators import RegexValidator, MinLengthValidator
 
 class DeliveryBase(models.Model):
@@ -98,7 +96,7 @@ class APIKey(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.name} ({self.user.username})"
+        return f"{self.name} ({self.user.email})"
 
     def save(self, *args, **kwargs):
         if not self.key:
@@ -108,20 +106,17 @@ class APIKey(models.Model):
     @staticmethod
     def generate_key():
         import secrets
-        return secrets.token_hex(20)  # 40 characters hex string
-
-
+        return secrets.token_hex(20)
 
 class UploadedFile(models.Model):
     user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
     filename = models.CharField(max_length=255)
-    file_path = models.CharField(max_length=500)  # Store the relative path
+    file_path = models.CharField(max_length=500)
     uploaded_at = models.DateTimeField(default=timezone.now)
-    file_size = models.PositiveIntegerField()  # Size in bytes
+    file_size = models.PositiveIntegerField()
 
     def __str__(self):
-        return f"{self.filename} by {self.user.username}"
+        return f"{self.filename} by {self.user.email}"
 
     class Meta:
         indexes = [models.Index(fields=['user', 'uploaded_at'])]
-

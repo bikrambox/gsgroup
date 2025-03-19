@@ -61,7 +61,7 @@ def get_user_profile(request):
 @permission_classes([AllowAny])
 def api_root(request):
     return Response({
-        "message": f"Welcome {request.user.username if request.user.is_authenticated else 'Guest'} to the API",
+        "message": f"Welcome {request.user.email if request.user.is_authenticated else 'Guest'} to the API",
         "endpoints": {
             "profile": "/api/profile/",
             "auth": {
@@ -76,34 +76,6 @@ def api_root(request):
         }
     })
 
-# @api_view(['GET', 'POST'])
-# @permission_classes([AllowAny])
-# def register_user(request):
-#     if request.user.is_authenticated:
-#         return redirect('api-root')
-
-#     if request.method == 'GET':
-#         return Response({
-#             "message": "User Registration API",
-#             "method": "POST",
-#             "required_fields": {
-#                 "username": "(required) - Choose a unique username",
-#                 "email": "(required) - Provide a valid email address",
-#                 "password": "(required) - Choose a secure password"
-#             }
-#         }, status=status.HTTP_200_OK)
-    
-#     serializer = UserSerializer(data=request.data)
-#     if serializer.is_valid():
-#         serializer.save()
-#         return Response({
-#             "message": "User registered successfully"
-#         }, status=status.HTTP_201_CREATED)
-    
-#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-
 @api_view(['GET', 'POST'])
 @permission_classes([AllowAny])
 def register_user(request):
@@ -116,7 +88,7 @@ def register_user(request):
             "method": "POST",
             "required_fields": {
                 "username": "(required) - Choose a unique username",
-                "email": "(required) - Provide a valid email address",
+                "email": "(required) - Provide a valid email address (used for login)",
                 "password": "(required) - Choose a secure password",
                 "first_name": "(optional) - Your first name",
                 "last_name": "(optional) - Your last name"
@@ -131,12 +103,20 @@ def register_user(request):
         }, status=status.HTTP_201_CREATED)
     
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 class CustomLoginView(LoginView):
     template_name = 'rest_framework/login.html'
     success_url = reverse_lazy('api-root')
     
     def get_success_url(self):
         return self.success_url
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        # Change the username field to email
+        form.fields['username'].label = 'Email'
+        form.fields['username'].help_text = 'Enter your email address'
+        return form
 
 @api_view(['GET', 'POST'])
 @permission_classes([AllowAny])
@@ -224,7 +204,6 @@ def upload_json_file(request):
         )
 
     try:
-        # Ensure the directory exists
         mkdir_result = ftp.mkdir(ftp_base_path)
         if mkdir_result['status'] != 'success':
             return Response(
@@ -232,7 +211,6 @@ def upload_json_file(request):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-        # Navigate to the directory
         try:
             ftp.ftp.cwd(ftp_base_path)
             logger.info(f"Successfully navigated to {ftp_base_path}")
@@ -256,10 +234,7 @@ def upload_json_file(request):
                 all_successful = False
                 continue
 
-            # Create file buffer without validation
             file_buffer = io.BytesIO(uploaded_file.read())
-
-            # Attempt FTP upload with username prefix
             ftp_result = ftp.upload_stream(file_buffer, uploaded_file.name, username)
             if ftp_result['status'] == 'success':
                 result = {

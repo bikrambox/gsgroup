@@ -13,21 +13,21 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class FTPConnection:
-    def __init__(self, authenticated_username=None):
+    def __init__(self, authenticated_user=None):
         load_dotenv()
         self.ftp = None
         self.host = os.getenv('FTP_HOST', '10.6.8.43')
         self.port = int(os.getenv('FTP_PORT', 21))
         self.username = os.getenv('FTP_USERNAME', r'BHSR\jeba').replace('\\\\', '\\')
         self.password = os.getenv('FTP_PASSWORD', 'Hundekoldt2006!')
-        self.authenticated_username = authenticated_username
+        self.authenticated_user = authenticated_user
         self.connected = False
         self.keep_alive_interval = 300
         self.keep_alive_thread = None
         logger.info(f"Initializing FTPS connection from bastion host to {self.host}:{self.port}")
         logger.info(f"Using credentials - Username: '{self.username}', Password: '***'")
         logger.info(f"Raw username (repr): {repr(self.username)}")
-        logger.info(f"Authenticated username: {self.authenticated_username}")
+        logger.info(f"Authenticated user email: {self.authenticated_user.email if self.authenticated_user else 'None'}")
 
     def connect(self):
         if self.connected:
@@ -44,7 +44,7 @@ class FTPConnection:
             logger.info("Connection established, attempting login")
             self.ftp.login(self.username, self.password)
             logger.info("Login successful, enabling protection")
-            self.ftp.prot_c()  # Set data channel to clear (PROT C) for compatibility
+            self.ftp.prot_c()
             logger.info("Set data channel to clear (PROT C) for compatibility")
             self.ftp.set_pasv(True)
             logger.info(f"Passive mode response: {self.ftp.voidcmd('PASV')}")
@@ -190,12 +190,10 @@ class FTPConnection:
             logger.warning("Attempted to create directory without active connection")
             return {"status": "error", "message": "Not connected to FTPS server"}
 
-        # Normalize path
         normalized_path = path.replace('\\', '/')
         if not normalized_path.startswith('/'):
             normalized_path = '/' + normalized_path
 
-        # Step 1: Ensure the base directory /Reports/ELON_data/Upload_test exists
         base_path = '/Reports/ELON_data/Upload_test'
         try:
             self.ftp.cwd(base_path)
@@ -209,7 +207,6 @@ class FTPConnection:
                 logger.error(f"Failed to create base directory {base_path}: {e}")
                 return {"status": "error", "message": f"Failed to create base directory {base_path}: {e}"}
 
-        # Step 2: Create the target directory
         try:
             self.ftp.cwd(normalized_path)
             logger.info(f"Target directory {normalized_path} exists")
@@ -227,7 +224,7 @@ class FTPConnection:
 
         return {"status": "success", "message": f"Directory {normalized_path} ensured"}
 
-    def upload_stream(self, file_buffer, original_filename, username):
+    def upload_stream(self, file_buffer, original_filename, user_identifier):
         """Upload a file stream to the FTPS server with the specified naming convention."""
         if not self.ensure_connected():
             logger.warning("Attempted to upload file without active connection")
@@ -237,21 +234,20 @@ class FTPConnection:
             if not original_filename.lower().endswith('.json'):
                 return {"status": "error", "message": "Only JSON files are allowed"}
 
-            # Prepare the base filename with username prefix and replace whitespace with underscore
             base_filename = original_filename.replace(' ', '_')
-            prefixed_filename = f"{username}_{base_filename}"
+            # Use a sanitized version of the email as the prefix (replace @ and . with _)
+            sanitized_email = user_identifier.replace('@', '_').replace('.', '_')
+            prefixed_filename = f"{sanitized_email}_{base_filename}"
 
             base_path = '/Reports/ELON_data/Upload_test'
             today = time.strftime('%Y_%m_%d')
-            folder_name = f"{username}_{today}"
+            folder_name = f"{sanitized_email}_{today}"
             upload_dir = f"{base_path}/{folder_name}"
 
-            # Ensure the directory exists
             mkdir_result = self.mkdir(upload_dir)
             if mkdir_result['status'] != 'success':
                 return mkdir_result
 
-            # Navigate to the directory
             try:
                 self.ftp.cwd(upload_dir)
                 logger.info(f"Successfully navigated to {upload_dir}")
@@ -259,7 +255,6 @@ class FTPConnection:
                 logger.error(f"Failed to navigate to {upload_dir}: {e}")
                 return {"status": "error", "message": f"Failed to navigate to directory {upload_dir}: {str(e)}"}
 
-            # Check for existing files to handle duplicates
             list_result = self.list_dir(upload_dir)
             if list_result['status'] != 'success':
                 logger.warning(f"Could not list directory {upload_dir} to check for duplicates")
@@ -272,7 +267,6 @@ class FTPConnection:
                     name, ext = os.path.splitext(prefixed_filename)
                     new_filename = f"{name}_{counter:02d}{ext}"
 
-            # Set binary mode and upload
             self.ftp.voidcmd("TYPE I")
             logger.info("Set binary mode")
             file_buffer.seek(0)
@@ -316,9 +310,13 @@ class FTPConnection:
         return True
 
 if __name__ == "__main__":
-    ftp = FTPConnection(authenticated_username="testuser")
+    # For testing, create a mock user object
+    class MockUser:
+        email = "testuser@example.com"
+    
+    ftp = FTPConnection(authenticated_user=MockUser())
     ftp.connect()
     with open("test.json", 'rb') as f:
-        result = ftp.upload_stream(io.BytesIO(f.read()), "test.json", "testuser")
+        result = ftp.upload_stream(io.BytesIO(f.read()), "test.json", MockUser().email)
     print(result)
     ftp.disconnect()

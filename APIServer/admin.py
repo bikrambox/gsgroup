@@ -4,9 +4,36 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.utils.html import format_html
 from .models import APIKey
+from django import forms
+from django.contrib.auth.forms import AuthenticationForm
+
+class EmailAuthenticationForm(AuthenticationForm):
+    """
+    Custom admin login form to use email instead of username.
+    """
+    username = forms.EmailField(label='Email', widget=forms.EmailInput(attrs={'autofocus': True}))
+
+    def clean(self):
+        email = self.cleaned_data.get('username')  # 'username' field is now email
+        password = self.cleaned_data.get('password')
+
+        if email and password:
+            self.user_cache = authenticate(self.request, email=email, password=password)
+            if self.user_cache is None:
+                raise forms.ValidationError(
+                    self.error_messages['invalid_login'],
+                    code='invalid_login',
+                    params={'username': 'email'},
+                )
+            else:
+                self.confirm_login_allowed(self.user_cache)
+
+        return self.cleaned_data
 
 class CustomUserAdmin(UserAdmin):
-    list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff', 'get_api_keys')
+    list_display = ('email', 'first_name', 'last_name', 'is_staff', 'get_api_keys')
+    list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
+    search_fields = ('email', 'first_name', 'last_name')
     
     def get_api_keys(self, obj):
         api_keys = obj.api_keys.filter(is_active=True)
@@ -36,14 +63,21 @@ class CustomUserAdmin(UserAdmin):
 admin.site.unregister(User)
 admin.site.register(User, CustomUserAdmin)
 
+# Set the custom authentication form for admin login
+admin.site.login_form = EmailAuthenticationForm
+
 @admin.register(APIKey)
 class APIKeyAdmin(admin.ModelAdmin):
-    list_display = ('name', 'user', 'key', 'created_at', 'is_active')
+    list_display = ('name', 'user_email', 'key', 'created_at', 'is_active')
     list_filter = ('is_active', 'created_at', 'user')
-    search_fields = ('name', 'key', 'user__username')
+    search_fields = ('name', 'key', 'user__email')
     readonly_fields = ('key', 'created_at')
     ordering = ('-created_at',)
     actions = ['toggle_active']
+
+    def user_email(self, obj):
+        return obj.user.email
+    user_email.short_description = 'User Email'
 
     def toggle_active(self, request, queryset):
         for api_key in queryset:
