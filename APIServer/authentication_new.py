@@ -9,13 +9,14 @@ from django.contrib.auth import get_user_model
 
 logger = logging.getLogger(__name__)    
 
-
-
-class InactiveAccountException(Exception):
-    pass
-
 class EmailAuthenticationBackend(BaseBackend):
+    """
+    Custom authentication backend to authenticate users using email instead of username.
+    Supports both `email` and `username` parameters to handle form-based logins (where the email
+    is passed as `username`) and API-based logins (where the email is passed as `email`).
+    """
     def authenticate(self, request, email=None, password=None, username=None, **kwargs):
+        # If email is not provided, use the username parameter (which may contain the email)
         if email is None:
             email = username
 
@@ -26,7 +27,7 @@ class EmailAuthenticationBackend(BaseBackend):
 
         User = get_user_model()
         try:
-            user = User.objects.get(email__iexact=email)
+            user = User.objects.get(email__iexact=email)  # Case-insensitive lookup
             logger.debug(f"Found user: {user.username} with email: {user.email}")
         except User.DoesNotExist:
             logger.warning(f"Authentication failed: No user found with email {email}")
@@ -41,9 +42,6 @@ class EmailAuthenticationBackend(BaseBackend):
                 return user
             else:
                 logger.warning(f"User {email} is inactive and cannot authenticate")
-                # Instead of raising an exception, return None and set an error message on the request
-                if request is not None:
-                    request.auth_error = "Your account is inactive. Please wait for admin approval."
                 return None
         else:
             logger.warning(f"Authentication failed: Incorrect password for email {email}")
@@ -55,100 +53,6 @@ class EmailAuthenticationBackend(BaseBackend):
             return User.objects.get(pk=user_id)
         except User.DoesNotExist:
             return None
-
-
-
-# class InactiveAccountException(Exception):
-#     pass
-
-# class EmailAuthenticationBackend(BaseBackend):
-#     def authenticate(self, request, email=None, password=None, username=None, **kwargs):
-#         if email is None:
-#             email = username
-
-#         logger.debug(f"Attempting to authenticate user with email: {email}")
-#         if email is None or password is None:
-#             logger.warning("Email or password not provided")
-#             return None
-
-#         User = get_user_model()
-#         try:
-#             user = User.objects.get(email__iexact=email)
-#             logger.debug(f"Found user: {user.username} with email: {user.email}")
-#         except User.DoesNotExist:
-#             logger.warning(f"Authentication failed: No user found with email {email}")
-#             return None
-#         except User.MultipleObjectsReturned:
-#             logger.error(f"Multiple users found with email {email}")
-#             return None
-
-#         if user.check_password(password):
-#             if user.is_active:
-#                 logger.info(f"User with email {email} authenticated successfully")
-#                 return user
-#             else:
-#                 logger.warning(f"User {email} is inactive and cannot authenticate")
-#                 raise InactiveAccountException("Your account is inactive. Please wait for admin approval.")
-
-#         else:
-#             logger.warning(f"Authentication failed: Incorrect password for email {email}")
-#             return None
-
-#     def get_user(self, user_id):
-#         User = get_user_model()
-#         try:
-#             return User.objects.get(pk=user_id)
-#         except User.DoesNotExist:
-#             return None
-
-
-
-# class EmailAuthenticationBackend(BaseBackend):
-#     """
-#     Custom authentication backend to authenticate users using email instead of username.
-#     Supports both `email` and `username` parameters to handle form-based logins (where the email
-#     is passed as `username`) and API-based logins (where the email is passed as `email`).
-#     """
-#     def authenticate(self, request, email=None, password=None, username=None, **kwargs):
-#         # If email is not provided, use the username parameter (which may contain the email)
-#         if email is None:
-#             email = username
-
-#         logger.debug(f"Attempting to authenticate user with email: {email}")
-#         if email is None or password is None:
-#             logger.warning("Email or password not provided")
-#             return None
-
-#         User = get_user_model()
-#         try:
-#             user = User.objects.get(email__iexact=email)  # Case-insensitive lookup
-#             logger.debug(f"Found user: {user.username} with email: {user.email}")
-#         except User.DoesNotExist:
-#             logger.warning(f"Authentication failed: No user found with email {email}")
-#             return None
-#         except User.MultipleObjectsReturned:
-#             logger.error(f"Multiple users found with email {email}")
-#             return None
-
-#         if user.check_password(password):
-#             if user.is_active:
-#                 logger.info(f"User with email {email} authenticated successfully")
-#                 return user
-#             else:
-#                 logger.warning(f"User {email} is inactive and cannot authenticate")
-#                 return None
-#         else:
-#             logger.warning(f"Authentication failed: Incorrect password for email {email}")
-#             return None
-
-#     def get_user(self, user_id):
-#         User = get_user_model()
-#         try:
-#             return User.objects.get(pk=user_id)
-#         except User.DoesNotExist:
-#             return None
-
-
 
 
 

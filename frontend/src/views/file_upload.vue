@@ -1,9 +1,11 @@
 <!-- FileName: frontend\src\views\file_upload.vue -->
 <template>
   <div class="max-w-2xl mx-auto p-6">
-    <h2 class="text-5xl font-bold tracking-tight text-gray-600 dark:text-white sm:text-7xl text-center" style="font-family: Helvetica, sans-serif;">BHS logistics</h2>
+    <h2 class="text-5xl font-bold tracking-tight text-gray-600 dark:text-white sm:text-7xl text-center"
+      style="font-family: Helvetica, sans-serif;">BHS logistics</h2>
     <!-- File Input with Drag-and-Drop -->
-    <div class="border-2 border-dashed border-gray-300 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-800 bg-gray-50 dark:bg-black rounded-lg p-6 text-center relative mt-4"
+    <div
+      class="border-2 border-dashed border-gray-300 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-800 bg-gray-50 dark:bg-black rounded-lg p-6 text-center relative mt-4"
       @dragover.prevent="handleDragOver" @dragleave.prevent="handleDragLeave" @drop.prevent="handleDrop"
       :class="{ 'hover:bg-green-50 dark:hover:bg-green-700': isDragging }">
       <input type="file" ref="fileInput" @change="handleFileChange" class="hidden" accept=".json" multiple />
@@ -12,9 +14,13 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M7 16V4m0 0L3 8m4-4l4-4m10 12h-6m6 0l-4 4m0-8l-4-4m-2 12V8m0 0l-4 4m4-4l4 4" />
         </svg> -->
-        
+
+        <!-- <button @click="testProfileFetch" class="bg-blue-500 text-white px-4 py-2 rounded">
+  Test Profile Fetch
+</button> -->
+
         <label class="text-gray-600 dark:text-gray-100 ">
-          Drag & Drop file here or 
+          Drag & Drop file here or
           <span @click="$refs.fileInput.click()" class="text-blue-600 cursor-pointer hover:underline">
             Choose file
           </span>
@@ -23,7 +29,7 @@
           Supported formats: .json • Maximum size: 10MB
         </p>
       </div>
-      
+
     </div>
 
     <!-- Selected Files List -->
@@ -82,12 +88,9 @@
             </div>
             <p class="text-xs text-gray-500 text-right mt-1">{{ fileProgress[index] }}%</p>
           </div>
-          <button
-            @click="removeFile(index)"
+          <button @click="removeFile(index)"
             class="text-red-400 dark:text-gray-50 hover:text-red-700 dark:hover:text-red-500 focus:outline-none"
-            title="Remove file"
-            :disabled="loading"
-          >
+            title="Remove file" :disabled="loading">
             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -114,7 +117,8 @@
         <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
         </svg>
-        <p>Upload Success! {{ uploadedFileCount }} {{ uploadedFileCount === 1 ? 'file' : 'files' }} successfully uploaded!</p>
+        <p>Upload Success! {{ uploadedFileCount }} {{ uploadedFileCount === 1 ? 'file' : 'files' }} successfully
+          uploaded!</p>
       </div>
       <div v-if="uploadComplete && !error && fileLocations.length > 0" class="mt-2 text-gray-600 location-container">
         <p v-for="(location, index) in fileLocations" :key="index" class="location-text break-all">
@@ -160,6 +164,21 @@ const isDragging = ref(false)
 const uploadedFileCount = ref(0) // New ref to store the number of uploaded files
 const errorDismissTimer = ref(5) // Timer for auto-dismissing duplicate error
 let errorDismissInterval = null // Store the interval ID for cleanup
+
+
+// import { useAuthStore } from '../stores/auth';
+
+// const authStore = useAuthStore();
+
+// const testProfileFetch = async () => {
+//   try {
+//     await authStore.fetchUserProfile();
+//     console.log('Profile fetched successfully:', authStore.user);
+//   } catch (error) {
+//     console.error('Profile fetch failed:', error);
+//   }
+// };
+
 
 const handleDragOver = () => {
   isDragging.value = true
@@ -342,11 +361,18 @@ onBeforeUnmount(() => {
     clearInterval(errorDismissInterval)
   }
 })
-
 onMounted(() => {
   console.log('API URL:', import.meta.env.VITE_API_URL)
 })
 </script>
+
+
+
+
+
+
+
+
 
 <style scoped>
 /* Center the entire component in the middle of the screen */
@@ -396,6 +422,7 @@ onMounted(() => {
 
 /* Styling for delete button */
 button:disabled svg {
-  stroke: #d1d5db; /* Gray out the icon when disabled */
+  stroke: #d1d5db;
+  /* Gray out the icon when disabled */
 }
 </style>

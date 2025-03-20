@@ -1,5 +1,3 @@
-<!-- FileName: frontend\src\views\Navbar.vue -->
-
 <template>
   <nav ref="navRef" class="bg-gray-200 dark:bg-gray-900 text-gray-900 dark:text-gray-400 sticky top-0 left-0 right-0 z-50">
     <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -19,9 +17,6 @@
 
         <!-- Desktop Navigation -->
         <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-          <div class="flex-shrink-0">
-            <h1 class="text-3xl font-extrabold text-gray-900">BHS LOGISTICS</h1>
-          </div>
           <!-- Desktop Menu Items -->
           <div class="hidden sm:ml-6 sm:block">
             <div class="flex space-x-4">
@@ -55,14 +50,11 @@
 
         <!-- User menu -->
         <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-          <button v-if="route.path !== '/' && route.path !== '/fileupload' && route.path !== '/admindashboard'" type="button" @click="handleItemClick('Log In')" class="relative rounded-md text-gray-900 dark:text-gray-50 hover:bg-gray-300 dark:hover:bg-gray-700 px-3 mr-1 py-2 text-sm font-medium cursor-pointer">
-            User Login
+          <button v-if="route.path !== '/' && route.path !== '/fileupload'" type="button" @click="handleItemClick('Log In')" class="relative rounded-md text-gray-900 dark:text-gray-50 hover:bg-gray-300 dark:hover:bg-gray-700 px-3 mr-1 py-2 text-sm font-medium cursor-pointer">
+            Login
           </button>
-          <button v-if="route.path !== '/admin' && route.path !== '/admindashboard' && route.path !== '/fileupload'" type="button" @click="handleItemClick('Admin Login')" class="relative rounded-md text-gray-900 dark:text-gray-50 hover:bg-gray-300 dark:hover:bg-gray-700 px-3 mr-1 py-2 text-sm font-medium cursor-pointer">
-            Admin Login
-          </button>
-          <button v-if="route.path !== '/register' && route.path !== '/fileupload' && route.path !== '/admindashboard'" type="button" @click="handleItemClick('Register')" class="relative rounded-md text-gray-900 dark:text-gray-50 hover:bg-gray-300 dark:hover:bg-gray-700 px-3 ml-1 py-2 text-sm font-medium cursor-pointer">
-            User Register
+          <button v-if="route.path !== '/register' && route.path !== '/fileupload'" type="button" @click="handleItemClick('Register')" class="relative rounded-md text-gray-900 dark:text-gray-50 hover:bg-gray-300 dark:hover:bg-gray-700 px-3 ml-1 py-2 text-sm font-medium cursor-pointer">
+            Register
           </button>
           <a v-if="(authStore.isAuthenticated || route.path === '/fileupload') && route.path !== '/' && route.path !== '/register'" href="#" @click.prevent="handleLogout" class="text-gray-900 dark:text-gray-50 text-sm font-medium ml-4">
             Logout
@@ -105,7 +97,7 @@
 import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
-import api from '../api'
+import api from '../api' // Import your Axios instance
 
 const hoveredDropdown = ref(null)
 const isMobileMenuOpen = ref(false)
@@ -148,14 +140,12 @@ const handleItemClick = (itemName) => {
     router.push('/')
   } else if (itemName === 'Register') {
     router.push('/register')
-  } else if (itemName === 'Admin Login') {
-    router.push('/admin')
   } else if (itemName === 'Home') {
     router.push('/')
   } else {
     console.log(`Navigating to ${itemName}`)
   }
-  isMobileMenuOpen.value = false
+  isMobileMenuOpen.value = false // Close mobile menu after click
 }
 
 const resetDropdowns = () => {
@@ -191,17 +181,20 @@ const toggleDarkMode = () => {
 
 const handleLogout = async () => {
   try {
-    await api.post('/api/auth/logout/') // Optional: Call backend logout endpoint
-  } catch (error) {
-    console.warn('Logout request failed:', error.response?.data || error.message)
-  } finally {
+    await api.post('/api/auth/logout/') // Call backend logout endpoint
     authStore.logout() // Clear frontend auth state
     router.push('/') // Redirect to login page
+  } catch (error) {
+    console.error('Logout failed:', error.response?.data || error.message)
+    alert('Logout failed: ' + (error.response?.data?.message || 'Server error'))
   }
 }
 
+// Dynamically compute the navigation items based on auth status and current route
 const navigation = computed(() => {
-  const navItems = []
+  const navItems = [
+    // { name: 'Home', href: '/', current: route.path === '/' },
+  ]
   return navItems
 })
 </script>

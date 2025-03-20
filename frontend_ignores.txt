@@ -65,3 +65,5 @@ frontend\vite.config_copy.js
 frontend\vite.config.js
 frontend\src\style.css
 frontend\src\views\file_upload.vue
+frontend\src\views\Navbar_LAST.vue
+frontend\src\views\file_upload_BAK.vue

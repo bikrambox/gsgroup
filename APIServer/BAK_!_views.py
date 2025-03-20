@@ -3,13 +3,14 @@ import os
 import io
 import json
 import logging
-from rest_framework import viewsets, status
+import ftplib
+from rest_framework import viewsets, status, serializers
 from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.response import Response
 from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth.models import User
-from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth import update_session_auth_hash, authenticate
 from .models import APIKey
 from .serializers import UserSerializer, APIKeySerializer, UserProfileSerializer, ChangePasswordSerializer
 from django.http import JsonResponse
@@ -19,79 +20,130 @@ from .ftp_fetch import FTPConnection
 from datetime import datetime
 from .forms import EmailAuthenticationForm
 
-from rest_framework.views import APIView
-from django.contrib.auth import authenticate, login
-# from .authentication import InactiveAccountException
-from rest_framework_simplejwt.tokens import RefreshToken
-
+# Add imports for Simple JWT
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 logger = logging.getLogger(__name__)
 
 from .models import NomecoDelivery, NovonordisDelivery
 from .serializers import NomecoDeliverySerializer, NovonordisDeliverySerializer
 
-class AdminFrontView(APIView):
-    permission_classes = [IsAdminUser]  # Only superusers can access this endpoint
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        # Get the email and password from the request
+        email = attrs.get("email")
+        password = attrs.get("password")
 
-    def get(self, request, *args, **kwargs):
-        """
-        Fetch the list of all users with their details.
-        """
-        users = User.objects.all()
-        serializer = UserSerializer(users, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        # First, check if the user exists (case-insensitive email lookup)
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        try:
+            user = User.objects.get(email__iexact=email)  # Case-insensitive lookup
+            logger.info(f"Found user with email {email}: {user.username}, is_active={user.is_active}")
+        except User.DoesNotExist:
+            logger.warning(f"No user found with email {email}")
+            raise serializers.ValidationError(
+                # "No account found with the given email address.",
+                "Your account is inactive. Please wait for admin approval.",
+                code="no_account"
+            )
+
+        # Check if the user is inactive
+        if not user.is_active:
+            logger.info(f"User {email} is inactive")
+            raise serializers.ValidationError(
+                "Your account is inactive. Please wait for admin approval Original.",
+                code="inactive_account"
+            )
+
+        # Authenticate the user
+        user = authenticate(request=self.context["request"], email=email, password=password)
+        if user is None:
+            logger.warning(f"Authentication failed for email {email}")
+            raise serializers.ValidationError(
+                "Invalid password.",
+                code="invalid_password"
+            )
+
+        # If authentication succeeds, proceed with token generation
+        data = super().validate(attrs)
+        return data
+
+
+# # Custom Token Obtain Pair View for handling inactive users
+# class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+#     def validate(self, attrs):
+#         # Get the email and password from the request
+#         email = attrs.get("email")
+#         password = attrs.get("password")
+
+#         # First, check if the user exists (case-insensitive email lookup)
+#         from django.contrib.auth import get_user_model
+#         User = get_user_model()
+#         try:
+#             user = User.objects.get(email__iexact=email)  # Case-insensitive lookup
+#         except User.DoesNotExist:
+#             # If the user doesn't exist, raise a generic error
+#             raise serializers.ValidationError(
+#                 "No account found with the given email address.",
+#                 code="no_account"
+#             )
+
+#         # Check if the user is inactive
+#         if not user.is_active:
+#             raise serializers.ValidationError(
+#                 "Your account is inactive. Please wait for admin approval.",
+#                 code="inactive_account"
+#             )
+
+#         # Authenticate the user
+#         user = authenticate(request=self.context["request"], email=email, password=password)
+#         if user is None:
+#             # If authentication fails (e.g., wrong password), raise a generic error
+#             raise serializers.ValidationError(
+#                 "Invalid password.",
+#                 code="invalid_password"
+#             )
+
+#         # If authentication succeeds, proceed with token generation
+#         data = super().validate(attrs)
+#         return data
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
 
     def post(self, request, *args, **kwargs):
-        """
-        Update the is_active status of a user.
-        Expects: { "user_id": <id>, "is_active": true/false }
-        """
-        user_id = request.data.get("user_id")
-        is_active = request.data.get("is_active")
-
-        # Validate input
-        if user_id is None or is_active is None:
+        serializer = self.get_serializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except serializers.ValidationError as e:
+            # If validation fails, return the error response
+            status_code = status.HTTP_403_FORBIDDEN if "inactive" in str(e).lower() else status.HTTP_401_UNAUTHORIZED
             return Response(
-                {"detail": "user_id and is_active are required."},
+                {"detail": str(e)},
+                status=status_code
+            )
+        except Exception as e:
+            return Response(
+                {"detail": str(e)},
                 status=status.HTTP_400_BAD_REQUEST
             )
-
-        try:
-            user = User.objects.get(id=user_id)
-        except User.DoesNotExist:
-            return Response(
-                {"detail": "User not found."},
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-        # Prevent superusers from deactivating themselves
-        if user == request.user and not is_active:
-            return Response(
-                {"detail": "You cannot deactivate your own account."},
-                status=status.HTTP_403_FORBIDDEN
-            )
-
-        # Update the is_active status
-        user.is_active = is_active
-        user.save()
-
-        return Response(
-            {
-                "detail": f"User {user.email} is now {'active' if is_active else 'inactive'}."
-            },
-            status=status.HTTP_200_OK
-        )
-
-
-# !!!!!!!!!!!!!!!!!!!!!!!!!!!
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
 class CustomLoginView(LoginView):
     template_name = 'rest_framework/login.html'
     success_url = reverse_lazy('api-root')
-    authentication_form = EmailAuthenticationForm  # Use the custom form
-
+    
     def get_success_url(self):
         return self.success_url
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        # Change the username field to email
+        form.fields['username'].label = 'Email'
+        form.fields['username'].help_text = 'Enter your email address'
+        return form
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
@@ -146,38 +198,6 @@ def api_root(request):
         }
     })
 
-# @api_view(['GET', 'POST'])
-# @permission_classes([AllowAny])
-# def register_user(request):
-#     if request.user.is_authenticated:
-#         return redirect('api-root')
-
-#     if request.method == 'GET':
-#         return Response({
-#             "message": "User Registration API",
-#             "method": "POST",
-#             "required_fields": {
-#                 "username": "(required) - Choose a unique username",
-#                 "email": "(required) - Provide a valid email address (used for login)",
-#                 "password": "(required) - Choose a secure password",
-#                 "first_name": "(optional) - Your first name",
-#                 "last_name": "(optional) - Your last name"
-#             }
-#         }, status=status.HTTP_200_OK)
-    
-#     serializer = UserSerializer(data=request.data)
-#     if serializer.is_valid():
-#         serializer.save()
-#         return Response({
-#             "message": "User registered successfully"
-#         }, status=status.HTTP_201_CREATED)
-    
-#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-# New Register  wiuth deactivated login 
-
-
 @api_view(['GET', 'POST'])
 @permission_classes([AllowAny])
 def register_user(request):
@@ -208,130 +228,6 @@ def register_user(request):
         }, status=status.HTTP_201_CREATED)
     
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-
-#New LoginVieew
-
-
-# class CustomLoginView(APIView):
-#     def post(self, request, *args, **kwargs):
-#         email = request.data.get("email")
-#         password = request.data.get("password")
-
-#         if not email or not password:
-#             return Response(
-#                 {"detail": "Email and password are required."},
-#                 status=status.HTTP_400_BAD_REQUEST
-#             )
-
-#         user = authenticate(request, email=email, password=password)
-
-#         if user is None:
-#             # Check if there's a specific auth error (e.g., inactive account)
-#             error_message = getattr(request, 'auth_error', None)
-#             if error_message:
-#                 return Response(
-#                     {"detail": error_message},
-#                     status=status.HTTP_403_FORBIDDEN
-#                 )
-#             return Response(
-#                 {"detail": "Invalid email or password."},
-#                 status=status.HTTP_401_UNAUTHORIZED
-#             )
-
-#         # No need for the redundant is_active check since the backend already handles it
-#         login(request, user)
-#         refresh = RefreshToken.for_user(user)
-#         return Response(
-#             {
-#                 "refresh": str(refresh),
-#                 "access": str(refresh.access_token),
-#             },
-#             status=status.HTTP_200_OK
-#         )
-
-
-# class CustomLoginView(APIView):
-#     def post(self, request, *args, **kwargs):
-#         email = request.data.get("email")
-#         password = request.data.get("password")
-
-#         if not email or not password:
-#             return Response(
-#                 {"detail": "Email and password are required."},
-#                 status=status.HTTP_400_BAD_REQUEST
-#             )
-
-#         try:
-#             user = authenticate(request, email=email, password=password)
-#         except InactiveAccountException as e:
-#             return Response(
-#                 {"detail": str(e)},
-#                 status=status.HTTP_403_FORBIDDEN
-#             )
-
-#         if user is None:
-#             return Response(
-#                 {"detail": "Invalid email or password."},
-#                 status=status.HTTP_401_UNAUTHORIZED
-#             )
-
-#         if not user.is_active:
-#             return Response(
-#                 {"detail": "Your account is inactive. Please wait for admin approval."},
-#                 status=status.HTTP_403_FORBIDDEN
-#             )
-
-#         # Log the user in (optional, depending on whether you need session-based auth)
-#         login(request, user)
-
-#         # Generate JWT tokens
-#         refresh = RefreshToken.for_user(user)
-#         return Response(
-#             {
-#                 "refresh": str(refresh),
-#                 "access": str(refresh.access_token),
-#             },
-#             status=status.HTTP_200_OK
-#         )
-
-
-# class CustomLoginView(LoginView):
-#     template_name = 'rest_framework/login.html'
-#     success_url = reverse_lazy('api-root')
-#     authentication_form = EmailAuthenticationForm
-
-#     def form_invalid(self, form):
-#         try:
-#             # Attempt to authenticate to catch the InactiveAccountException
-#             email = form.cleaned_data.get('email')
-#             password = form.cleaned_data.get('password')
-#             if email and password:
-#                 from django.contrib.auth import authenticate
-#                 authenticate(self.request, email=email, password=password)
-#         except InactiveAccountException as e:
-#             # Add the custom message to the form errors
-#             messages.error(self.request, str(e))
-#             return self.render_to_response(self.get_context_data(form=form))
-#         return super().form_invalid(form)
-
-#     def get_success_url(self):
-#         return self.success_url
-
-
-# class CustomLoginView(LoginView):
-#     template_name = 'rest_framework/login.html'
-#     success_url = reverse_lazy('api-root')
-    
-#     def get_success_url(self):
-#         return self.success_url
-
-#     def get_form(self, form_class=None):
-#         form = super().get_form(form_class)
-#         # Change the username field to email
-#         form.fields['username'].label = 'Email'
-#         form.fields['username'].help_text = 'Enter your email address'
-#         return form
 
 @api_view(['GET', 'POST'])
 @permission_classes([AllowAny])

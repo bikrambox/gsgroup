@@ -88,21 +88,38 @@ REST_FRAMEWORK = {
 }
 
 # JWT Settings
+# SIMPLE_JWT = {
+#     'ACCESS_TOKEN_LIFETIME': timedelta(seconds=5),
+#     'REFRESH_TOKEN_LIFETIME': timedelta(seconds=6),  # Refresh token expires in 1 minute
+#     'ROTATE_REFRESH_TOKENS': True,
+#     'BLACKLIST_AFTER_ROTATION': True,
+#     'UPDATE_LAST_LOGIN': False,
+#     'ALGORITHM': 'HS256',
+#     'SIGNING_KEY': SECRET_KEY,
+#     'VERIFYING_KEY': None,
+#     'AUDIENCE': None,
+#     'ISSUER': None,
+#     'AUTH_HEADER_TYPES': ('Bearer',),
+#     'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+#     'USER_ID_FIELD': 'id',
+#     'USER_ID_CLAIM': 'user_id',
+# }
+
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-    'ROTATE_REFRESH_TOKENS': False,
-    'BLACKLIST_AFTER_ROTATION': True,
-    'UPDATE_LAST_LOGIN': False,
-    'ALGORITHM': 'HS256',
-    'SIGNING_KEY': SECRET_KEY,
-    'VERIFYING_KEY': None,
-    'AUDIENCE': None,
-    'ISSUER': None,
-    'AUTH_HEADER_TYPES': ('Bearer',),
-    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
-    'USER_ID_FIELD': 'id',
-    'USER_ID_CLAIM': 'user_id',
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=30),  # Shorter for frequent testing of token refresh
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),   # Long enough to avoid frequent logouts during development
+    'ROTATE_REFRESH_TOKENS': True,                  # Keep True to test token rotation
+    'BLACKLIST_AFTER_ROTATION': True,               # Keep True to test token blacklisting
+    'UPDATE_LAST_LOGIN': False,                     # Optional, same as production
+    'ALGORITHM': 'HS256',                           # Same as production
+    'SIGNING_KEY': SECRET_KEY,                      # Same as production
+    'VERIFYING_KEY': None,                          # Same as production
+    'AUDIENCE': None,                               # Same as production
+    'ISSUER': None,                                 # Same as production
+    'AUTH_HEADER_TYPES': ('Bearer',),               # Same as production
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',       # Same as production
+    'USER_ID_FIELD': 'id',                          # Same as production
+    'USER_ID_CLAIM': 'user_id',                     # Same as production
 }
 
 MIDDLEWARE = [
@@ -120,7 +137,7 @@ MIDDLEWARE = [
 # CORS settings for local development
 CORS_ALLOW_ALL_ORIGINS = False  # More secure, specify origins
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173',  # Your Vue.js development server
+    "http://localhost:4430",  # Your frontend development URL
     'http://127.0.0.1:5173',  # Localhost for testing
     'http://10.42.0.14:8000',  # Docker container IP for testing
     'http://10.42.0.14:5173',  # Docker container IP for testing
@@ -131,6 +148,7 @@ CORS_ALLOW_CREDENTIALS = True  # Allow credentials (cookies, authorization heade
 
 # CSRF settings for cross-origin requests (local development)
 CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:4430",  # Your frontend development URL
     'http://localhost:5173',
     'http://127.0.0.1:5173',
     'http://10.42.0.14:8000',
@@ -139,9 +157,12 @@ CSRF_TRUSTED_ORIGINS = [
     'https://vps1139.basicserver.io:42032',  # Your production frontend URL with port
 ]
 
-# # Session settings (local development, no HTTPS)
-# SESSION_COOKIE_SAMESITE = 'Lax'  # Suitable for local HTTP
-# SESSION_COOKIE_SECURE = False  # Keep False for local HTTP testing
+# # Cookie settings for local testing
+# SESSION_COOKIE_SAMESITE = 'None'
+# CSRF_COOKIE_SAMESITE = 'None'
+# SESSION_COOKIE_SECURE = False  # False for local testing (HTTP)
+# CSRF_COOKIE_SECURE = False    # False for local testing (HTTP)
+
 
 # Session settings for production
 

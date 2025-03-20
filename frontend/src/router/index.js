@@ -1,7 +1,8 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import { useAuthStore } from '../stores/auth' // Assuming an auth store exists
+// frontend/src/router/index.js
 
-// Define routes
+import { createRouter, createWebHistory } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
+
 const routes = [
   {
     path: '/',
@@ -9,25 +10,24 @@ const routes = [
     meta: { requiresAuth: false },
   },
   {
-    path: '/dashboard',
-    component: () => import('../views/Dashboard.vue'),
-    meta: { requiresAuth: true },
-  },
-  // {
-  //   path: '/signup',
-  //   component: () => import('../views/Sign_up.vue'),
-  //   meta: { requiresAuth: false },
-  // },
-  {
     path: '/fileupload',
     component: () => import('../views/file_upload.vue'),
     meta: { requiresAuth: true },
-    // meta: { requiresAuth: false },
   },
   {
     path: '/register',
     component: () => import('../views/Sign_up.vue'),
     meta: { requiresAuth: false },
+  },
+  {
+    path: '/admin',
+    component: () => import('../views/AdminLoginView.vue'),
+    meta: { requiresAuth: false },
+  },
+  {
+    path: '/admindashboard',
+    component: () => import('../views/AdminView.vue'),
+    meta: { requiresAuth: true, requiresSuperuser: true }, // Require superuser access
   },
 ];
 
@@ -36,25 +36,24 @@ const router = createRouter({
   routes,
 });
 
-// Navigation guard to handle authentication and redirects
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
+  await authStore.checkAuth(); // Wait for token validation
   const isAuthenticated = authStore.isAuthenticated;
+  // const isSuperuser = authStore.user?.is_superuser || false; // Check if the user is a superuser
+  const isAdmin = authStore.user?.profile_summary?.is_staff || false; // Check is_staff instead of is_superuser
 
-  // If route requires auth and user is not authenticated, redirect to login
   if (to.meta.requiresAuth && !isAuthenticated) {
-    next('/');
-  } 
-  // If already authenticated and trying to access login, redirect to fileupload
-  else if (to.path === '/' && isAuthenticated) {
-    next('/fileupload');
-  } 
-  // If authenticated and trying to access /register or /signup, redirect to fileupload
-  else if ((to.path === '/register') && isAuthenticated) {
-    next('/fileupload');
-  } 
-  // Proceed to the requested route
-  else {
+    next('/'); // Redirect to login if not authenticated
+  } else if (to.meta.requiresSuperuser && (!isAuthenticated || !isAdmin)) {
+    next('/admin'); // Redirect to admin login if not a superuser
+  } else if (to.path === '/' && isAuthenticated) {
+    next('/fileupload'); // Redirect authenticated users to fileupload
+  } else if (to.path === '/register' && isAuthenticated) {
+    next('/fileupload'); // Redirect authenticated users to fileupload
+  } else if (to.path === '/admin' && isAuthenticated && isAdmin) {
+    next('/admindashboard'); // Redirect authenticated superusers to admin dashboard
+  } else {
     next();
   }
 });

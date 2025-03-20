@@ -14,8 +14,16 @@ templates
 var\vassals
 frontend
 .git
+APIServer\__pycache__
+APIServer\views\__pycache__
+APIServer\migrations
 
 [files]
+
+APIServer\authentication_new.py
+APIServer\BAK_!_views.py
+APIServer\views\asdasdsaas.py
+
 
 APIServer\middleware\__init__.py
 APIServer\migrations\__init__.py
