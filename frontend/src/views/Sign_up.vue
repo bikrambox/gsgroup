@@ -1,16 +1,15 @@
 <!-- FileName: frontend\src\views\Sign_up.vue -->
-
 <template>
   <div class="flex min-h-full flex-1 flex-col justify-center px-6 py-6 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-sm">
       <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight">Sign up for your BHS account</h2>
-      <h2 class="text-center text-red-500 dark:text-red-500">* All fields are mandatory</h2>
+      <h2 class="text-center text-red-500">* All fields are mandatory</h2>
     </div>
     <div class="pt-6 sm:mx-auto sm:w-full sm:max-w-sm">
       <form class="space-y-6" @submit.prevent="handleSubmit">
         <div class="flex items-center justify-between">
           <div class="flex-1">
-            <label for="firstname" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">First name</label>
+            <label for="firstname" class="block mb-2 text-sm font-medium text-gray-900">First name</label>
             <div class="mt-1">
               <input
                 type="text"
@@ -20,12 +19,12 @@
                 id="firstname"
                 autocomplete="given-name"
                 required
-                class="shadow-xs bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-xs-light"
+                class="shadow-xs bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
               />
             </div>
           </div>
           <div class="flex-1 ml-4">
-            <label for="lastname" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Last name</label>
+            <label for="lastname" class="block mb-2 text-sm font-medium text-gray-900">Last name</label>
             <div class="mt-1">
               <input
                 type="text"
@@ -35,13 +34,13 @@
                 id="lastname"
                 autocomplete="family-name"
                 required
-                class="shadow-xs bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-xs-light"
+                class="shadow-xs bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
               />
             </div>
           </div>
         </div>
         <div>
-          <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email address</label>
+          <label for="email" class="block mb-2 text-sm font-medium text-gray-900">Email address</label>
           <div class="mt-2">
             <input
               type="email"
@@ -51,13 +50,13 @@
               id="email"
               autocomplete="email"
               required
-              class="shadow-xs bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-xs-light"
+              class="shadow-xs bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
             />
             <p v-if="errors.email" class="mt-2 text-sm text-red-500">{{ errors.email }}</p>
           </div>
         </div>
         <div>
-          <label for="username" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Username</label>
+          <label for="username" class="block mb-2 text-sm font-medium text-gray-900">Username</label>
           <div class="mt-2">
             <input
               type="text"
@@ -67,7 +66,7 @@
               id="username"
               autocomplete="username"
               required
-              class="shadow-xs bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-xs-light"
+              class="shadow-xs bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
             />
             <p v-if="errors.username" class="mt-2 text-sm text-red-500">{{ errors.username }}</p>
           </div>
@@ -75,7 +74,7 @@
 
         <!-- Password field -->
         <div class="mb-5">
-          <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
+          <label for="password" class="block mb-2 text-sm font-medium text-gray-900">Password</label>
           <div class="relative">
             <input
               :type="showPassword ? 'text' : 'password'"
@@ -83,13 +82,13 @@
               v-model="password"
               @input="checkPasswordStrength"
               placeholder="**** ****"
-              class="shadow-xs bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              class="shadow-xs bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
               required
             />
             <button
               type="button"
               @click="togglePassword"
-              class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 dark:text-gray-400"
+              class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500"
             >
               <svg
                 v-if="showPassword"
@@ -132,14 +131,14 @@
               :key="index"
               :class="[
                 'h-1.5 flex-1 rounded-full transition-all duration-300',
-                index < passwordStrength ? 'bg-blue-500' : 'bg-gray-200 dark:bg-gray-700'
+                index < passwordStrength ? 'bg-blue-500' : 'bg-gray-200'
               ]"
             ></div>
           </div>
 
           <!-- Password Requirements -->
           <div class="mt-3">
-            <p class="text-sm text-gray-700 dark:text-gray-300 mb-1">
+            <p class="text-sm text-gray-700 mb-1">
               Level: <span class="font-semibold">{{ strengthLevel }}</span>
             </p>
             <ul class="space-y-1">
@@ -166,7 +165,7 @@
 
         <!-- Confirm Password field -->
         <div class="mb-5">
-          <label for="confirmPassword" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Confirm Password</label>
+          <label for="confirmPassword" class="block mb-2 text-sm font-medium text-gray-900">Confirm Password</label>
           <div class="relative">
             <input
               :type="showConfirmPassword ? 'text' : 'password'"
@@ -174,13 +173,13 @@
               v-model="confirmPassword"
               @input="checkPasswordMatch"
               placeholder="**** ****"
-              class="shadow-xs bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              class="shadow-xs bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
               required
             />
             <button
               type="button"
               @click="toggleConfirmPassword"
-              class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 dark:text-gray-400"
+              class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500"
             >
               <svg
                 v-if="showConfirmPassword"
@@ -227,27 +226,27 @@
               id="terms"
               type="checkbox"
               v-model="form.terms"
-              class="w-4 h-4 border border-gray-300 rounded-sm bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800"
+              class="w-4 h-4 border border-gray-300 rounded-sm bg-gray-50 focus:ring-3 focus:ring-blue-300"
               required
             />
           </div>
-          <label for="terms" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-            I agree with the <a href="#" class="text-blue-600 hover:underline dark:text-blue-500">terms and conditions</a>
+          <label for="terms" class="ms-2 text-sm font-medium text-gray-900">
+            I agree with the <a href="#" class="text-blue-600 hover:underline">terms and conditions</a>
           </label>
         </div>
 
         <button
           type="submit"
-          class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
         >
           Submit
         </button>
       </form>
 
-      <p class="mt-10 text-center text-sm/6 text-gray-500">
+      <!-- <p class="mt-10 text-center text-sm/6 text-gray-500">
         Already a member? {{ ' ' }}
         <a href="/" class="font-semibold text-indigo-600 hover:text-indigo-500">Login</a>
-      </p>
+      </p> -->
     </div>
   </div>
 </template>

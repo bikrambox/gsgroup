@@ -1,42 +1,32 @@
 <!-- FileName: frontend\src\views\file_upload.vue -->
 <template>
   <div class="max-w-2xl mx-auto p-6">
-    <h2 class="text-5xl font-bold tracking-tight text-gray-600 dark:text-white sm:text-7xl text-center"
+    <h2 class="text-5xl font-bold tracking-tight text-gray-600 sm:text-7xl text-center"
       style="font-family: Helvetica, sans-serif;">BHS logistics</h2>
     <!-- File Input with Drag-and-Drop -->
     <div
-      class="border-2 border-dashed border-gray-300 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-800 bg-gray-50 dark:bg-black rounded-lg p-6 text-center relative mt-4"
+      class="border-2 border-dashed border-gray-300 hover:bg-gray-200 bg-gray-50 rounded-lg p-6 text-center relative mt-4"
       @dragover.prevent="handleDragOver" @dragleave.prevent="handleDragLeave" @drop.prevent="handleDrop"
-      :class="{ 'hover:bg-green-50 dark:hover:bg-green-700': isDragging }">
+      :class="{ 'hover:bg-green-50': isDragging }">
       <input type="file" ref="fileInput" @change="handleFileChange" class="hidden" accept=".json" multiple />
-      <div class="flex flex-col items-center hover:text-red-700 dark:hover:text-red-50">
-        <!-- <svg class="h-12 w-12 text-gray-500 dark:text-gray-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M7 16V4m0 0L3 8m4-4l4-4m10 12h-6m6 0l-4 4m0-8l-4-4m-2 12V8m0 0l-4 4m4-4l4 4" />
-        </svg> -->
-
-        <!-- <button @click="testProfileFetch" class="bg-blue-500 text-white px-4 py-2 rounded">
-  Test Profile Fetch
-</button> -->
-
-        <label class="text-gray-600 dark:text-gray-100 ">
+      <div class="flex flex-col items-center hover:text-red-700">
+        <label class="text-gray-600">
           Drag & Drop file here or
           <span @click="$refs.fileInput.click()" class="text-blue-600 cursor-pointer hover:underline">
             Choose file
           </span>
         </label>
-        <p class="text-sm text-gray-500 dark:text-gray-100 mt-2">
+        <p class="text-sm text-gray-500 mt-2">
           Supported formats: .json • Maximum size: 10MB
         </p>
       </div>
-
     </div>
 
     <!-- Selected Files List -->
     <div v-if="selectedFiles.length > 0" class="mt-4">
-      <p class="text-sm text-gray-600 dark:text-white ">Number of files: {{ selectedFiles.length }}</p>
+      <p class="text-sm text-gray-600">Number of files: {{ selectedFiles.length }}</p>
       <div v-for="(file, index) in selectedFiles" :key="index"
-        class="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded-lg mb-2">
+        class="flex items-center justify-between p-2 bg-gray-50 rounded-lg mb-2">
         <div class="flex items-center">
           <svg class="h-6 w-6 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path style="fill:#FBA026;" d="M442.879,325.778c3.298,97.524-89.057,175.55-186.879,175.514
@@ -52,7 +42,7 @@
                 d="M287.765,115.48c-3.369-4.858-10.042-6.067-14.902-2.697s-6.067,10.042-2.697,14.903l0.772,1.112
 		c2.08,3.003,5.417,4.612,8.812,4.612c2.103,0,4.229-0.618,6.089-1.906c4.862-3.369,6.073-10.039,2.705-14.901L287.765,115.48z" />
               <path style="fill:#231F20;" d="M453.586,325.573c-0.302-47.909-48.229-116.819-94.579-183.464
-		c-3.971-5.708-7.896-11.353-11.736-16.908c-0.037-0.054-0.075-0.107-0.113-0.16C301.761,61.874,270.569,14.82,266.134,7.16
+		c-3.971-5.708-7.896-11.353-11.736-16.908c-0.037-0.054-0.075-0.107-0.113-0.160C301.761,61.874,270.569,14.82,266.134,7.16
 		c-0.177-0.484-0.395-0.974-0.661-1.472c-1.816-3.408-5.337-5.572-9.167-5.682c-4.069-0.137-7.877,2.099-9.786,5.694
 		c-0.261,0.493-0.478,0.978-0.652,1.455c-4.435,7.658-35.631,54.72-81.025,117.883c-0.039,0.054-0.076,0.107-0.114,0.16
 		c-3.841,5.557-7.767,11.202-11.737,16.911c-46.35,66.645-94.276,135.554-94.578,183.463
@@ -77,19 +67,19 @@
             </g>
           </svg>
           <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-white">{{ file.name }}</p>
-            <p class="text-xs text-gray-500 dark:text-gray-100">{{ formatFileSize(file.size) }}</p>
+            <p class="text-sm font-medium text-gray-600">{{ file.name }}</p>
+            <p class="text-xs text-gray-500">{{ formatFileSize(file.size) }}</p>
           </div>
         </div>
         <div class="flex items-center">
           <div v-if="loading && fileProgress[index] !== undefined" class="w-1/3 mr-4">
-            <div class="bg-gray-200  rounded-full h-2">
+            <div class="bg-gray-200 rounded-full h-2">
               <div class="bg-blue-600 h-2 rounded-full" :style="{ width: `${fileProgress[index]}%` }"></div>
             </div>
             <p class="text-xs text-gray-500 text-right mt-1">{{ fileProgress[index] }}%</p>
           </div>
           <button @click="removeFile(index)"
-            class="text-red-400 dark:text-gray-50 hover:text-red-700 dark:hover:text-red-500 focus:outline-none"
+            class="text-red-400 hover:text-red-700 focus:outline-none"
             title="Remove file" :disabled="loading">
             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />

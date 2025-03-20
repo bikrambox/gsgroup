@@ -382,6 +382,116 @@ def logout_view(request):
     logout(request)
     return Response({"detail": "Successfully logged out."}, status=status.HTTP_200_OK)
 
+# @api_view(['POST'])
+# @permission_classes([IsAuthenticated])
+# def upload_json_file(request):
+#     """
+#     API endpoint to upload multiple JSON files to an FTPS server.
+#     Files are checked for .json extension, necessary folders are verified/created, then uploaded.
+#     """
+#     logger.debug(f"Received request.FILES: {dict(request.FILES)}")
+#     logger.debug(f"Request headers: {dict(request.headers)}")
+#     logger.debug(f"Request data: {request.data}")
+
+#     if not request.FILES:
+#         return Response(
+#             {'error': 'No files uploaded', 'details': 'request.FILES is empty'},
+#             status=status.HTTP_400_BAD_REQUEST
+#         )
+
+#     files = request.FILES.getlist('files')
+#     if not files:
+#         return Response(
+#             {'error': 'No files provided in the request (use key "files")'},
+#             status=status.HTTP_400_BAD_REQUEST
+#         )
+
+#     username = request.user.username
+#     today_date = datetime.now().strftime('%Y_%m_%d')
+#     ftp_base_path = f'/Reports/ELON_data/Upload_test/{username}_{today_date}'
+
+#     ftp = FTPConnection(authenticated_username=username)
+#     ftp_connect_result = ftp.connect()
+#     if ftp_connect_result['status'] != 'success':
+#         return Response(
+#             {'error': 'Failed to connect to FTPS server', 'details': ftp_connect_result['message']},
+#             status=status.HTTP_500_INTERNAL_SERVER_ERROR
+#         )
+
+#     try:
+#         mkdir_result = ftp.mkdir(ftp_base_path)
+#         if mkdir_result['status'] != 'success':
+#             return Response(
+#                 {'error': f"Failed to create directory {ftp_base_path}", 'details': mkdir_result['message']},
+#                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
+#             )
+
+#         try:
+#             ftp.ftp.cwd(ftp_base_path)
+#             logger.info(f"Successfully navigated to {ftp_base_path}")
+#         except ftplib.error_perm as e:
+#             logger.error(f"Failed to navigate to {ftp_base_path}: {e}")
+#             return Response(
+#                 {'error': f'Failed to navigate to directory {ftp_base_path}: {str(e)}'},
+#                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
+#             )
+
+#         results = []
+#         all_successful = True
+#         for uploaded_file in files:
+#             if not uploaded_file.name.lower().endswith('.json'):
+#                 result = {
+#                     'filename': uploaded_file.name,
+#                     'status': 'error',
+#                     'message': 'Only JSON files are allowed'
+#                 }
+#                 results.append(result)
+#                 all_successful = False
+#                 continue
+
+#             file_buffer = io.BytesIO(uploaded_file.read())
+#             ftp_result = ftp.upload_stream(file_buffer, uploaded_file.name, username)
+#             if ftp_result['status'] == 'success':
+#                 result = {
+#                     'filename': uploaded_file.name,
+#                     'status': 'success',
+#                     'ftp_path': ftp_result['file_path'],
+#                     'message': ftp_result['message']
+#                 }
+#                 results.append(result)
+#             else:
+#                 logger.error(f"FTPS upload failed for {uploaded_file.name}: {ftp_result['message']}")
+#                 result = {
+#                     'filename': uploaded_file.name,
+#                     'status': 'error',
+#                     'message': ftp_result['message']
+#                 }
+#                 results.append(result)
+#                 all_successful = False
+
+#         if all_successful:
+#             return Response({
+#                 'message': 'File upload processing completed',
+#                 'results': results,
+#                 'user': username
+#             }, status=status.HTTP_200_OK)
+#         else:
+#             return Response({
+#                 'message': 'File upload processing completed with errors',
+#                 'results': results,
+#                 'user': username
+#             }, status=status.HTTP_400_BAD_REQUEST)
+
+#     except Exception as e:
+#         logger.error(f"Unexpected error during file upload: {str(e)}")
+#         return Response(
+#             {'error': f'Unexpected error: {str(e)}'},
+#             status=status.HTTP_500_INTERNAL_SERVER_ERROR
+#         )
+#     finally:
+#         ftp.disconnect()
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def upload_json_file(request):
@@ -410,7 +520,8 @@ def upload_json_file(request):
     today_date = datetime.now().strftime('%Y_%m_%d')
     ftp_base_path = f'/Reports/ELON_data/Upload_test/{username}_{today_date}'
 
-    ftp = FTPConnection(authenticated_username=username)
+    # Fix: Use authenticated_user instead of authenticated_username, and pass the full user object
+    ftp = FTPConnection(authenticated_user=request.user)
     ftp_connect_result = ftp.connect()
     if ftp_connect_result['status'] != 'success':
         return Response(
@@ -450,7 +561,8 @@ def upload_json_file(request):
                 continue
 
             file_buffer = io.BytesIO(uploaded_file.read())
-            ftp_result = ftp.upload_stream(file_buffer, uploaded_file.name, username)
+            # Fix: Update the upload_stream call to remove the user_identifier parameter
+            ftp_result = ftp.upload_stream(file_buffer, uploaded_file.name)
             if ftp_result['status'] == 'success':
                 result = {
                     'filename': uploaded_file.name,

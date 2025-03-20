@@ -1,3 +1,61 @@
+// // frontend/src/router/index.js
+// import { createRouter, createWebHistory } from 'vue-router'
+// import { useAuthStore } from '../stores/auth'
+
+// const routes = [
+//   {
+//     path: '/',
+//     component: () => import('../views/Login.vue'),
+//   },
+//   {
+//     path: '/register',
+//     component: () => import('../views/Sign_up.vue'),
+//   },
+//   {
+//     path: '/adminlogin',
+//     component: () => import('../views/AdminLoginView.vue'),
+//   },
+//   {
+//     path: '/admindashboard',
+//     component: () => import('../views/AdminView.vue'),
+//     meta: { requiresAuth: true, requiresAdmin: true },
+//   },
+//   {
+//     path: '/fileupload',
+//     component: () => import('../views/file_upload.vue'),
+//     meta: { requiresAuth: true },
+//   },
+// ]
+
+// const router = createRouter({
+//   history: createWebHistory(),
+//   routes,
+// })
+
+// router.beforeEach(async (to, from, next) => {
+//   const authStore = useAuthStore()
+//   await authStore.checkAuth()
+//   const isAuthenticated = authStore.isAuthenticated
+//   const isAdmin = authStore.user?.profile_summary?.is_staff || false
+
+//   if (to.meta.requiresAuth && !isAuthenticated) {
+//     next('/')
+//   } else if (to.meta.requiresAdmin && (!isAuthenticated || !isAdmin)) {
+//     next('/adminlogin')
+//   } else if (to.path === '/' && isAuthenticated) {
+//     next('/fileupload')
+//   } else if (to.path === '/register' && isAuthenticated) {
+//     next('/fileupload')
+//   } else if (to.path === '/adminlogin' && isAuthenticated && isAdmin) {
+//     next('/admindashboard')
+//   } else {
+//     next()
+//   }
+// })
+
+// export default router
+
+
 // frontend/src/router/index.js
 
 import { createRouter, createWebHistory } from 'vue-router'
@@ -20,7 +78,7 @@ const routes = [
     meta: { requiresAuth: false },
   },
   {
-    path: '/admin',
+    path: '/adminlogin',
     component: () => import('../views/AdminLoginView.vue'),
     meta: { requiresAuth: false },
   },
@@ -46,12 +104,12 @@ router.beforeEach(async (to, from, next) => {
   if (to.meta.requiresAuth && !isAuthenticated) {
     next('/'); // Redirect to login if not authenticated
   } else if (to.meta.requiresSuperuser && (!isAuthenticated || !isAdmin)) {
-    next('/admin'); // Redirect to admin login if not a superuser
+    next('/adminlogin'); // Redirect to admin login if not a superuser
   } else if (to.path === '/' && isAuthenticated) {
     next('/fileupload'); // Redirect authenticated users to fileupload
   } else if (to.path === '/register' && isAuthenticated) {
     next('/fileupload'); // Redirect authenticated users to fileupload
-  } else if (to.path === '/admin' && isAuthenticated && isAdmin) {
+  } else if (to.path === '/adminlogin' && isAuthenticated && isAdmin) {
     next('/admindashboard'); // Redirect authenticated superusers to admin dashboard
   } else {
     next();

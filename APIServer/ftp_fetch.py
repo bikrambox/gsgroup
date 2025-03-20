@@ -224,7 +224,75 @@ class FTPConnection:
 
         return {"status": "success", "message": f"Directory {normalized_path} ensured"}
 
-    def upload_stream(self, file_buffer, original_filename, user_identifier):
+    # def upload_stream(self, file_buffer, original_filename, user_identifier):
+    #     """Upload a file stream to the FTPS server with the specified naming convention."""
+    #     if not self.ensure_connected():
+    #         logger.warning("Attempted to upload file without active connection")
+    #         return {"status": "error", "message": "Not connected to FTPS server"}
+
+    #     try:
+    #         if not original_filename.lower().endswith('.json'):
+    #             return {"status": "error", "message": "Only JSON files are allowed"}
+
+    #         base_filename = original_filename.replace(' ', '_')
+    #         # Use a sanitized version of the email as the prefix (replace @ and . with _)
+    #         sanitized_email = user_identifier.replace('@', '_').replace('.', '_')
+    #         prefixed_filename = f"{sanitized_email}_{base_filename}"
+
+    #         base_path = '/Reports/ELON_data/Upload_test'
+    #         today = time.strftime('%Y_%m_%d')
+    #         folder_name = f"{sanitized_email}_{today}"
+    #         upload_dir = f"{base_path}/{folder_name}"
+
+    #         mkdir_result = self.mkdir(upload_dir)
+    #         if mkdir_result['status'] != 'success':
+    #             return mkdir_result
+
+    #         try:
+    #             self.ftp.cwd(upload_dir)
+    #             logger.info(f"Successfully navigated to {upload_dir}")
+    #         except ftplib.error_perm as e:
+    #             logger.error(f"Failed to navigate to {upload_dir}: {e}")
+    #             return {"status": "error", "message": f"Failed to navigate to directory {upload_dir}: {str(e)}"}
+
+    #         list_result = self.list_dir(upload_dir)
+    #         if list_result['status'] != 'success':
+    #             logger.warning(f"Could not list directory {upload_dir} to check for duplicates")
+    #         else:
+    #             existing_files = [item['name'] for item in list_result['data'] if not item['is_dir']]
+    #             counter = 0
+    #             new_filename = prefixed_filename
+    #             while new_filename in existing_files:
+    #                 counter += 1
+    #                 name, ext = os.path.splitext(prefixed_filename)
+    #                 new_filename = f"{name}_{counter:02d}{ext}"
+
+    #         self.ftp.voidcmd("TYPE I")
+    #         logger.info("Set binary mode")
+    #         file_buffer.seek(0)
+    #         logger.info(f"Attempting to upload file {original_filename} as {new_filename}...")
+    #         self.ftp.storbinary(f"STOR {new_filename}", file_buffer)
+    #         logger.info(f"Successfully uploaded {original_filename} as {new_filename} to {upload_dir}")
+
+    #         return {
+    #             "status": "success",
+    #             "message": f"File uploaded successfully to {upload_dir}/{new_filename}",
+    #             "file_path": f"{upload_dir}/{new_filename}"
+    #         }
+
+    #     except ftplib.error_perm as e:
+    #         logger.error(f"Permission error during upload: {e}")
+    #         return {"status": "error", "message": f"Permission error during upload: {e}"}
+    #     except ssl.SSLError as e:
+    #         logger.error(f"TLS/SSL error during upload: {e}")
+    #         return {"status": "error", "message": f"TLS/SSL error during upload: {e}"}
+    #     except Exception as e:
+    #         logger.error(f"Error uploading file via FTPS: {e}")
+    #         return {"status": "error", "message": f"Error uploading file via FTPS: {e}"}
+
+
+        # APIServer/ftp_fetch.py
+    def upload_stream(self, file_buffer, original_filename):
         """Upload a file stream to the FTPS server with the specified naming convention."""
         if not self.ensure_connected():
             logger.warning("Attempted to upload file without active connection")
@@ -235,13 +303,15 @@ class FTPConnection:
                 return {"status": "error", "message": "Only JSON files are allowed"}
 
             base_filename = original_filename.replace(' ', '_')
-            # Use a sanitized version of the email as the prefix (replace @ and . with _)
-            sanitized_email = user_identifier.replace('@', '_').replace('.', '_')
-            prefixed_filename = f"{sanitized_email}_{base_filename}"
+            # Use the username from authenticated_user instead of user_identifier
+            if not self.authenticated_user:
+                return {"status": "error", "message": "No authenticated user provided"}
+            sanitized_username = self.authenticated_user.username.replace('@', '_').replace('.', '_')
+            prefixed_filename = f"{sanitized_username}_{base_filename}"
 
             base_path = '/Reports/ELON_data/Upload_test'
             today = time.strftime('%Y_%m_%d')
-            folder_name = f"{sanitized_email}_{today}"
+            folder_name = f"{sanitized_username}_{today}"
             upload_dir = f"{base_path}/{folder_name}"
 
             mkdir_result = self.mkdir(upload_dir)

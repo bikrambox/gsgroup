@@ -79,9 +79,10 @@ export default {
 </style> -->
 
 
+
 <!-- frontend/src/App.vue -->
 <template>
-  <div class="min-h-screen">
+  <div class=" min-h-screen">
     <Navbar />
     <router-view></router-view>
   </div>
@@ -106,12 +107,25 @@ onMounted(async () => {
   // Check authentication status on app load
   await authStore.checkAuth()
 
+  // Set up dark mode handling
+  const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+  handleDarkMode(darkModeMediaQuery)
+  darkModeMediaQuery.addEventListener('change', handleDarkMode)
+
   // Listen for the token-expired event
   window.addEventListener('token-expired', handleTokenExpired)
 })
 
 onUnmounted(() => {
+  // Clean up dark mode event listener
+  const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+  darkModeMediaQuery.removeEventListener('change', handleDarkMode)
+
   // Clean up token-expired event listener
   window.removeEventListener('token-expired', handleTokenExpired)
 })
+
+const handleDarkMode = (e) => {
+  console.log('System dark mode is:', e.matches ? 'on' : 'off')
+}
 </script>

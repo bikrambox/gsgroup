@@ -1,6 +1,6 @@
 <template>
-  <div class="min-h-screen flex flex-col bg-gray-50">
-    <!-- <AdminHeader :show-logout="false" /> -->
+  <div class="min-h-screen flex flex-col">
+    
 
     <div class="flex-1 flex items-center justify-center">
       <div class="max-w-md w-full space-y-8 p-8 bg-white rounded-xl shadow-lg">
